@@ -14,6 +14,7 @@
     "itv": "tsx src/interfaces/cli/index.ts",
     "mcp": "tsx src/interfaces/mcp/server.ts",
     "build": "tsc && node scripts/build-mcp-app.mjs",
+    "build:vscode": "node scripts/build-vscode-extension.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
