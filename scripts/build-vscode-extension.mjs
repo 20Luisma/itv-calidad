@@ -17,6 +17,7 @@ function buildContentTypesXml() {
   <Default Extension=".js" ContentType="application/javascript"/>
   <Default Extension=".map" ContentType="application/json"/>
   <Default Extension=".svg" ContentType="image/svg+xml"/>
+  <Default Extension=".png" ContentType="image/png"/>
   <Default Extension=".md" ContentType="text/markdown"/>
   <Default Extension=".vsixmanifest" ContentType="text/xml"/>
 </Types>
@@ -34,6 +35,7 @@ function buildVsixManifest(pkg) {
     <Description xml:space="preserve">${pkg.description}</Description>
     <Tags>${tags}</Tags>
     <Categories>${categories}</Categories>
+    <Icon>extension/media/icon.png</Icon>
     <Properties>
       <Property Id="Microsoft.VisualStudio.Code.Engine" Value="${pkg.engines.vscode}" />
       <Property Id="Microsoft.VisualStudio.Code.ExtensionDependencies" Value="" />
@@ -48,6 +50,7 @@ function buildVsixManifest(pkg) {
   <Assets>
     <Asset Type="Microsoft.VisualStudio.Code.Manifest" Path="extension/package.json" Addressable="true" />
     <Asset Type="Microsoft.VisualStudio.Services.Content.Details" Path="extension/README.md" Addressable="true" />
+    <Asset Type="Microsoft.VisualStudio.Services.Icons.Default" Path="extension/media/icon.png" Addressable="true" />
   </Assets>
 </PackageManifest>
 `;
