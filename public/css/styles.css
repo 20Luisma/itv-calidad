@@ -279,6 +279,122 @@ code {
   padding: 0 14px;
 }
 
+.btn--header {
+  height: 36px;
+  padding: 0 13px;
+  font-size: 0.8rem;
+}
+
+.btn--tiny {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 0.76rem;
+}
+
+.alert--info {
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #bae6fd;
+}
+
+/* Integrations Modal */
+.modal {
+  width: min(740px, 94vw);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-strong);
+  background: #0c1324;
+  color: var(--text-primary);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.75);
+}
+
+.modal::backdrop {
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.integration-group {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.integration-group__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.integration-group__title {
+  margin: 0;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.integration-group__link {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+.integration-group__link:hover {
+  text-decoration: underline;
+}
+
+.modal__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.modal__grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 700px) {
+  .modal__grid,
+  .modal__grid--three {
+    grid-template-columns: 1fr;
+  }
+}
+
+.integration-group__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
 .field__label {
   font-size: 0.76rem;
   font-weight: 700;

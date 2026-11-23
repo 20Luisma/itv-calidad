@@ -6,6 +6,11 @@ import { exportReportAsMarkdown } from '../../application/ExportReportMarkdown.j
 import { RunItvInspection } from '../../application/RunItvInspection.js';
 import { ORDERED_STATION_IDS, STATION_CATALOG } from '../../domain/catalog.js';
 import type { CommandExecutor, InspectionReport, StationRunner } from '../../domain/types.js';
+import {
+  getIntegrationsStatus,
+  saveIntegrationsEnv,
+  type IntegrationsUpdatePayload
+} from '../../infrastructure/config/loadDotEnv.js';
 import { SafeCommandExecutor } from '../../infrastructure/exec/SafeCommandExecutor.js';
 import { createDefaultStations } from '../../infrastructure/stations/index.js';
 
@@ -54,6 +59,7 @@ async function readBody(req: IncomingMessage, maxBytes = 1024 * 1024): Promise<s
 export interface WebServerDependencies {
   readonly publicDir?: string;
   readonly defaultRepoPath?: string;
+  readonly envDir?: string;
   readonly stations?: readonly StationRunner[];
   readonly executor?: CommandExecutor;
   readonly pickFolder?: () => Promise<string | null>;
@@ -86,6 +92,7 @@ async function pickLocalFolderMac(executor: CommandExecutor): Promise<string | n
 export function createWebServer(deps: WebServerDependencies = {}): Server {
   const publicDir = deps.publicDir ?? DEFAULT_PUBLIC_DIR;
   const defaultRepoPath = deps.defaultRepoPath ?? process.cwd();
+  const envDir = deps.envDir ?? process.cwd();
   const executor = deps.executor ?? new SafeCommandExecutor();
   const stations = deps.stations ?? createDefaultStations();
   const pickFolder = deps.pickFolder ?? (() => pickLocalFolderMac(executor));
@@ -121,6 +128,26 @@ export function createWebServer(deps: WebServerDependencies = {}): Server {
           return;
         }
         sendJson(res, 200, { cancelled: false, path: selectedPath });
+        return;
+      }
+
+      // 2c. Estado y guardado seguro de integraciones (SonarCloud, Sentry, GitHub) — nunca devuelve tokens
+      if (req.method === 'GET' && pathname === '/api/integrations') {
+        sendJson(res, 200, getIntegrationsStatus());
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/integrations') {
+        const raw = await readBody(req, 64 * 1024);
+        let payload: IntegrationsUpdatePayload;
+        try {
+          payload = JSON.parse(raw) as IntegrationsUpdatePayload;
+        } catch {
+          sendJson(res, 400, { error: 'JSON inválido para integraciones.' });
+          return;
+        }
+        const updated = await saveIntegrationsEnv(payload, envDir);
+        sendJson(res, 200, updated);
         return;
       }
 

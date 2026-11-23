@@ -28,6 +28,9 @@
             <span class="pill pill--neutral" id="stack-pill">Stack: pendiente</span>
             <span class="pill pill--neutral" id="branch-pill">Rama: —</span>
           </div>
+          <button type="button" id="btn-integrations" class="btn btn--secondary btn--header">
+            ⚙ Integraciones
+          </button>
           <div
             id="traffic-light"
             class="traffic-light"
@@ -205,6 +208,103 @@
         <span>Cero falsos verdes · Solo lectura sobre el repositorio inspeccionado</span>
       </div>
     </footer>
+
+    <dialog id="integrations-modal" class="modal" aria-labelledby="integrations-title">
+      <div class="modal__header">
+        <div>
+          <h2 id="integrations-title" class="section-title">Integraciones opcionales (Estación 7)</h2>
+          <p class="section-hint">
+            Guardá tus tokens en <code>.env</code> local (<code>chmod 600</code>, nunca subidos a Git ni visibles al navegador). La Estación 7 cambia automáticamente a los servicios que conectes.
+          </p>
+        </div>
+        <button type="button" id="btn-close-integrations" class="btn btn--ghost btn--compact" aria-label="Cerrar panel de integraciones">
+          Cerrar
+        </button>
+      </div>
+
+      <form id="integrations-form" class="modal__body">
+        <section class="integration-group">
+          <div class="integration-group__head">
+            <div>
+              <h3 class="integration-group__title">SonarCloud / SonarQube (Gratis para repos públicos)</h3>
+              <a class="integration-group__link" href="https://sonarcloud.io/account/security" target="_blank" rel="noopener noreferrer">
+                Generar token en SonarCloud ↗
+              </a>
+            </div>
+            <span id="badge-sonar" class="status-chip status-chip--pending">Sin conectar</span>
+          </div>
+          <div class="modal__grid">
+            <div class="field">
+              <label for="int-sonar-token" class="field__label">SONAR_TOKEN</label>
+              <input id="int-sonar-token" type="password" class="field__input" placeholder="Dejar vacío para mantener actual" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="int-sonar-key" class="field__label">Project Key (opcional)</label>
+              <input id="int-sonar-key" type="text" class="field__input" placeholder="Auto desde sonar-project.properties" autocomplete="off" />
+            </div>
+          </div>
+          <div class="integration-group__actions">
+            <button type="button" id="btn-clear-sonar" class="btn btn--ghost btn--tiny" hidden>Desconectar Sonar</button>
+          </div>
+        </section>
+
+        <section class="integration-group">
+          <div class="integration-group__head">
+            <div>
+              <h3 class="integration-group__title">Sentry (Plan Developer gratis)</h3>
+              <a class="integration-group__link" href="https://sentry.io/settings/account/api/auth-tokens/" target="_blank" rel="noopener noreferrer">
+                Generar Auth Token en Sentry ↗
+              </a>
+            </div>
+            <span id="badge-sentry" class="status-chip status-chip--pending">Sin conectar</span>
+          </div>
+          <div class="modal__grid modal__grid--three">
+            <div class="field">
+              <label for="int-sentry-token" class="field__label">SENTRY_AUTH_TOKEN</label>
+              <input id="int-sentry-token" type="password" class="field__input" placeholder="Dejar vacío para mantener actual" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="int-sentry-org" class="field__label">Organización (slug)</label>
+              <input id="int-sentry-org" type="text" class="field__input" placeholder="mi-org" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="int-sentry-project" class="field__label">Proyecto (slug)</label>
+              <input id="int-sentry-project" type="text" class="field__input" placeholder="mi-proyecto" autocomplete="off" />
+            </div>
+          </div>
+          <div class="integration-group__actions">
+            <button type="button" id="btn-clear-sentry" class="btn btn--ghost btn--tiny" hidden>Desconectar Sentry</button>
+          </div>
+        </section>
+
+        <section class="integration-group">
+          <div class="integration-group__head">
+            <div>
+              <h3 class="integration-group__title">GitHub Security &amp; Dependabot (Gratis)</h3>
+              <a class="integration-group__link" href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer">
+                Generar Personal Access Token en GitHub ↗
+              </a>
+            </div>
+            <span id="badge-github" class="status-chip status-chip--pending">Sin conectar</span>
+          </div>
+          <div class="field">
+            <label for="int-github-token" class="field__label">GITHUB_TOKEN (owner/repo se autodetecta desde .git/config)</label>
+            <input id="int-github-token" type="password" class="field__input" placeholder="Dejar vacío para mantener actual" autocomplete="off" />
+          </div>
+          <div class="integration-group__actions">
+            <button type="button" id="btn-clear-github" class="btn btn--ghost btn--tiny" hidden>Desconectar GitHub</button>
+          </div>
+        </section>
+
+        <div id="integrations-msg" class="alert alert--info" role="status" hidden></div>
+
+        <div class="modal__footer">
+          <button type="submit" id="btn-save-integrations" class="btn btn--primary">
+            Guardar en .env local
+          </button>
+        </div>
+      </form>
+    </dialog>
 
     <script type="module" src="/js/app.js"></script>
   </body>
