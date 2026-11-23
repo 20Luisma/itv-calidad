@@ -8,6 +8,8 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 
 > **Solo lectura y 100% local:** corre íntegramente en tu máquina sin API keys obligatorias, sin tokens pagos, sin telemetría y **sin modificar ni borrar nunca ningún archivo** del repositorio inspeccionado.
 
+![Demo en vivo de ITV de Código (MCP App embebida pasando las 7 estaciones en Antigravity)](docs/assets/itv-mcp-demo.gif)
+
 ---
 
 ## ¿Qué hace realmente (y qué NO hace)?
