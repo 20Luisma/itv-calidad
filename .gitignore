@@ -1,0 +1,21 @@
+# Dependencias y build
+node_modules/
+dist/
+build/
+coverage/
+
+# Entorno y secretos locales
+.env
+.env.local
+.env.*.local
+
+# Sistema y editor
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Reportes temporales de pruebas
+playwright-report/
+test-results/
+.lighthouseci/
