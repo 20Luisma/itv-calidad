@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ITV Didáctica de Código — Inspección Local Pre-Push</title>
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="container topbar__inner">
+        <div class="brand">
+          <div class="brand__badge" aria-hidden="true">ITV</div>
+          <div>
+            <h1 class="brand__title">ITV Didáctica de Código</h1>
+            <p class="brand__subtitle">
+              Inspección técnica local en cámara lenta · 0 cuentas · 100% solo lectura
+            </p>
+          </div>
+        </div>
+        <div class="topbar__pills">
+          <span class="pill pill--neutral" id="stack-pill">Stack: pendiente</span>
+          <span class="pill pill--neutral" id="branch-pill">Rama: —</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="container main-content">
+      <section class="card control-panel" aria-labelledby="control-title">
+        <div class="control-panel__header">
+          <h2 id="control-title" class="section-title">Configurar línea de inspección</h2>
+          <p class="section-hint">
+            Indicá la ruta absoluta de cualquier repositorio local (PHP, Node/TS o Python) antes de hacer <code>git push</code>.
+          </p>
+        </div>
+
+        <form id="inspection-form" class="control-form">
+          <div class="field field--grow">
+            <label for="repo-path" class="field__label">Ruta local del repositorio</label>
+            <input
+              id="repo-path"
+              name="repoPath"
+              type="text"
+              class="field__input"
+              placeholder="/Users/admin/Desktop/Proyectos/mi-repo"
+              autocomplete="off"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="slow-motion" class="field__label">Velocidad didáctica</label>
+            <select id="slow-motion" name="slowMotionMs" class="field__select">
+              <option value="1200" selected>Cámara lenta (1.2s)</option>
+              <option value="600">Normal (0.6s)</option>
+              <option value="0">Rápida (sin pausas)</option>
+            </select>
+          </div>
+
+          <div class="field field--compact">
+            <label for="min-coverage" class="field__label">Cobertura mín. (%)</label>
+            <input
+              id="min-coverage"
+              name="minCoverage"
+              type="number"
+              min="0"
+              max="100"
+              value="75"
+              class="field__input"
+            />
+          </div>
+
+          <div class="control-actions">
+            <button type="submit" id="btn-start" class="btn btn--primary">
+              Iniciar ITV
+            </button>
+            <button type="button" id="btn-stop" class="btn btn--ghost" hidden>
+              Detener
+            </button>
+          </div>
+        </form>
+
+        <div id="error-banner" class="alert alert--error" role="alert" hidden></div>
+      </section>
+
+      <section class="card track-panel" aria-labelledby="track-title">
+        <div class="track-panel__header">
+          <h2 id="track-title" class="section-title">Línea de 6 estaciones</h2>
+          <span id="live-status" class="live-status">Lista para inspeccionar</span>
+        </div>
+        <ol id="station-track" class="station-track" aria-label="Progreso por estación"></ol>
+      </section>
+
+      <section id="verdict-section" class="card verdict-panel" aria-live="polite" hidden>
+        <div class="verdict-panel__main">
+          <div>
+            <span id="verdict-badge" class="verdict-badge">VEREDICTO</span>
+            <h2 id="verdict-title" class="verdict-title">Resultado de la inspección</h2>
+            <p id="verdict-desc" class="verdict-desc"></p>
+          </div>
+          <div class="verdict-actions">
+            <button type="button" id="btn-export-md" class="btn btn--secondary">
+              Exportar Evidencia (.md)
+            </button>
+            <button type="button" id="btn-export-json" class="btn btn--ghost">
+              Exportar JSON
+            </button>
+          </div>
+        </div>
+        <div id="verdict-metrics" class="verdict-metrics"></div>
+      </section>
+
+      <section class="stations-section" aria-labelledby="stations-title">
+        <div class="stations-section__header">
+          <h2 id="stations-title" class="section-title">Detalle didáctico por estación</h2>
+          <p class="section-hint">
+            Hacé clic en cualquier estación para ver qué revisa, el comando exacto, la salida real y cómo arreglar cada hallazgo.
+          </p>
+        </div>
+        <div id="stations-grid" class="stations-grid"></div>
+      </section>
+
+      <section
+        id="checklist-section"
+        class="card checklist-panel"
+        aria-labelledby="checklist-title"
+        hidden
+      >
+        <div class="checklist-panel__header">
+          <div>
+            <h2 id="checklist-title" class="section-title">
+              Checklist de Tranquilidad / Diligencia Debida en Seguridad
+            </h2>
+            <p id="checklist-disclaimer" class="section-hint"></p>
+          </div>
+          <div id="checklist-score" class="score-ring" aria-label="Puntaje de controles automáticos"></div>
+        </div>
+
+        <div class="checklist-columns">
+          <div>
+            <h3 class="checklist-subtitle">Verificado automáticamente en tu código</h3>
+            <ul id="checklist-automated" class="checklist-list"></ul>
+          </div>
+          <div>
+            <h3 class="checklist-subtitle">Cobertura operativa y contractual (fuera del código)</h3>
+            <ul id="checklist-operational" class="checklist-list"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <span>ITV Didáctica de Código · Ejecución 100% local sin tokens ni telemetría</span>
+        <span>Cero falsos verdes · Solo lectura sobre el repositorio inspeccionado</span>
+      </div>
+    </footer>
+
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>

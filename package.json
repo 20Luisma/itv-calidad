@@ -1,0 +1,34 @@
+{
+  "name": "itv-didactica-codigo",
+  "version": "1.0.0",
+  "description": "Herramienta 100% local (CLI + Dashboard Web en cámara lenta) que inspecciona repositorios antes de git push pasando por 6 estaciones didácticas de calidad.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "itv-codigo": "./dist/interfaces/cli/index.js"
+  },
+  "scripts": {
+    "dev": "tsx watch src/interfaces/web/server.ts",
+    "start": "tsx src/interfaces/web/server.ts",
+    "itv": "tsx src/interfaces/cli/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "audit:deps": "npm audit --audit-level=moderate"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^5.1.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^5.1.1"
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-darwin-arm64": "^1.3.3"
+  }
+}
