@@ -99,9 +99,22 @@ declare module 'vscode' {
     readonly name: string;
   }
 
+  export interface SecretStorage {
+    get(key: string): Thenable<string | undefined>;
+    store(key: string, value: string): Thenable<void>;
+    delete(key: string): Thenable<void>;
+  }
+
+  export interface Memento {
+    get<T>(key: string): T | undefined;
+    update(key: string, value: unknown): Thenable<void>;
+  }
+
   export interface ExtensionContext {
     readonly subscriptions: Disposable[];
     readonly extensionUri: Uri;
+    readonly secrets: SecretStorage;
+    readonly globalState: Memento;
   }
 
   export namespace workspace {

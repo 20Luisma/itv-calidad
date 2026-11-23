@@ -77,6 +77,11 @@
       {
         "command": "itvCalidad.openFinding",
         "title": "ITV: Abrir archivo en hallazgo"
+      },
+      {
+        "command": "itvCalidad.configureIntegrations",
+        "title": "ITV: Configurar integraciones (Sonar / Sentry / GitHub)",
+        "icon": "$(gear)"
       }
     ],
     "menus": {

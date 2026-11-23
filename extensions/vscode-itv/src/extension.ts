@@ -6,6 +6,7 @@ import type { InspectionReport } from '../../../src/domain/types.js';
 import { loadLocalEnv } from '../../../src/infrastructure/config/loadDotEnv.js';
 import { SafeCommandExecutor } from '../../../src/infrastructure/exec/SafeCommandExecutor.js';
 import { createDefaultStations } from '../../../src/infrastructure/stations/index.js';
+import { IntegrationsStore } from './IntegrationsStore.js';
 import { ItvTreeProvider } from './ItvTreeProvider.js';
 import { ItvWebviewProvider } from './ItvWebviewProvider.js';
 
@@ -29,6 +30,7 @@ async function resolveTargetFolder(): Promise<string | null> {
 }
 
 export function activate(context: vscode.ExtensionContext): void {
+  const integrationsStore = new IntegrationsStore(context);
   const treeProvider = new ItvTreeProvider();
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
   statusBar.text = '$(shield) ITV';
@@ -46,6 +48,7 @@ export function activate(context: vscode.ExtensionContext): void {
     if (!repoPath) return;
 
     loadLocalEnv(repoPath);
+    await integrationsStore.applyToProcessEnv();
     const controller = new AbortController();
     activeController = controller;
     treeProvider.reset(repoPath);
@@ -135,6 +138,17 @@ export function activate(context: vscode.ExtensionContext): void {
     onStop: stopInspection,
     onExport: () => {
       void exportMarkdown();
+    },
+    onRequestIntegrations: () => {
+      void integrationsStore.getPublicStatus().then((st) => webviewProvider.postIntegrationsStatus(st));
+    },
+    onSaveIntegrations: (update) => {
+      void integrationsStore.save(update).then((st) => {
+        webviewProvider.postIntegrationsStatus(st, true);
+        void vscode.window.showInformationMessage(
+          `ITV de Código: integraciones guardadas (${st.activeCount} activas).`
+        );
+      });
     }
   });
 
@@ -147,7 +161,10 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('itvCalidad.runInspection', runInspection),
     vscode.commands.registerCommand('itvCalidad.stopInspection', stopInspection),
     vscode.commands.registerCommand('itvCalidad.exportMarkdown', exportMarkdown),
-    vscode.commands.registerCommand('itvCalidad.openFinding', openFinding)
+    vscode.commands.registerCommand('itvCalidad.openFinding', openFinding),
+    vscode.commands.registerCommand('itvCalidad.configureIntegrations', () => {
+      webviewProvider.openIntegrationsPanel();
+    })
   );
 }
 
