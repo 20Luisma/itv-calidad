@@ -52,7 +52,7 @@ describe('HTTP & SSE Web Server', () => {
 
     const stationsRes = await fetch(`${baseUrl}/api/stations`);
     const stationsJson = (await stationsRes.json()) as { stations: unknown[] };
-    expect(stationsJson.stations).toHaveLength(6);
+    expect(stationsJson.stations).toHaveLength(7);
   });
 
   it('bloquea intentos de path traversal en archivos estáticos', async () => {

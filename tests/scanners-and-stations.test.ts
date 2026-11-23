@@ -191,7 +191,7 @@ describe('Coverage extraction & RunItvInspection end-to-end', () => {
       (event) => events.push(event)
     );
 
-    expect(report.stations).toHaveLength(6);
+    expect(report.stations).toHaveLength(7);
     expect(report.stations[2]?.id).toBe('tests-coverage');
     expect(report.stations[2]?.status).toBe('fail');
     expect(report.blocksPush).toBe(true);

@@ -78,6 +78,19 @@ export const STATION_CATALOG: Readonly<Record<StationId, StationMetadata>> = {
         'Una interfaz inaccesible excluye usuarios con lectores de pantalla o navegación por teclado y suele empeorar SEO y mantenibilidad.',
       toolsByStack: '@axe-core/playwright / Pa11y / Lighthouse + auditoría estática HTML'
     }
+  },
+  'code-health-observability': {
+    id: 'code-health-observability',
+    order: 7,
+    name: 'Estación 7 — Calidad Sonar y Observabilidad (Sentry)',
+    shortName: 'Sonar & Sentry',
+    didactic: {
+      whatItChecks:
+        'Analiza deuda técnica local tipo Sonar (archivos monolíticos, complejidad ciclomática, bloques duplicados, debugger/var_dump olvidados) y audita observabilidad fail-safe / Sentry (DSN en .env, RGPD PII, handlers globales).',
+      whyItMatters:
+        'El código duplicado o demasiado complejo dispara el costo de mantenimiento, y desplegar sin observabilidad o con un DSN/PII mal configurado te deja ciego ante fallos en producción.',
+      toolsByStack: 'Escáner local tipo Sonar + auditoría Sentry/observabilidad (0 cuentas obligatorias)'
+    }
   }
 };
 
@@ -87,5 +100,6 @@ export const ORDERED_STATION_IDS: readonly StationId[] = [
   'tests-coverage',
   'security-cves',
   'e2e-browser',
-  'accessibility-ui'
+  'accessibility-ui',
+  'code-health-observability'
 ];

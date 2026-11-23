@@ -1,5 +1,6 @@
 import type { StationRunner } from '../../domain/types.js';
 import { AccessibilityUiStation } from './AccessibilityUiStation.js';
+import { CodeHealthObservabilityStation } from './CodeHealthObservabilityStation.js';
 import { E2eBrowserStation } from './E2eBrowserStation.js';
 import { SecurityCvesStation } from './SecurityCvesStation.js';
 import { StaticTypesStation } from './StaticTypesStation.js';
@@ -13,6 +14,7 @@ export function createDefaultStations(): readonly StationRunner[] {
     new TestsCoverageStation(),
     new SecurityCvesStation(),
     new E2eBrowserStation(),
-    new AccessibilityUiStation()
+    new AccessibilityUiStation(),
+    new CodeHealthObservabilityStation()
   ];
 }

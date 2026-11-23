@@ -3,6 +3,10 @@ import { createWebServer } from './httpApp.js';
 const PORT = Number(process.env.PORT ?? 4173);
 const HOST = process.env.HOST ?? '127.0.0.1';
 
+process.on('unhandledRejection', (reason) => {
+  console.error('[ITV] Promesa no controlada:', reason);
+});
+
 const server = createWebServer();
 
 server.listen(PORT, HOST, () => {
