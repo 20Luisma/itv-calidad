@@ -6,7 +6,8 @@ export type StationId =
   | 'tests-coverage'
   | 'security-cves'
   | 'e2e-browser'
-  | 'accessibility-ui';
+  | 'accessibility-ui'
+  | 'code-health-observability';
 
 export type StationStatus = 'pass' | 'warn' | 'fail' | 'skipped';
 

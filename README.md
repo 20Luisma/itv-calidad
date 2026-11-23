@@ -1,6 +1,6 @@
 # ITV de Código (`itv-calidad`)
 
-Herramienta **100% local, open-source y sin cuentas externas** (CLI + Dashboard Web en cámara lenta) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **6 estaciones reales de calidad de software**.
+Herramienta **100% local, open-source y sin cuentas externas** (CLI + Dashboard Web en cámara lenta) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**.
 
 Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar de una "caja negra" que falla en la nube, te muestra paso a paso **qué revisa cada estación, qué comando exacto ejecuta, por qué importa y cómo corregir cada fallo**.
 
@@ -79,7 +79,7 @@ npm run itv -- /ruta/a/tu/proyecto --json > itv-evidencia.json
 
 ---
 
-## Las 6 Estaciones de la ITV
+## Las 7 Estaciones de la ITV
 
 | # | Estación | Qué revisa | Herramientas ejecutadas |
 |---|---|---|---|
@@ -89,6 +89,7 @@ npm run itv -- /ruta/a/tu/proyecto --json > itv-evidencia.json
 | **4** | **Seguridad, CVEs y Diligencia Debida** | CVEs en dependencias + escáner de credenciales, IPs `http://`, `eval()`, `shell: true` + Checklist OWASP/RGPD | `npm audit`, `composer audit`, `pip-audit` + escáneres locales propios |
 | **5** | **Pruebas E2E en navegador** | Flujos reales de usuario y casos negativos si el repo tiene suite E2E | `npm run test:e2e`, `npm run e2e` o `playwright test` |
 | **6** | **Accesibilidad y calidad UI** | Cumplimiento WCAG 2.1 AA en vistas y/o URL viva | `npm run test:a11y` / `a11y`, `pa11y --standard WCAG2AA <url>` + escáner estático en `.html`, `.htm`, `.php`, `.jsx`, `.tsx`, `.vue` (`lang`, `alt`, `label`, `button`, `a`, saltos de headings) |
+| **7** | **Calidad Sonar y Observabilidad (Sentry)** | Deuda técnica local (archivos monolíticos, complejidad ciclomática, bloques duplicados, `debugger`/`var_dump`) + observabilidad fail-safe / Sentry (DSN en `.env`, `sendDefaultPii` RGPD) | Mini-Sonar local + auditoría Sentry/observabilidad (0 cuentas obligatorias) |
 
 ---
 
@@ -141,3 +142,4 @@ npm run itv -- . --fast # Auto-inspección de la propia ITV
 - [AGENTS.md](AGENTS.md) — Protocolo de ingeniería y contratos del proyecto.
 - [docs/adr/ADR-001-arquitectura-itv-didactica.md](docs/adr/ADR-001-arquitectura-itv-didactica.md) — Decisión arquitectónica inicial.
 - [docs/adr/ADR-002-checklist-diligencia-debida-seguridad.md](docs/adr/ADR-002-checklist-diligencia-debida-seguridad.md) — Checklist de Tranquilidad / Diligencia Debida.
+- [docs/adr/ADR-003-estacion-7-sonar-observabilidad.md](docs/adr/ADR-003-estacion-7-sonar-observabilidad.md) — Estación 7: Calidad Sonar y Observabilidad (Sentry).
