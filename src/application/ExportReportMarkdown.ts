@@ -15,7 +15,7 @@ function statusBadge(status: StationStatus): string {
 
 export function exportReportAsMarkdown(report: InspectionReport): string {
   const lines: string[] = [
-    `# Informe ITV Didáctica de Código — ${report.stack.repoName}`,
+    `# Informe ITV de Código — ${report.stack.repoName}`,
     '',
     `- **Veredicto:** ${report.verdict} (${report.blocksPush ? 'BLOQUEA PUSH' : 'APTO PARA PUSH'})`,
     `- **Fecha:** ${report.finishedAt}`,

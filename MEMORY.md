@@ -1,8 +1,8 @@
-# MEMORY.md — ITV Didáctica de Código
+# MEMORY.md — ITV de Código
 
 ## Contexto General
-- **Proyecto:** ITV Didáctica de Código (`itv-didactica-codigo`).
-- **Objetivo:** Herramienta **100% local** (CLI + Dashboard Web en cámara lenta) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **6 estaciones didácticas** con estándar profesional completo, explicando qué audita cada estación, por qué importa y cómo corregir los fallos.
+- **Proyecto:** ITV de Código (`itv-calidad`).
+- **Objetivo:** Herramienta **100% local** (CLI + Dashboard Web en cámara lenta) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **6 estaciones de calidad** con estándar profesional completo, explicando qué audita cada estación, por qué importa y cómo corregir los fallos.
 - **Origen:** Surge tras auditar y pulir el proyecto `20Luisma/marvel` (657+80 tests, PHPStan 7, `composer audit` 0 CVEs, Playwright E2E, Pa11y/Lighthouse, SonarCloud) y detectar el valor de ver y entender cada capa de calidad de forma visual, concreta y 100% local sin cuentas ni tokens.
 - **Restricciones clave:** 0 cuentas externas, 0 tokens pagos, solo lectura sobre el repo inspeccionado, cero falsos verdes.
 

@@ -7,7 +7,7 @@ const server = createWebServer();
 
 server.listen(PORT, HOST, () => {
   console.log('');
-  console.log('🚗 ITV Didáctica de Código — Dashboard Web Local');
+  console.log('🚗 ITV de Código — Dashboard Web Local');
   console.log(`   URL local : http://${HOST}:${PORT}`);
   console.log('   Modo      : 100% local · Solo lectura · Cero cuentas externas');
   console.log('');

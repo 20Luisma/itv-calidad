@@ -1,4 +1,4 @@
-# ITV Didáctica de Código (`itv-calidad`)
+# ITV de Código (`itv-calidad`)
 
 Herramienta **100% local, open-source y sin cuentas externas** (CLI + Dashboard Web en cámara lenta) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **6 estaciones reales de calidad de software**.
 
@@ -125,7 +125,7 @@ Además de auditar CVEs y secretos, la Estación 4 genera un reporte de diligenc
 
 El propio proyecto sigue Clean Architecture ligera, separación estricta HTML/CSS/JS (con CSP sin inline scripts ni inline styles) y pasa su propia ITV en verde:
 
-- `src/domain/` — Tipos puros, catálogo didáctico y cálculo de veredictos (sin dependencias de Node/HTTP).
+- `src/domain/` — Tipos puros, catálogo de estaciones y cálculo de veredictos (sin dependencias de Node/HTTP).
 - `src/application/` — `DetectRepoStack`, `RunItvInspection` (orquestador + cámara lenta + eventos) y `ExportReportMarkdown`.
 - `src/infrastructure/` — `SafeCommandExecutor` (`spawn` con `shell: false` y timeouts), `RepoFileWalker` (solo lectura), escáneres locales y las 6 estaciones.
 - `src/interfaces/` — CLI (`cli/`) y servidor HTTP/SSE nativo (`web/`) + Dashboard modular (`public/`).

@@ -1,7 +1,7 @@
 {
-  "name": "itv-didactica-codigo",
+  "name": "itv-calidad",
   "version": "1.0.0",
-  "description": "Herramienta 100% local (CLI + Dashboard Web en cámara lenta) que inspecciona repositorios antes de git push pasando por 6 estaciones didácticas de calidad.",
+  "description": "Herramienta 100% local (CLI + Dashboard Web en cámara lenta) que inspecciona repositorios antes de git push pasando por 6 estaciones de calidad y seguridad.",
   "type": "module",
   "private": true,
   "bin": {

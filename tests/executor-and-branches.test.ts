@@ -408,7 +408,7 @@ describe('Export Markdown & HTTP endpoints extra', () => {
       body: JSON.stringify(report)
     });
     expect(mdRes.status).toBe(200);
-    expect(await mdRes.text()).toContain('# Informe ITV Didáctica de Código — app');
+    expect(await mdRes.text()).toContain('# Informe ITV de Código — app');
 
     const badJson = await fetch(`${baseUrl}/api/export/markdown`, {
       method: 'POST',
@@ -421,7 +421,7 @@ describe('Export Markdown & HTTP endpoints extra', () => {
 
     const indexRes = await fetch(`${baseUrl}/`);
     expect(indexRes.status).toBe(200);
-    expect(await indexRes.text()).toContain('ITV Didáctica de Código');
+    expect(await indexRes.text()).toContain('ITV de Código');
   });
 
   it('RunItvInspection soporta pausa cámara lenta y error en ruta inválida', async () => {

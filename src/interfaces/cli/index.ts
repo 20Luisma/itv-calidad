@@ -31,14 +31,14 @@ function formatStatus(status: StationStatus): string {
 
 function printHelp(): void {
   console.log(`
-${ANSI.bold}ITV Didáctica de Código — CLI local${ANSI.reset}
+${ANSI.bold}ITV de Código — CLI local${ANSI.reset}
 
 Uso:
   npm run itv -- [ruta-al-repo] [opciones]
 
 Opciones:
   --fast               Sin pausas de cámara lenta (delay = 0ms)
-  --delay <ms>         Pausa didáctica entre estaciones (default: 800)
+  --delay <ms>         Pausa entre estaciones en cámara lenta (default: 800)
   --min-coverage <n>   Umbral mínimo de cobertura % (default: 75)
   --url <http://...>   URL local opcional para auditoría WCAG 2.1 AA en vivo (pa11y)
   --json               Imprime el reporte completo en JSON (útil para evidencias/CI)
@@ -62,7 +62,7 @@ async function main(): Promise<void> {
 
     if (event.type === 'inspection:start') {
       console.log('');
-      console.log(`${ANSI.bold}${ANSI.cyan}═══ ITV DIDÁCTICA DE CÓDIGO ═══${ANSI.reset}`);
+      console.log(`${ANSI.bold}${ANSI.cyan}═══ ITV DE CÓDIGO ═══${ANSI.reset}`);
       console.log(`Repositorio : ${event.stack.repoName} (${event.stack.repoPath})`);
       console.log(
         `Stack       : ${event.stack.detectedStacks.join(', ')} (principal: ${event.stack.primaryStack})${event.stack.gitBranch ? ` · rama ${event.stack.gitBranch}` : ''}`

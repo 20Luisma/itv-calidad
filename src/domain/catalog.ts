@@ -73,7 +73,7 @@ export const STATION_CATALOG: Readonly<Record<StationId, StationMetadata>> = {
     shortName: 'Accesibilidad UI',
     didactic: {
       whatItChecks:
-        'Revisa cumplimiento WCAG 2.1 AA con herramientas del repo (Axe, Pa11y, Lighthouse) y realiza un escaneo estático didáctico de HTML (alt en imágenes, labels, lang, headings).',
+        'Revisa cumplimiento WCAG 2.1 AA con herramientas del repo (Axe, Pa11y, Lighthouse) y realiza un escaneo estático de vistas (alt en imágenes, labels, lang, links y headings).',
       whyItMatters:
         'Una interfaz inaccesible excluye usuarios con lectores de pantalla o navegación por teclado y suele empeorar SEO y mantenibilidad.',
       toolsByStack: '@axe-core/playwright / Pa11y / Lighthouse + auditoría estática HTML'
