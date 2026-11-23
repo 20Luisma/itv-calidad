@@ -136,6 +136,21 @@ npm run itv -- /ruta/a/tu/proyecto --json > itv-evidencia.json
 
 ---
 
+## Opción 4 — Extensión de Barra Lateral (`.vsix` para Antigravity, VS Code, Cursor, Windsurf)
+
+Además del MCP App, puedes compilar e instalar la **extensión nativa de barra lateral** (con su icono de escudo en la barra izquierda, vista en árbol de las 7 estaciones con salto directo a archivo/línea, cabina visual con semáforo y botón en la barra de estado):
+
+```bash
+npm run build:vscode
+# Genera: dist/itv-calidad-vscode-1.2.0.vsix
+```
+
+Para instalarla en tu IDE:
+- **Antigravity / Cursor / Windsurf / VS Code (UI):** abre la pestaña **Extensions** → menú `···` (arriba a la derecha) → **Install from VSIX…** → selecciona `dist/itv-calidad-vscode-1.2.0.vsix`.
+- **VS Code (CLI):** `code --install-extension dist/itv-calidad-vscode-1.2.0.vsix`
+
+---
+
 ## Las 7 Estaciones de la ITV
 
 | # | Estación | Qué revisa | Herramientas ejecutadas |

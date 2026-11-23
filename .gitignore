@@ -1,6 +1,9 @@
 # Dependencias y build
 node_modules/
 dist/
+extensions/vscode-itv/dist/
+extensions/vscode-itv/.vsix-stage/
+*.vsix
 build/
 coverage/
 test-results/
