@@ -18,6 +18,7 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 - **Se integra directo en tu flujo con agentes de IA:** corrés la ITV → exportás el `.md` → se lo pasás a tu agente de código → volvés a pasar la ITV como auditor independiente.
 
 ### Lo que NO hace (transparencia ante todo)
+- **Es un complemento a GitHub Actions / CI, no un reemplazo:** actúa como **primera barrera local rápida** antes del `git push` (evita subir secretos, errores de tipos o CVEs al repo), pero en equipos o despliegues a producción sigue siendo recomendable mantener CI en la nube (entorno limpio reproducible + *Branch Protection*).
 - **No reemplaza** un pentest profesional, un SAST enterprise (SonarQube / CodeQL / Semgrep) ni una auditoría de seguridad formal para sistemas críticos o banca.
 - **No constituye asesoramiento legal:** el bloque operativo/contractual del checklist (DPA, backups, plan 72h) es una guía técnica de buenas prácticas basada en OWASP/RGPD.
 - **No instala ni modifica dependencias en el repo inspeccionado:** utiliza los binarios disponibles en tu máquina o en `node_modules`/`vendor` del propio proyecto.
