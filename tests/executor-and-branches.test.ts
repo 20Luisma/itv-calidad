@@ -313,6 +313,20 @@ describe('Stations edge cases (PHP, Python, Playwright, A11y, Security)', () => 
       executor: new StubExecutor(() => ({ notFound: true, exitCode: null }))
     });
     expect(missingPa11y.status).toBe('warn');
+
+    const chromeMissing = await new AccessibilityUiStation().run({
+      repoPath: dir,
+      stack: { ...stack, hasAccessibilityTooling: false },
+      minCoverage: 75,
+      commandTimeoutMs: 5000,
+      targetUrl: 'http://127.0.0.1:4173',
+      executor: new StubExecutor(() => ({
+        exitCode: 1,
+        stderr: 'Error: Could not find Chrome (ver. 142) at ChromeLauncher.launch'
+      }))
+    });
+    expect(chromeMissing.status).toBe('warn');
+    expect(chromeMissing.findings.some((f) => f.title.includes('Entorno de navegador'))).toBe(true);
   });
 });
 

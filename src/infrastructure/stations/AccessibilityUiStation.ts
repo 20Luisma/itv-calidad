@@ -1,7 +1,14 @@
+import { access } from 'node:fs/promises';
 import { STATION_CATALOG } from '../../domain/catalog.js';
 import { createStationResult } from '../../domain/report.js';
 import type { Finding, StationContext, StationResult, StationRunner } from '../../domain/types.js';
 import { scanStaticHtmlAccessibility } from '../scanners/StaticHtmlA11yScanner.js';
+
+const MAC_CHROME_PATHS = [
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  '/Applications/Chromium.app/Contents/MacOS/Chromium',
+  '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
+] as const;
 
 export function isValidTargetUrl(rawUrl: string): boolean {
   try {
@@ -10,6 +17,27 @@ export function isValidTargetUrl(rawUrl: string): boolean {
   } catch {
     return false;
   }
+}
+
+export function isBrowserEnvironmentError(output: string): boolean {
+  return /Could not find Chrome|Failed to launch the browser|ChromeLauncher|BrowserLauncher|ERR_CONNECTION_REFUSED|ECONNREFUSED|ProtocolError/i.test(
+    output
+  );
+}
+
+async function detectLocalChromeExecutable(): Promise<string | undefined> {
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    return process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+  for (const candidate of MAC_CHROME_PATHS) {
+    try {
+      await access(candidate);
+      return candidate;
+    } catch {
+      // Probar siguiente candidato
+    }
+  }
+  return undefined;
 }
 
 export class AccessibilityUiStation implements StationRunner {
@@ -61,9 +89,11 @@ export class AccessibilityUiStation implements StationRunner {
           howToFix: 'Indicá una URL local válida como `http://127.0.0.1:4173` o `http://localhost:8000`.'
         });
       } else {
+        const chromePath = await detectLocalChromeExecutable();
         const pa11yRes = await executor.run('pa11y', ['--standard', 'WCAG2AA', targetUrl], {
           cwd: repoPath,
           timeoutMs: commandTimeoutMs,
+          ...(chromePath ? { env: { PUPPETEER_EXECUTABLE_PATH: chromePath } } : {}),
           ...(signal ? { signal } : {})
         });
         commands.push(pa11yRes.command);
@@ -76,6 +106,14 @@ export class AccessibilityUiStation implements StationRunner {
             title: 'Binario pa11y no instalado para auditar URL en vivo',
             reason: 'Pediste auditar una URL viva (contraste y DOM real), pero `pa11y` no está en PATH.',
             howToFix: 'Instalá Pa11y globalmente con `npm install -g pa11y` para auditar contraste y WCAG 2.1 AA sobre cualquier URL local.'
+          });
+        } else if (pa11yRes.exitCode !== 0 && isBrowserEnvironmentError(out)) {
+          outputs.push(out);
+          findings.push({
+            severity: 'warning',
+            title: `Entorno de navegador / URL no disponible para pa11y (${targetUrl})`,
+            reason: 'Pa11y/Puppeteer falló al iniciar Chrome o conectarse a la URL; esto es un fallo de entorno, no una violación WCAG.',
+            howToFix: 'Verificá que la URL esté levantada y que Puppeteer tenga navegador disponible (`npx puppeteer browsers install chrome` o `PUPPETEER_EXECUTABLE_PATH`).'
           });
         } else if (pa11yRes.exitCode !== 0) {
           hardFailed = true;
