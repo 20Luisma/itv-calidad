@@ -6,6 +6,7 @@ import {
 
 const form = document.getElementById('inspection-form');
 const repoPathInput = document.getElementById('repo-path');
+const browseBtn = document.getElementById('btn-browse');
 const targetUrlInput = document.getElementById('target-url');
 const slowMotionSelect = document.getElementById('slow-motion');
 const minCoverageInput = document.getElementById('min-coverage');
@@ -243,6 +244,30 @@ stopBtn.addEventListener('click', () => {
   setTrafficLight('');
   stopInspection('Inspección cancelada por el usuario.');
 });
+
+if (browseBtn) {
+  browseBtn.addEventListener('click', async () => {
+    clearError();
+    browseBtn.disabled = true;
+    const originalText = browseBtn.textContent;
+    browseBtn.textContent = 'Abriendo…';
+    try {
+      const response = await fetch('/api/pick-folder', { method: 'POST' });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'No se pudo abrir el selector de carpetas.');
+      }
+      if (!data.cancelled && data.path) {
+        repoPathInput.value = data.path;
+      }
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Error abriendo selector de carpetas.');
+    } finally {
+      browseBtn.disabled = false;
+      browseBtn.textContent = originalText;
+    }
+  });
+}
 
 exportJsonBtn.addEventListener('click', () => {
   if (!lastReport) return;

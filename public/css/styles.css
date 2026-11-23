@@ -260,6 +260,21 @@ code {
   gap: 6px;
 }
 
+.input-with-btn {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input-with-btn .field__input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.btn--compact {
+  padding: 0 14px;
+}
+
 .field__label {
   font-size: 0.76rem;
   font-weight: 700;

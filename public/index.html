@@ -54,15 +54,20 @@
         <form id="inspection-form" class="control-form">
           <div class="field">
             <label for="repo-path" class="field__label">Ruta local del repositorio</label>
-            <input
-              id="repo-path"
-              name="repoPath"
-              type="text"
-              class="field__input"
-              placeholder="/Users/admin/Desktop/Proyectos/mi-repo"
-              autocomplete="off"
-              required
-            />
+            <div class="input-with-btn">
+              <input
+                id="repo-path"
+                name="repoPath"
+                type="text"
+                class="field__input"
+                placeholder="/Users/admin/Desktop/Proyectos/mi-repo"
+                autocomplete="off"
+                required
+              />
+              <button type="button" id="btn-browse" class="btn btn--secondary btn--compact">
+                Examinar…
+              </button>
+            </div>
           </div>
 
           <div class="field">

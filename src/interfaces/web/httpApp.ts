@@ -56,6 +56,31 @@ export interface WebServerDependencies {
   readonly defaultRepoPath?: string;
   readonly stations?: readonly StationRunner[];
   readonly executor?: CommandExecutor;
+  readonly pickFolder?: () => Promise<string | null>;
+}
+
+async function pickLocalFolderMac(executor: CommandExecutor): Promise<string | null> {
+  if (process.platform !== 'darwin') {
+    throw new Error('El selector nativo de carpetas está habilitado para macOS.');
+  }
+  const script =
+    'POSIX path of (choose folder with prompt "Seleccioná la carpeta del repositorio para la ITV")';
+  const res = await executor.run('osascript', ['-e', script], {
+    cwd: process.cwd(),
+    timeoutMs: 120_000
+  });
+  if (res.notFound) {
+    throw new Error('osascript no disponible en este sistema.');
+  }
+  if (res.exitCode !== 0) {
+    // Código -128 en AppleScript significa que el usuario presionó Cancelar
+    if (res.stderr.includes('-128') || /User canceled/i.test(res.stderr)) {
+      return null;
+    }
+    throw new Error(res.stderr || 'No se pudo abrir el selector de carpetas.');
+  }
+  const selected = res.stdout.trim().replace(/\/+$/, '');
+  return selected || null;
 }
 
 export function createWebServer(deps: WebServerDependencies = {}): Server {
@@ -63,6 +88,7 @@ export function createWebServer(deps: WebServerDependencies = {}): Server {
   const defaultRepoPath = deps.defaultRepoPath ?? process.cwd();
   const executor = deps.executor ?? new SafeCommandExecutor();
   const stations = deps.stations ?? createDefaultStations();
+  const pickFolder = deps.pickFolder ?? (() => pickLocalFolderMac(executor));
   const inspectionUseCase = new RunItvInspection(stations, executor);
 
   return createServer(async (req, res) => {
@@ -84,6 +110,17 @@ export function createWebServer(deps: WebServerDependencies = {}): Server {
       if (req.method === 'GET' && pathname === '/api/stations') {
         const list = ORDERED_STATION_IDS.map((id) => STATION_CATALOG[id]);
         sendJson(res, 200, { stations: list });
+        return;
+      }
+
+      // 2b. Selector nativo de carpeta local (Finder en macOS)
+      if (req.method === 'POST' && pathname === '/api/pick-folder') {
+        const selectedPath = await pickFolder();
+        if (!selectedPath) {
+          sendJson(res, 200, { cancelled: true });
+          return;
+        }
+        sendJson(res, 200, { cancelled: false, path: selectedPath });
         return;
       }
 

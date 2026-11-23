@@ -29,7 +29,8 @@ afterEach(async () => {
 async function startTestServer(): Promise<string> {
   activeServer = createWebServer({
     executor: new AlwaysPassExecutor(),
-    defaultRepoPath: process.cwd()
+    defaultRepoPath: process.cwd(),
+    pickFolder: async () => '/Users/admin/Desktop/Proyectos/demo'
   });
   await new Promise<void>((resolve) => activeServer?.listen(0, '127.0.0.1', () => resolve()));
   const addr = activeServer.address() as AddressInfo;
@@ -71,5 +72,14 @@ describe('HTTP & SSE Web Server', () => {
     expect(body).toContain('event: inspection:start');
     expect(body).toContain('event: station:complete');
     expect(body).toContain('event: inspection:complete');
+  });
+
+  it('responde POST /api/pick-folder devolviendo la carpeta elegida', async () => {
+    const baseUrl = await startTestServer();
+    const res = await fetch(`${baseUrl}/api/pick-folder`, { method: 'POST' });
+    expect(res.status).toBe(200);
+    const json = (await res.json()) as { cancelled: boolean; path: string };
+    expect(json.cancelled).toBe(false);
+    expect(json.path).toBe('/Users/admin/Desktop/Proyectos/demo');
   });
 });
