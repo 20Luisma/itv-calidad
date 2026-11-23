@@ -3,6 +3,7 @@ import path from 'node:path';
 import { STATION_CATALOG } from '../../domain/catalog.js';
 import { createStationResult } from '../../domain/report.js';
 import type { Finding, StationContext, StationResult, StationRunner } from '../../domain/types.js';
+import { createMissingBinaryResult, runStationCommand } from './stationHelpers.js';
 
 async function exists(target: string): Promise<boolean> {
   try {
@@ -58,30 +59,19 @@ export class E2eBrowserStation implements StationRunner {
       }
     }
 
-    const res = await executor.run(binary, args, {
-      cwd: repoPath,
-      timeoutMs: commandTimeoutMs,
-      ...(signal ? { signal } : {})
-    });
-    const combinedOutput = [res.stdout, res.stderr].filter(Boolean).join('\n');
+    const { res, combinedOutput } = await runStationCommand(context, binary, args);
     const durationMs = Date.now() - startedAt;
 
     if (res.notFound) {
-      return createStationResult({
+      return createMissingBinaryResult({
         metadata: this.metadata,
         command: res.command,
-        status: 'warn',
         durationMs,
         summary: 'Playwright está configurado pero no instalado localmente.',
         rawOutput: combinedOutput,
-        findings: [
-          {
-            severity: 'warning',
-            title: 'Binario de Playwright no encontrado',
-            reason: res.stderr,
-            howToFix: 'Ejecutá `npm install && npx playwright install` en el repositorio.'
-          }
-        ]
+        findingTitle: 'Binario de Playwright no encontrado',
+        findingReason: res.stderr,
+        howToFix: 'Ejecutá `npm install && npx playwright install` en el repositorio.'
       });
     }
 
