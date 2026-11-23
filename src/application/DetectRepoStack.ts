@@ -1,6 +1,7 @@
 import { access, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import type { RepoStack, StackKind } from '../domain/types.js';
+import { walkRepoFiles } from '../infrastructure/fs/RepoFileWalker.js';
 
 interface PackageJsonShape {
   scripts?: Record<string, string>;
@@ -119,6 +120,21 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
   if (hasComposerJson) detectedStacks.push('php');
   if (hasPythonProject) detectedStacks.push('python');
 
+  // Fallback para proyectos vanilla sin manifiesto (ej. PHP puro con index.php, JS o Python suelto)
+  if (detectedStacks.length === 0) {
+    const sampleFiles = await walkRepoFiles(
+      resolvedPath,
+      new Set(['.php', '.js', '.mjs', '.cjs', '.py']),
+      30
+    );
+    const hasPhpFiles = sampleFiles.some((f) => f.relativePath.endsWith('.php'));
+    const hasPyFiles = sampleFiles.some((f) => f.relativePath.endsWith('.py'));
+    const hasJsFiles = sampleFiles.some((f) => /\.(?:js|mjs|cjs)$/i.test(f.relativePath));
+    if (hasPhpFiles) detectedStacks.push('php');
+    if (hasJsFiles) detectedStacks.push('node');
+    if (hasPyFiles) detectedStacks.push('python');
+  }
+
   const allNodeDeps = {
     ...(pkg?.dependencies ?? {}),
     ...(pkg?.devDependencies ?? {})
@@ -157,6 +173,8 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
     primaryStack = 'php';
   } else if (hasPythonProject) {
     primaryStack = 'python';
+  } else if (detectedStacks[0]) {
+    primaryStack = detectedStacks[0];
   }
 
   const base: RepoStack = {

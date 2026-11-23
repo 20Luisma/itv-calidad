@@ -149,6 +149,17 @@ describe('DetectRepoStack', () => {
     expect(stack.hasAccessibilityTooling).toBe(true);
   });
 
+  it('detecta proyectos vanilla PHP/JS sin composer.json ni package.json', async () => {
+    const dir = await createTempRepo();
+    await writeFile(path.join(dir, 'index.php'), '<?php echo "hola";');
+    await writeFile(path.join(dir, 'app.js'), 'console.log("ok");');
+
+    const stack = await detectRepoStack(dir);
+    expect(stack.primaryStack).toBe('php');
+    expect(stack.detectedStacks).toEqual(['php', 'node']);
+    expect(stack.hasComposerJson).toBe(false);
+  });
+
   it('lanza error claro si la ruta no existe', async () => {
     await expect(detectRepoStack('/ruta/que/no/existe/jamas')).rejects.toThrow(/no existe/i);
   });

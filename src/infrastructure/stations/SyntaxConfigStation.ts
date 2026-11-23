@@ -67,10 +67,14 @@ export class SyntaxConfigStation implements StationRunner {
         }
       }
 
-      // php -l sobre archivos PHP (muestra hasta 60 archivos para mantener rapidez)
+      // php -l sobre archivos PHP (funciona con o sin composer.json)
+    }
+
+    if (stack.hasComposerJson || stack.detectedStacks.includes('php')) {
       const phpFiles = await walkRepoFiles(repoPath, new Set(['.php']), 60);
       if (phpFiles.length > 0) {
         commands.push(`php -l (${phpFiles.length} archivos)`);
+        let phpErrorCount = 0;
         for (const file of phpFiles) {
           const phpRes = await executor.run('php', ['-l', file.absolutePath], {
             cwd: repoPath,
@@ -88,6 +92,7 @@ export class SyntaxConfigStation implements StationRunner {
           }
           if (phpRes.exitCode !== 0) {
             hardFailed = true;
+            phpErrorCount += 1;
             outputs.push(phpRes.stderr || phpRes.stdout);
             findings.push({
               severity: 'error',
@@ -98,11 +103,14 @@ export class SyntaxConfigStation implements StationRunner {
             });
           }
         }
+        if (phpErrorCount === 0) {
+          outputs.push(`php -l: ${phpFiles.length} archivo(s) PHP válidos.`);
+        }
       }
     }
 
     // 2. Node / JS: si existe script lint en package.json lo ejecuta, si no valida archivos .js/.mjs con node --check
-    if (stack.hasPackageJson) {
+    if (stack.hasPackageJson || stack.detectedStacks.includes('node')) {
       if (stack.packageScripts.lint) {
         const lintRes = await executor.run('npm', ['run', 'lint'], {
           cwd: repoPath,
@@ -149,8 +157,8 @@ export class SyntaxConfigStation implements StationRunner {
       }
     }
 
-    // 3. Python: py_compile
-    if (stack.hasPythonProject) {
+    // 3. Python: py_compile (con o sin pyproject.toml / requirements.txt)
+    if (stack.hasPythonProject || stack.detectedStacks.includes('python')) {
       const pyFiles = await walkRepoFiles(repoPath, new Set(['.py']), 50);
       if (pyFiles.length > 0) {
         const pyRes = await executor.run(
