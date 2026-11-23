@@ -2,7 +2,7 @@
 
 [![CI — ITV de Código](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml/badge.svg)](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml)
 
-Herramienta **100% local, open-source y sin cuentas externas** (CLI + Dashboard Web en cámara lenta) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**.
+Herramienta **100% local, open-source y sin cuentas externas** (**CLI + Dashboard Web en cámara lenta + Servidor MCP oficial**) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**.
 
 Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar de una "caja negra" que falla en la nube, te muestra paso a paso **qué revisa cada estación, qué comando exacto ejecuta, por qué importa y cómo corregir cada fallo**.
 
@@ -80,6 +80,41 @@ npm run itv -- /ruta/a/tu/proyecto --json > itv-evidencia.json
 - `1` → `DESFAVORABLE` (fallo bloqueante detectado).
 - `2` → Error de invocación (ej. ruta inexistente).
 
+### Opción 3 — Servidor MCP nativo (Antigravity, Cursor, Claude Code)
+
+`itv-calidad` incluye un **MCP Server oficial por Stdio** para que cualquier agente IA audite tus repositorios como herramienta nativa sin ejecutar bash manual:
+
+**1. Compilar el servidor MCP:**
+```bash
+git clone https://github.com/20Luisma/itv-calidad.git
+cd itv-calidad
+npm install
+npm run build
+```
+
+**2. Registrarlo en tu IDE / Agente:**
+- **Antigravity:** `~/.gemini/config/mcp_config.json`
+- **Cursor:** `.cursor/mcp.json` o `~/.cursor/mcp.json`
+- **Claude Desktop / Claude Code:** `claude_desktop_config.json` o `claude mcp add itv-calidad -- node /ruta/absoluta/a/itv-calidad/dist/interfaces/mcp/server.js`
+
+```json
+{
+  "mcpServers": {
+    "itv-calidad": {
+      "command": "node",
+      "args": ["/ruta/absoluta/a/itv-calidad/dist/interfaces/mcp/server.js"]
+    }
+  }
+}
+```
+
+**3. Herramientas MCP expuestas:**
+| Herramienta | Qué hace |
+|---|---|
+| `run_itv` | Ejecuta las 7 estaciones sobre `repoPath` y devuelve el veredicto en `json` o `markdown` (acepta `minCoverage` y `targetUrl` opcionales). |
+| `get_security_checklist` | Ejecuta la Estación 4 y devuelve el Checklist OWASP ASVS Nivel 1 / RGPD Art. 32. |
+| `list_itv_stations` | Lista las 7 estaciones y su guía didáctica sin ejecutar comandos. |
+
 ---
 
 ## Las 7 Estaciones de la ITV
@@ -142,29 +177,6 @@ El propio proyecto sigue Clean Architecture ligera, separación estricta HTML/CS
 - `src/application/` — `DetectRepoStack`, `RunItvInspection` (orquestador + cámara lenta + eventos) y `ExportReportMarkdown`.
 - `src/infrastructure/` — `SafeCommandExecutor` (`spawn` con `shell: false` y timeouts), `RepoFileWalker` (solo lectura), escáneres locales y las 6 estaciones.
 - `src/interfaces/` — CLI (`cli/`), servidor HTTP/SSE nativo (`web/`) + Dashboard modular (`public/`), y **Servidor MCP Stdio (`mcp/`)** para agentes IA.
-
----
-
-## 🔌 Uso como Servidor MCP (Antigravity, Cursor, Claude Code)
-
-`itv-calidad` expone un **MCP Server oficial por Stdio** con 3 herramientas nativas (`list_itv_stations`, `run_itv`, `get_security_checklist`):
-
-```bash
-npm run build
-```
-
-Agregalo en `~/.gemini/config/mcp_config.json` (Antigravity) o en la configuración MCP de tu IDE:
-
-```json
-{
-  "mcpServers": {
-    "itv-calidad": {
-      "command": "node",
-      "args": ["/ruta/absoluta/a/itv-didactica-codigo/dist/interfaces/mcp/server.js"]
-    }
-  }
-}
-```
 
 ```bash
 npm run typecheck      # TypeScript strict (0 errores)
