@@ -298,9 +298,21 @@ describe('Stations edge cases (PHP, Python, Playwright, A11y, Security)', () => 
       stack,
       minCoverage: 75,
       commandTimeoutMs: 5000,
+      targetUrl: 'http://127.0.0.1:4173',
       executor: new StubExecutor(() => ({ exitCode: 1, stdout: 'WCAG contrast error' }))
     });
     expect(failA11y.status).toBe('fail');
+    expect(failA11y.findings.some((f) => f.title.includes('WCAG 2.1 AA detectadas en vivo'))).toBe(true);
+
+    const missingPa11y = await new AccessibilityUiStation().run({
+      repoPath: dir,
+      stack: { ...stack, hasAccessibilityTooling: false },
+      minCoverage: 75,
+      commandTimeoutMs: 5000,
+      targetUrl: 'http://127.0.0.1:4173',
+      executor: new StubExecutor(() => ({ notFound: true, exitCode: null }))
+    });
+    expect(missingPa11y.status).toBe('warn');
   });
 });
 

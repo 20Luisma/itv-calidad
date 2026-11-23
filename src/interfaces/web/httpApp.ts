@@ -90,6 +90,7 @@ export function createWebServer(deps: WebServerDependencies = {}): Server {
       // 3. Stream SSE en cámara lenta de la ITV
       if (req.method === 'GET' && pathname === '/api/inspect/stream') {
         const repoPath = (requestUrl.searchParams.get('repoPath') ?? defaultRepoPath).trim();
+        const targetUrl = (requestUrl.searchParams.get('targetUrl') ?? '').trim();
         const slowMotionParam = Number(requestUrl.searchParams.get('slowMotionMs') ?? '900');
         const minCoverageParam = Number(requestUrl.searchParams.get('minCoverage') ?? '75');
 
@@ -126,6 +127,7 @@ export function createWebServer(deps: WebServerDependencies = {}): Server {
               repoPath,
               slowMotionMs,
               minCoverage,
+              ...(targetUrl ? { targetUrl } : {}),
               signal: controller.signal
             },
             (event) => {

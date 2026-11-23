@@ -20,10 +20,11 @@ npm run dev
 
 ### Opciones útiles del CLI
 ```bash
-npm run itv -- . --fast                 # Sin pausas de cámara lenta
-npm run itv -- . --min-coverage 80      # Exigir 80% de cobertura mínima
-npm run itv -- . --markdown > itv.md    # Exportar evidencia en Markdown
-npm run itv -- . --json > itv.json      # Exportar reporte estructurado en JSON
+npm run itv -- . --fast                      # Sin pausas de cámara lenta
+npm run itv -- . --min-coverage 80           # Exigir 80% de cobertura mínima
+npm run itv -- . --url http://127.0.0.1:4173 # Auditar WCAG 2.1 AA en vivo con pa11y
+npm run itv -- . --markdown > itv.md         # Exportar evidencia en Markdown
+npm run itv -- . --json > itv.json           # Exportar reporte estructurado en JSON
 ```
 
 ## Las 6 Estaciones de la ITV

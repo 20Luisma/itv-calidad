@@ -69,22 +69,15 @@ export class RunItvInspection {
       });
 
       const results: StationResult[] = [];
-      const context: StationContext = options.signal
-        ? {
-            repoPath: stack.repoPath,
-            stack,
-            minCoverage,
-            commandTimeoutMs,
-            executor: this.executor,
-            signal: options.signal
-          }
-        : {
-            repoPath: stack.repoPath,
-            stack,
-            minCoverage,
-            commandTimeoutMs,
-            executor: this.executor
-          };
+      const context: StationContext = {
+        repoPath: stack.repoPath,
+        stack,
+        minCoverage,
+        commandTimeoutMs,
+        executor: this.executor,
+        ...(options.targetUrl ? { targetUrl: options.targetUrl } : {}),
+        ...(options.signal ? { signal: options.signal } : {})
+      };
 
       for (const station of this.stations) {
         if (options.signal?.aborted) {

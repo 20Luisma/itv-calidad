@@ -3,12 +3,21 @@ import { createStationResult } from '../../domain/report.js';
 import type { Finding, StationContext, StationResult, StationRunner } from '../../domain/types.js';
 import { scanStaticHtmlAccessibility } from '../scanners/StaticHtmlA11yScanner.js';
 
+export function isValidTargetUrl(rawUrl: string): boolean {
+  try {
+    const parsed = new URL(rawUrl);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export class AccessibilityUiStation implements StationRunner {
   readonly metadata = STATION_CATALOG['accessibility-ui'];
 
   async run(context: StationContext): Promise<StationResult> {
     const startedAt = Date.now();
-    const { stack, repoPath, executor, commandTimeoutMs, signal } = context;
+    const { stack, repoPath, executor, commandTimeoutMs, targetUrl, signal } = context;
     const findings: Finding[] = [];
     const outputs: string[] = [];
     const commands: string[] = [];
@@ -42,18 +51,59 @@ export class AccessibilityUiStation implements StationRunner {
       }
     }
 
-    // 2. Auditoría estática didáctica de archivos HTML del repositorio
+    // 2. Auditoría WCAG 2.1 AA en vivo sobre URL local opcional (pa11y)
+    if (targetUrl) {
+      if (!isValidTargetUrl(targetUrl)) {
+        findings.push({
+          severity: 'warning',
+          title: 'URL de auditoría en vivo inválida',
+          reason: `La URL "${targetUrl}" no usa protocolo http:// o https:// válido.`,
+          howToFix: 'Indicá una URL local válida como `http://127.0.0.1:4173` o `http://localhost:8000`.'
+        });
+      } else {
+        const pa11yRes = await executor.run('pa11y', ['--standard', 'WCAG2AA', targetUrl], {
+          cwd: repoPath,
+          timeoutMs: commandTimeoutMs,
+          ...(signal ? { signal } : {})
+        });
+        commands.push(pa11yRes.command);
+        const out = [pa11yRes.stdout, pa11yRes.stderr].filter(Boolean).join('\n');
+
+        if (pa11yRes.notFound) {
+          outputs.push('pa11y no está instalado globalmente en esta máquina.');
+          findings.push({
+            severity: 'warning',
+            title: 'Binario pa11y no instalado para auditar URL en vivo',
+            reason: 'Pediste auditar una URL viva (contraste y DOM real), pero `pa11y` no está en PATH.',
+            howToFix: 'Instalá Pa11y globalmente con `npm install -g pa11y` para auditar contraste y WCAG 2.1 AA sobre cualquier URL local.'
+          });
+        } else if (pa11yRes.exitCode !== 0) {
+          hardFailed = true;
+          outputs.push(out);
+          findings.push({
+            severity: 'error',
+            title: `Violaciones WCAG 2.1 AA detectadas en vivo (${targetUrl})`,
+            reason: out.slice(-600) || `pa11y devolvió exit code ${String(pa11yRes.exitCode)}`,
+            howToFix: `Revisá los contrastes, etiquetas ARIA o elementos reportados por \`pa11y --standard WCAG2AA ${targetUrl}\`.`
+          });
+        } else {
+          outputs.push(out || `pa11y WCAG2AA sobre ${targetUrl}: 0 errores.`);
+        }
+      }
+    }
+
+    // 3. Auditoría estática didáctica de vistas (.html, .htm, .php, .jsx, .tsx, .vue)
     const staticScan = await scanStaticHtmlAccessibility(repoPath);
     if (staticScan.filesScanned > 0) {
-      commands.push(`auditoría estática HTML WCAG (${staticScan.filesScanned} archivo(s))`);
+      commands.push(`auditoría estática WCAG en vistas (${staticScan.filesScanned} archivo(s))`);
       findings.push(...staticScan.findings);
       if (staticScan.findings.some((f) => f.severity === 'error')) {
         hardFailed = true;
       }
       outputs.push(
         staticScan.findings.length === 0
-          ? `Auditoría HTML estática: ${staticScan.filesScanned} archivo(s) sin errores de alt, lang, labels ni botones vacíos.`
-          : `Auditoría HTML estática: ${staticScan.findings.length} hallazgo(s) en ${staticScan.filesScanned} archivo(s).`
+          ? `Auditoría estática de vistas: ${staticScan.filesScanned} archivo(s) sin errores de alt, lang, labels, links ni headings.`
+          : `Auditoría estática de vistas: ${staticScan.findings.length} hallazgo(s) en ${staticScan.filesScanned} archivo(s).`
       );
     }
 
@@ -62,10 +112,10 @@ export class AccessibilityUiStation implements StationRunner {
     if (commands.length === 0) {
       return createStationResult({
         metadata: this.metadata,
-        command: 'Sin vistas HTML ni herramientas WCAG configuradas',
+        command: 'Sin vistas HTML/PHP/JSX ni herramientas WCAG configuradas',
         status: 'skipped',
         durationMs,
-        summary: 'Proyecto sin archivos HTML estáticos ni suite Axe/Pa11y/Lighthouse configurada.',
+        summary: 'Proyecto sin vistas web ni suite Axe/Pa11y/Lighthouse configurada.',
         rawOutput: 'Estación omitida limpiamente (proyecto CLI/API sin interfaz web detectada).'
       });
     }
@@ -75,7 +125,7 @@ export class AccessibilityUiStation implements StationRunner {
       ? `Accesibilidad con fallos críticos (${findings.filter((f) => f.severity === 'error').length} error(es) WCAG).`
       : findings.length > 0
         ? `Accesibilidad aceptable con ${findings.length} recomendación(es) de mejora.`
-        : 'Accesibilidad y calidad HTML superadas en verde.';
+        : 'Accesibilidad y calidad UI superadas en verde.';
 
     return createStationResult({
       metadata: this.metadata,
@@ -86,7 +136,7 @@ export class AccessibilityUiStation implements StationRunner {
       rawOutput: outputs.filter(Boolean).join('\n\n'),
       findings,
       metrics: {
-        htmlFilesScanned: staticScan.filesScanned
+        viewsScanned: staticScan.filesScanned
       }
     });
   }

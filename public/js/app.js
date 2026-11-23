@@ -6,6 +6,7 @@ import {
 
 const form = document.getElementById('inspection-form');
 const repoPathInput = document.getElementById('repo-path');
+const targetUrlInput = document.getElementById('target-url');
 const slowMotionSelect = document.getElementById('slow-motion');
 const minCoverageInput = document.getElementById('min-coverage');
 const startBtn = document.getElementById('btn-start');
@@ -106,7 +107,7 @@ function stopInspection(message = 'Inspección detenida por el usuario.') {
   liveStatus.textContent = message;
 }
 
-function startInspection(repoPath, slowMotionMs, minCoverage) {
+function startInspection(repoPath, slowMotionMs, minCoverage, targetUrl) {
   stopInspection('');
   resetRunState();
   setRunningUi(true);
@@ -117,6 +118,9 @@ function startInspection(repoPath, slowMotionMs, minCoverage) {
     slowMotionMs: String(slowMotionMs),
     minCoverage: String(minCoverage)
   });
+  if (targetUrl) {
+    params.set('targetUrl', targetUrl);
+  }
 
   const source = new EventSource(`/api/inspect/stream?${params.toString()}`);
   activeSource = source;
@@ -185,7 +189,12 @@ form.addEventListener('submit', (event) => {
     showError('Ingresá una ruta local de repositorio.');
     return;
   }
-  startInspection(repoPath, Number(slowMotionSelect.value), Number(minCoverageInput.value || 75));
+  startInspection(
+    repoPath,
+    Number(slowMotionSelect.value),
+    Number(minCoverageInput.value || 75),
+    targetUrlInput ? targetUrlInput.value.trim() : ''
+  );
 });
 
 stopBtn.addEventListener('click', () => {

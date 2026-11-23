@@ -4,6 +4,7 @@ export interface CliOptions {
   readonly minCoverage: number;
   readonly format: 'pretty' | 'json' | 'markdown';
   readonly showHelp: boolean;
+  readonly targetUrl?: string;
 }
 
 export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): CliOptions {
@@ -12,6 +13,7 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
   let minCoverage = 75;
   let format: 'pretty' | 'json' | 'markdown' = 'pretty';
   let showHelp = false;
+  let targetUrl: string | undefined;
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i] ?? '';
@@ -25,6 +27,9 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
     } else if (arg === '--markdown' || arg === '--md') {
       format = 'markdown';
       slowMotionMs = 0;
+    } else if (arg === '--url' && argv[i + 1]) {
+      targetUrl = argv[i + 1]?.trim();
+      i += 1;
     } else if (arg === '--delay' && argv[i + 1]) {
       const parsed = Number(argv[i + 1]);
       if (!Number.isNaN(parsed) && parsed >= 0 && parsed <= 10_000) {
@@ -47,6 +52,7 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
     slowMotionMs,
     minCoverage,
     format,
-    showHelp
+    showHelp,
+    ...(targetUrl ? { targetUrl } : {})
   };
 }

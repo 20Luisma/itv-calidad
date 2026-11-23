@@ -40,6 +40,7 @@ Opciones:
   --fast               Sin pausas de cámara lenta (delay = 0ms)
   --delay <ms>         Pausa didáctica entre estaciones (default: 800)
   --min-coverage <n>   Umbral mínimo de cobertura % (default: 75)
+  --url <http://...>   URL local opcional para auditoría WCAG 2.1 AA en vivo (pa11y)
   --json               Imprime el reporte completo en JSON (útil para evidencias/CI)
   --markdown, --md     Imprime el informe de evidencia en Markdown
   --help, -h           Muestra esta ayuda
@@ -100,7 +101,8 @@ async function main(): Promise<void> {
       {
         repoPath: options.repoPath,
         slowMotionMs: options.slowMotionMs,
-        minCoverage: options.minCoverage
+        minCoverage: options.minCoverage,
+        ...(options.targetUrl ? { targetUrl: options.targetUrl } : {})
       },
       onEvent
     );

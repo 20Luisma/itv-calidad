@@ -83,19 +83,26 @@ describe('SecretAndIpScanner', () => {
 });
 
 describe('StaticHtmlA11yScanner', () => {
-  it('detecta fallos WCAG básicos en HTML y pasa limpio en HTML accesible', async () => {
+  it('detecta fallos WCAG básicos en HTML, vistas PHP/TSX, links vacíos y saltos de headings', async () => {
     const badDir = await createTempRepo();
     await writeFile(
       path.join(badDir, 'bad.html'),
-      '<html><body><img src="a.png"><input type="text"><button></button></body></html>'
+      '<html><body><h1>Título</h1><h4>Salto</h4><img src="a.png"><input type="text"><button></button><a href="/x"></a></body></html>'
+    );
+    await writeFile(
+      path.join(badDir, 'view.php'),
+      '<?php $x = 1; ?><section><img src="hero.png"></section>'
     );
     const badRes = await scanStaticHtmlAccessibility(badDir);
-    expect(badRes.findings.length).toBe(4);
+    expect(badRes.filesScanned).toBe(2);
+    expect(badRes.findings.some((f) => f.title.includes('Enlace <a>'))).toBe(true);
+    expect(badRes.findings.some((f) => f.title.includes('Salto de jerarquía'))).toBe(true);
+    expect(badRes.findings.some((f) => f.file === 'view.php')).toBe(true);
 
     const goodDir = await createTempRepo();
     await writeFile(
       path.join(goodDir, 'good.html'),
-      '<html lang="es"><body><img src="a.png" alt="Logo"><label for="q">Buscar</label><input id="q" type="text"><button>Enviar</button></body></html>'
+      '<html lang="es"><body><h1>Título</h1><h2>Sub</h2><img src="a.png" alt="Logo"><label for="q">Buscar</label><input id="q" type="text"><button>Enviar</button><a href="/home">Inicio</a></body></html>'
     );
     const goodRes = await scanStaticHtmlAccessibility(goodDir);
     expect(goodRes.findings.length).toBe(0);

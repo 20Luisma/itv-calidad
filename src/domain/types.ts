@@ -98,6 +98,7 @@ export interface InspectionOptions {
   readonly slowMotionMs?: number;
   readonly minCoverage?: number;
   readonly commandTimeoutMs?: number;
+  readonly targetUrl?: string;
   readonly signal?: AbortSignal;
 }
 
@@ -184,6 +185,7 @@ export interface StationContext {
   readonly minCoverage: number;
   readonly commandTimeoutMs: number;
   readonly executor: CommandExecutor;
+  readonly targetUrl?: string;
   readonly signal?: AbortSignal;
 }
 
