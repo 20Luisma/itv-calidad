@@ -8,7 +8,7 @@ import { RunItvInspection } from '../src/application/RunItvInspection.js';
 import { STATION_CATALOG } from '../src/domain/catalog.js';
 import { buildInspectionReport, createStationResult } from '../src/domain/report.js';
 import type { CommandExecutor, CommandResult, RepoStack } from '../src/domain/types.js';
-import { SafeCommandExecutor } from '../src/infrastructure/exec/SafeCommandExecutor.js';
+import { SafeCommandExecutor, stripAnsi } from '../src/infrastructure/exec/SafeCommandExecutor.js';
 import { pickNativeFolder } from '../src/infrastructure/exec/NativeFolderPicker.js';
 import { AccessibilityUiStation } from '../src/infrastructure/stations/AccessibilityUiStation.js';
 import { E2eBrowserStation } from '../src/infrastructure/stations/E2eBrowserStation.js';
@@ -65,6 +65,7 @@ describe('SafeCommandExecutor', () => {
     expect(ok.exitCode).toBe(0);
     expect(ok.stdout).toBe('hola-itv');
     expect(ok.notFound).toBe(false);
+    expect(stripAnsi('\u001b[1A\u001b[2K\u001b[32mPASS\u001b[0m')).toBe('PASS');
 
     const missing = await exec.run('binario-inexistente-itv-xyz', [], { cwd: process.cwd() });
     expect(missing.notFound).toBe(true);

@@ -3,6 +3,13 @@ import type { CommandExecutor, CommandResult, CommandRunOptions } from '../../do
 
 const MAX_OUTPUT_BYTES = 128 * 1024;
 const DEFAULT_TIMEOUT_MS = 120_000;
+const ANSI_ESCAPE_REGEX =
+  // eslint-disable-next-line no-control-regex
+  /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><~]/g;
+
+export function stripAnsi(value: string): string {
+  return value.replace(ANSI_ESCAPE_REGEX, '');
+}
 
 function formatCommand(binary: string, args: readonly string[]): string {
   const escapedArgs = args.map((arg) => (/\s/.test(arg) ? `"${arg}"` : arg));
@@ -57,8 +64,8 @@ export class SafeCommandExecutor implements CommandExecutor {
         resolve({
           command,
           exitCode,
-          stdout: stdout.trim(),
-          stderr: stderr.trim(),
+          stdout: stripAnsi(stdout).trim(),
+          stderr: stripAnsi(stderr).trim(),
           durationMs: Date.now() - startedAt,
           timedOut,
           notFound
