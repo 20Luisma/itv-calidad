@@ -11,6 +11,7 @@ import {
   saveIntegrationsEnv,
   type IntegrationsUpdatePayload
 } from '../../infrastructure/config/loadDotEnv.js';
+import { pickNativeFolder } from '../../infrastructure/exec/NativeFolderPicker.js';
 import { SafeCommandExecutor } from '../../infrastructure/exec/SafeCommandExecutor.js';
 import { createDefaultStations } from '../../infrastructure/stations/index.js';
 
@@ -65,37 +66,13 @@ export interface WebServerDependencies {
   readonly pickFolder?: () => Promise<string | null>;
 }
 
-async function pickLocalFolderMac(executor: CommandExecutor): Promise<string | null> {
-  if (process.platform !== 'darwin') {
-    throw new Error('El selector nativo de carpetas está habilitado para macOS.');
-  }
-  const script =
-    'POSIX path of (choose folder with prompt "Seleccioná la carpeta del repositorio para la ITV")';
-  const res = await executor.run('osascript', ['-e', script], {
-    cwd: process.cwd(),
-    timeoutMs: 120_000
-  });
-  if (res.notFound) {
-    throw new Error('osascript no disponible en este sistema.');
-  }
-  if (res.exitCode !== 0) {
-    // Código -128 en AppleScript significa que el usuario presionó Cancelar
-    if (res.stderr.includes('-128') || /User canceled/i.test(res.stderr)) {
-      return null;
-    }
-    throw new Error(res.stderr || 'No se pudo abrir el selector de carpetas.');
-  }
-  const selected = res.stdout.trim().replace(/\/+$/, '');
-  return selected || null;
-}
-
 export function createWebServer(deps: WebServerDependencies = {}): Server {
   const publicDir = deps.publicDir ?? DEFAULT_PUBLIC_DIR;
   const defaultRepoPath = deps.defaultRepoPath ?? process.cwd();
   const envDir = deps.envDir ?? process.cwd();
   const executor = deps.executor ?? new SafeCommandExecutor();
   const stations = deps.stations ?? createDefaultStations();
-  const pickFolder = deps.pickFolder ?? (() => pickLocalFolderMac(executor));
+  const pickFolder = deps.pickFolder ?? (() => pickNativeFolder(executor));
   const inspectionUseCase = new RunItvInspection(stations, executor);
 
   return createServer(async (req, res) => {

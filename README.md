@@ -22,7 +22,7 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 - **No reemplaza** un pentest profesional, un SAST enterprise (SonarQube / CodeQL / Semgrep) ni una auditoría de seguridad formal para sistemas críticos o banca.
 - **No constituye asesoramiento legal:** el bloque operativo/contractual del checklist (DPA, backups, plan 72h) es una guía técnica de buenas prácticas basada en OWASP/RGPD.
 - **No instala ni modifica dependencias en el repo inspeccionado:** utiliza los binarios disponibles en tu máquina o en `node_modules`/`vendor` del propio proyecto.
-- **Botón "Examinar…" (selector nativo de carpetas):** usa el diálogo nativo de Finder en macOS (`osascript`). En Windows y Linux la app funciona igual pegando la ruta local en el input o usando el CLI.
+- **Compatible con macOS, Windows y Linux:** el botón **Examinar…** abre el selector nativo de carpetas en los 3 sistemas (Finder en macOS, Explorador vía PowerShell en Windows y `zenity`/`kdialog` en Linux), y también podés pegar cualquier ruta a mano o usar el CLI.
 
 ---
 
@@ -52,7 +52,7 @@ npm run start
 ```
 
 Desde el Dashboard podés:
-1. Elegir cualquier proyecto local con el botón **Examinar…** (macOS) o pegando su ruta absoluta.
+1. Elegir cualquier proyecto local con el botón **Examinar…** (macOS, Windows y Linux) o pegando su ruta absoluta.
 2. *(Opcional)* Pegar una **URL local viva** (ej. `http://127.0.0.1:3000`) para correr auditoría WCAG 2.1 AA en vivo con `pa11y`.
 3. Elegir velocidad (**Cámara lenta 1.2s**, **Normal 0.6s** o **Rápida 0s**) y umbral mínimo de cobertura (default `75%`).
 4. Ver avanzar el semáforo y las 6 estaciones en tiempo real, desplegar cada hallazgo y exportar la evidencia en **`.md`** o **`.json`**.

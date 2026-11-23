@@ -4,10 +4,15 @@ import { createStationResult } from '../../domain/report.js';
 import type { Finding, StationContext, StationResult, StationRunner } from '../../domain/types.js';
 import { scanStaticHtmlAccessibility } from '../scanners/StaticHtmlA11yScanner.js';
 
-const MAC_CHROME_PATHS = [
+const LOCAL_CHROME_PATHS = [
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   '/Applications/Chromium.app/Contents/MacOS/Chromium',
-  '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
+  '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
+  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+  '/usr/bin/google-chrome',
+  '/usr/bin/chromium-browser',
+  '/usr/bin/chromium'
 ] as const;
 
 export function isValidTargetUrl(rawUrl: string): boolean {
@@ -29,7 +34,7 @@ async function detectLocalChromeExecutable(): Promise<string | undefined> {
   if (process.env.PUPPETEER_EXECUTABLE_PATH) {
     return process.env.PUPPETEER_EXECUTABLE_PATH;
   }
-  for (const candidate of MAC_CHROME_PATHS) {
+  for (const candidate of LOCAL_CHROME_PATHS) {
     try {
       await access(candidate);
       return candidate;

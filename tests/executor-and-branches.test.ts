@@ -9,6 +9,7 @@ import { STATION_CATALOG } from '../src/domain/catalog.js';
 import { buildInspectionReport, createStationResult } from '../src/domain/report.js';
 import type { CommandExecutor, CommandResult, RepoStack } from '../src/domain/types.js';
 import { SafeCommandExecutor } from '../src/infrastructure/exec/SafeCommandExecutor.js';
+import { pickNativeFolder } from '../src/infrastructure/exec/NativeFolderPicker.js';
 import { AccessibilityUiStation } from '../src/infrastructure/stations/AccessibilityUiStation.js';
 import { E2eBrowserStation } from '../src/infrastructure/stations/E2eBrowserStation.js';
 import { SecurityCvesStation } from '../src/infrastructure/stations/SecurityCvesStation.js';
@@ -431,5 +432,22 @@ describe('Export Markdown & HTTP endpoints extra', () => {
     const dir = await createTempDir();
     const ok = await runner.execute({ repoPath: dir, slowMotionMs: 10 });
     expect(ok.verdict).toBe('APTO');
+  });
+
+  it('pickNativeFolder soporta macOS, Windows (PowerShell) y Linux (zenity)', async () => {
+    const macExec = new StubExecutor((bin) =>
+      bin === 'osascript' ? { exitCode: 0, stdout: '/Users/demo/app/\n' } : { exitCode: 1 }
+    );
+    expect(await pickNativeFolder(macExec, 'darwin')).toBe('/Users/demo/app');
+
+    const winExec = new StubExecutor((bin) =>
+      bin === 'powershell' ? { exitCode: 0, stdout: 'C:\\Proyectos\\mi-app\\\r\n' } : { exitCode: 1 }
+    );
+    expect(await pickNativeFolder(winExec, 'win32')).toBe('C:\\Proyectos\\mi-app');
+
+    const linuxExec = new StubExecutor((bin) =>
+      bin === 'zenity' ? { exitCode: 0, stdout: '/home/dev/repo/\n' } : { notFound: true, exitCode: null }
+    );
+    expect(await pickNativeFolder(linuxExec, 'linux')).toBe('/home/dev/repo');
   });
 });
