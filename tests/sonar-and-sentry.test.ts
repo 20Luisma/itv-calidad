@@ -1,9 +1,17 @@
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { CommandExecutor, CommandResult, RepoStack } from '../src/domain/types.js';
-import { loadLocalEnv } from '../src/infrastructure/config/loadDotEnv.js';
+import {
+  getIntegrationsStatus,
+  loadLocalEnv,
+  saveIntegrationsEnv
+} from '../src/infrastructure/config/loadDotEnv.js';
+import {
+  parseGitHubRepoSlug,
+  queryGitHubSecurity
+} from '../src/infrastructure/integrations/GitHubSecurityClient.js';
 import { querySentryIssues } from '../src/infrastructure/integrations/SentryApiClient.js';
 import { querySonarCloud } from '../src/infrastructure/integrations/SonarCloudClient.js';
 import {
@@ -206,12 +214,71 @@ describe('Live API clients (SonarCloud, Sentry) & loadLocalEnv', () => {
     expect(failed.link?.status).toBe('error');
   });
 
-  it('loadLocalEnv carga variables desde .env sin pisar variables existentes', async () => {
+  it('loadLocalEnv y saveIntegrationsEnv persisten en .env sin exponer tokens', async () => {
     const dir = await createTempDir();
     await writeFile(path.join(dir, '.env'), 'ITV_TEST_VAR="valor123"\n# comentario\n');
     delete process.env.ITV_TEST_VAR;
     loadLocalEnv(dir);
     expect(process.env.ITV_TEST_VAR).toBe('valor123');
     delete process.env.ITV_TEST_VAR;
+
+    const fakeEnv: Record<string, string | undefined> = {};
+    const saved = await saveIntegrationsEnv(
+      {
+        sonarToken: 'secret-sonar',
+        sentryAuthToken: 'secret-sentry',
+        sentryOrg: 'my-org',
+        sentryProject: 'my-proj',
+        githubToken: 'secret-gh'
+      },
+      dir,
+      fakeEnv
+    );
+    expect(saved.activeNames).toEqual(['Sonar', 'Sentry', 'GitHub']);
+    expect(JSON.stringify(saved)).not.toContain('secret-sonar');
+
+    const cleared = await saveIntegrationsEnv(
+      { clearSonarToken: true, clearGithubToken: true },
+      dir,
+      fakeEnv
+    );
+    expect(cleared.activeNames).toEqual(['Sentry']);
+    expect(getIntegrationsStatus(fakeEnv).sonarConfigured).toBe(false);
+  });
+
+  it('GitHubSecurityClient detecta slug desde .git/config y consulta alertas Dependabot', async () => {
+    expect(parseGitHubRepoSlug('url = https://github.com/20Luisma/itv-calidad.git')).toBe(
+      '20Luisma/itv-calidad'
+    );
+    expect(parseGitHubRepoSlug('url = git@github.com:20Luisma/marvel.git')).toBe('20Luisma/marvel');
+
+    const dir = await createTempDir();
+    await mkdir(path.join(dir, '.git'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.git', 'config'),
+      '[remote "origin"]\n\turl = https://github.com/20Luisma/itv-calidad.git\n'
+    );
+
+    const noToken = await queryGitHubSecurity(dir, { env: {} });
+    expect(noToken.link?.status).toBe('not-configured');
+    expect(noToken.link?.url).toBe('https://github.com/20Luisma/itv-calidad/security');
+
+    const alertFetch = (async () =>
+      new Response(
+        JSON.stringify([
+          {
+            security_advisory: { severity: 'high', summary: 'Prototype pollution' },
+            dependency: { package: { name: 'demo-pkg' } }
+          }
+        ]),
+        { status: 200 }
+      )) as typeof fetch;
+
+    const connected = await queryGitHubSecurity(dir, {
+      env: { GITHUB_TOKEN: 'gh-test' },
+      fetchImpl: alertFetch
+    });
+    expect(connected.link?.status).toBe('connected');
+    expect(connected.findings.some((f) => f.severity === 'error')).toBe(true);
   });
 });

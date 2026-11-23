@@ -62,7 +62,7 @@ export interface SecurityChecklistReport {
 }
 
 export interface ExternalIntegrationLink {
-  readonly provider: 'sonarcloud' | 'sentry';
+  readonly provider: 'sonarcloud' | 'sentry' | 'github';
   readonly label: string;
   readonly url: string;
   readonly status: 'connected' | 'not-configured' | 'error';

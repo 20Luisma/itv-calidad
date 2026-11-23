@@ -91,14 +91,14 @@ npm run itv -- /ruta/a/tu/proyecto --json > itv-evidencia.json
 | **6** | **Accesibilidad y calidad UI** | Cumplimiento WCAG 2.1 AA en vistas y/o URL viva | `npm run test:a11y` / `a11y`, `pa11y --standard WCAG2AA <url>` + escáner estático en `.html`, `.htm`, `.php`, `.jsx`, `.tsx`, `.vue` (`lang`, `alt`, `label`, `button`, `a`, saltos de headings) |
 | **7** | **Deuda Técnica y Observabilidad (Sonar / Sentry)** | Análisis local ligero (archivos grandes, complejidad, duplicados DRY, `debugger`/`var_dump`) + auditoría estática Sentry/logs + **integración opcional en vivo con SonarCloud y Sentry** | Análisis local (0 cuentas) + API opcional SonarCloud / Sentry vía `.env` |
 
-### Conectar SonarCloud y Sentry reales (opcional)
-Si querés que la Estación 7 consulte el **Quality Gate real de SonarCloud** y los **issues abiertos en Sentry** (mostrando además los enlaces directos a ambos paneles en el Dashboard), copiá `.env.example` a `.env` y cargá tus tokens:
+### Conectar SonarCloud, Sentry y GitHub Security reales (opcional)
+Podés conectar cualquiera de estas 3 plataformas gratuitas desde el botón **⚙ Integraciones** del Dashboard (se guardan en tu `.env` local con `chmod 600` y se aplican al instante sin reiniciar, actualizando automáticamente el nombre de la Estación 7 a los servicios conectados), o editando `.env` a mano:
 ```bash
 cp .env.example .env
-# Completá SONAR_TOKEN y/o SENTRY_AUTH_TOKEN + SENTRY_ORG + SENTRY_PROJECT
+# SONAR_TOKEN · SENTRY_AUTH_TOKEN + SENTRY_ORG + SENTRY_PROJECT · GITHUB_TOKEN
 ```
 - `.env` está protegido en `.gitignore`; los tokens solo se leen en backend y nunca se envían al navegador ni a los reportes exportados.
-- Si no creás `.env`, la herramienta sigue funcionando **100% local sin cuentas**.
+- Si no conectás ninguno, la herramienta sigue funcionando **100% local sin cuentas**.
 
 ---
 

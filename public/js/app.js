@@ -28,12 +28,72 @@ const verdictMetrics = document.getElementById('verdict-metrics');
 const exportMdBtn = document.getElementById('btn-export-md');
 const exportJsonBtn = document.getElementById('btn-export-json');
 const checklistSection = document.getElementById('checklist-section');
+const integrationsBtn = document.getElementById('btn-integrations');
+const integrationsModal = document.getElementById('integrations-modal');
+const closeIntegrationsBtn = document.getElementById('btn-close-integrations');
+const integrationsForm = document.getElementById('integrations-form');
+const integrationsMsg = document.getElementById('integrations-msg');
+const sonarTokenInput = document.getElementById('int-sonar-token');
+const sonarKeyInput = document.getElementById('int-sonar-key');
+const sentryTokenInput = document.getElementById('int-sentry-token');
+const sentryOrgInput = document.getElementById('int-sentry-org');
+const sentryProjectInput = document.getElementById('int-sentry-project');
+const githubTokenInput = document.getElementById('int-github-token');
+const badgeSonar = document.getElementById('badge-sonar');
+const badgeSentry = document.getElementById('badge-sentry');
+const badgeGithub = document.getElementById('badge-github');
+const clearSonarBtn = document.getElementById('btn-clear-sonar');
+const clearSentryBtn = document.getElementById('btn-clear-sentry');
+const clearGithubBtn = document.getElementById('btn-clear-github');
 
 let catalogStations = [];
 let activeSource = null;
 let lastReport = null;
+let integrationsStatus = null;
 const stationState = new Map();
 const stationResults = new Map();
+
+function applyIntegrationsToUi(status) {
+  integrationsStatus = status;
+  const active = status?.activeNames ?? [];
+
+  if (integrationsBtn) {
+    integrationsBtn.textContent =
+      active.length > 0 ? `⚙ Integraciones (${active.length})` : '⚙ Integraciones';
+  }
+
+  // Cambiar dinámicamente el nombre de la Estación 7 en la pista
+  const st7 = catalogStations.find((s) => s.id === 'code-health-observability');
+  if (st7) {
+    st7.shortName = active.length > 0 ? active.join(' · ') : 'Deuda & Obs.';
+  }
+
+  const setBadge = (el, connected, clearBtn) => {
+    if (el) {
+      el.className = `status-chip ${connected ? 'status-chip--pass' : 'status-chip--pending'}`;
+      el.textContent = connected ? 'Conectado' : 'Sin conectar';
+    }
+    if (clearBtn) {
+      clearBtn.hidden = !connected;
+    }
+  };
+
+  setBadge(badgeSonar, Boolean(status?.sonarConfigured), clearSonarBtn);
+  setBadge(badgeSentry, Boolean(status?.sentryConfigured), clearSentryBtn);
+  setBadge(badgeGithub, Boolean(status?.githubConfigured), clearGithubBtn);
+
+  if (sonarKeyInput && status?.sonarProjectKey !== undefined) {
+    sonarKeyInput.value = status.sonarProjectKey;
+  }
+  if (sentryOrgInput && status?.sentryOrg !== undefined) {
+    sentryOrgInput.value = status.sentryOrg;
+  }
+  if (sentryProjectInput && status?.sentryProject !== undefined) {
+    sentryProjectInput.value = status.sentryProject;
+  }
+
+  renderAll();
+}
 
 function setTrafficLight(mode) {
   if (!trafficLight) return;
@@ -300,20 +360,88 @@ exportMdBtn.addEventListener('click', async () => {
   }
 });
 
+async function saveIntegrations(payload) {
+  if (integrationsMsg) integrationsMsg.hidden = true;
+  const res = await fetch('/api/integrations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'No se pudieron guardar las integraciones.');
+  }
+  applyIntegrationsToUi(data);
+  if (sonarTokenInput) sonarTokenInput.value = '';
+  if (sentryTokenInput) sentryTokenInput.value = '';
+  if (githubTokenInput) githubTokenInput.value = '';
+  if (integrationsMsg) {
+    integrationsMsg.textContent =
+      data.activeNames.length > 0
+        ? `Guardado en .env local. Estación 7 activa con: ${data.activeNames.join(' · ')}.`
+        : 'Guardado en .env local. Estación 7 en modo 100% local (sin tokens).';
+    integrationsMsg.hidden = false;
+  }
+}
+
+if (integrationsBtn && integrationsModal) {
+  integrationsBtn.addEventListener('click', () => {
+    if (integrationsMsg) integrationsMsg.hidden = true;
+    integrationsModal.showModal();
+  });
+}
+
+if (closeIntegrationsBtn && integrationsModal) {
+  closeIntegrationsBtn.addEventListener('click', () => integrationsModal.close());
+}
+
+if (integrationsForm) {
+  integrationsForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      await saveIntegrations({
+        sonarToken: sonarTokenInput?.value ?? '',
+        sonarProjectKey: sonarKeyInput?.value ?? '',
+        sentryAuthToken: sentryTokenInput?.value ?? '',
+        sentryOrg: sentryOrgInput?.value ?? '',
+        sentryProject: sentryProjectInput?.value ?? '',
+        githubToken: githubTokenInput?.value ?? ''
+      });
+    } catch (error) {
+      if (integrationsMsg) {
+        integrationsMsg.textContent = error instanceof Error ? error.message : 'Error guardando.';
+        integrationsMsg.hidden = false;
+      }
+    }
+  });
+}
+
+if (clearSonarBtn) {
+  clearSonarBtn.addEventListener('click', () => void saveIntegrations({ clearSonarToken: true }));
+}
+if (clearSentryBtn) {
+  clearSentryBtn.addEventListener('click', () => void saveIntegrations({ clearSentryToken: true }));
+}
+if (clearGithubBtn) {
+  clearGithubBtn.addEventListener('click', () => void saveIntegrations({ clearGithubToken: true }));
+}
+
 async function bootstrap() {
   try {
-    const [healthRes, stationsRes] = await Promise.all([
+    const [healthRes, stationsRes, integrationsRes] = await Promise.all([
       fetch('/api/health'),
-      fetch('/api/stations')
+      fetch('/api/stations'),
+      fetch('/api/integrations')
     ]);
     const health = await healthRes.json();
     const stationsPayload = await stationsRes.json();
+    const intStatus = await integrationsRes.json();
 
     if (health.defaultRepoPath && !repoPathInput.value) {
       repoPathInput.value = health.defaultRepoPath;
     }
     catalogStations = stationsPayload.stations ?? [];
-    renderAll();
+    applyIntegrationsToUi(intStatus);
   } catch {
     showError('No se pudo inicializar el dashboard local.');
   }
