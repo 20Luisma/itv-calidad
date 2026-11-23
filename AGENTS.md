@@ -5,7 +5,7 @@
 ## 1. Propósito del Proyecto
 **ITV Didáctica de Código** es una herramienta **100% local (0 cuentas externas, 0 tokens pagos)** que corre **antes de hacer `git push`** sobre cualquier repositorio local (PHP, Node.js/TypeScript o Python) y ejecuta **6 estaciones de inspección en cámara lenta**, explicando de forma visual, humana y didáctica **qué audita cada estación, por qué importa y cómo corregir cada fallo**.
 
-Nace como evolución práctica del estándar de calidad aplicado en `20Luisma/marvel`, pensado tanto para uso real en local como para enseñar calidad de software de forma comprensible.
+Nace como evolución práctica del estándar de calidad aplicado en `20Luisma/marvel`, pensado para uso real en local y para ver de forma clara y sin caja negra qué controla cada capa de calidad.
 
 ## 2. Stack Tecnológico
 - **Motor / CLI + Servidor local:** Node.js (LTS) + TypeScript (`strict: true`, `tsc --noEmit`).

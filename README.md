@@ -2,7 +2,7 @@
 
 Herramienta **100% local, open-source y sin cuentas externas** (CLI + Dashboard Web en cámara lenta) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **6 estaciones reales de calidad de software**.
 
-Pensada para desarrolladores, alumnos y equipos que programan con agentes de IA: en lugar de una "caja negra" que falla en la nube, te muestra paso a paso **qué revisa cada estación, qué comando exacto ejecuta, por qué importa y cómo corregir cada fallo**.
+Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar de una "caja negra" que falla en la nube, te muestra paso a paso **qué revisa cada estación, qué comando exacto ejecuta, por qué importa y cómo corregir cada fallo**.
 
 > **Solo lectura y 100% local:** corre íntegramente en tu máquina sin API keys, sin tokens pagos, sin telemetría y **sin modificar ni borrar nunca ningún archivo** del repositorio inspeccionado.
 
