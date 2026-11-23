@@ -141,7 +141,30 @@ El propio proyecto sigue Clean Architecture ligera, separación estricta HTML/CS
 - `src/domain/` — Tipos puros, catálogo de estaciones y cálculo de veredictos (sin dependencias de Node/HTTP).
 - `src/application/` — `DetectRepoStack`, `RunItvInspection` (orquestador + cámara lenta + eventos) y `ExportReportMarkdown`.
 - `src/infrastructure/` — `SafeCommandExecutor` (`spawn` con `shell: false` y timeouts), `RepoFileWalker` (solo lectura), escáneres locales y las 6 estaciones.
-- `src/interfaces/` — CLI (`cli/`) y servidor HTTP/SSE nativo (`web/`) + Dashboard modular (`public/`).
+- `src/interfaces/` — CLI (`cli/`), servidor HTTP/SSE nativo (`web/`) + Dashboard modular (`public/`), y **Servidor MCP Stdio (`mcp/`)** para agentes IA.
+
+---
+
+## 🔌 Uso como Servidor MCP (Antigravity, Cursor, Claude Code)
+
+`itv-calidad` expone un **MCP Server oficial por Stdio** con 3 herramientas nativas (`list_itv_stations`, `run_itv`, `get_security_checklist`):
+
+```bash
+npm run build
+```
+
+Agregalo en `~/.gemini/config/mcp_config.json` (Antigravity) o en la configuración MCP de tu IDE:
+
+```json
+{
+  "mcpServers": {
+    "itv-calidad": {
+      "command": "node",
+      "args": ["/ruta/absoluta/a/itv-didactica-codigo/dist/interfaces/mcp/server.js"]
+    }
+  }
+}
+```
 
 ```bash
 npm run typecheck      # TypeScript strict (0 errores)

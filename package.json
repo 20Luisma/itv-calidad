@@ -5,12 +5,14 @@
   "type": "module",
   "private": true,
   "bin": {
-    "itv-codigo": "./dist/interfaces/cli/index.js"
+    "itv-codigo": "./dist/interfaces/cli/index.js",
+    "itv-mcp": "./dist/interfaces/mcp/server.js"
   },
   "scripts": {
     "dev": "tsx watch src/interfaces/web/server.ts",
     "start": "tsx src/interfaces/web/server.ts",
     "itv": "tsx src/interfaces/cli/index.ts",
+    "mcp": "tsx src/interfaces/mcp/server.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -29,5 +31,9 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "vitest": "^5.1.1"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
   }
 }
