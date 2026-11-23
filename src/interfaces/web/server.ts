@@ -1,4 +1,7 @@
+import { loadLocalEnv } from '../../infrastructure/config/loadDotEnv.js';
 import { createWebServer } from './httpApp.js';
+
+loadLocalEnv();
 
 const PORT = Number(process.env.PORT ?? 4173);
 const HOST = process.env.HOST ?? '127.0.0.1';
