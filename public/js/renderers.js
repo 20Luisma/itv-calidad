@@ -18,12 +18,31 @@ export function statusLabel(status) {
     case 'skipped':
       return 'Omitida';
     case 'running':
-      return 'Inspeccionando…';
+      return 'Escaneando…';
     case 'manual':
-      return 'Revisar fuera del código';
+      return 'Fuera del código';
     default:
       return 'Pendiente';
   }
+}
+
+const STATION_ICONS = {
+  'syntax-config':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+  'static-types':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+  'tests-coverage':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v6.5L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3"/></svg>',
+  'security-cves':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  'e2e-browser':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+  'accessibility-ui':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M4 9h16"/><path d="M12 9v12"/><path d="M9 21l3-6 3 6"/></svg>'
+};
+
+function iconFor(stationId) {
+  return STATION_ICONS[stationId] ?? STATION_ICONS['syntax-config'];
 }
 
 export function renderTrackNodes(container, stations, stateMap) {
@@ -32,7 +51,10 @@ export function renderTrackNodes(container, stations, stateMap) {
       const state = stateMap.get(station.id) ?? 'pending';
       return `
         <li class="track-node track-node--${escapeHtml(state)}" data-station-id="${escapeHtml(station.id)}">
-          <span class="track-node__num">Estación ${escapeHtml(station.order)}</span>
+          <div class="track-node__top">
+            <span class="track-node__icon">${iconFor(station.id)}</span>
+            <span class="track-node__num">0${escapeHtml(station.order)}</span>
+          </div>
           <span class="track-node__name">${escapeHtml(station.shortName)}</span>
           <span class="track-node__state">${escapeHtml(statusLabel(state))}</span>
         </li>
@@ -77,11 +99,14 @@ export function renderStationCards(container, catalogStations, resultsMap, state
       return `
         <details class="station-card station-card--${escapeHtml(state)}" ${isOpen ? 'open' : ''}>
           <summary class="station-card__summary">
-            <div class="station-card__title-group">
-              <span class="station-card__name">${escapeHtml(meta.name)}</span>
-              <span class="station-card__subtitle">${escapeHtml(
-                result ? result.summary : meta.didactic.whatItChecks
-              )}</span>
+            <div class="station-card__left">
+              <span class="station-card__icon">${iconFor(meta.id)}</span>
+              <div class="station-card__title-group">
+                <span class="station-card__name">${escapeHtml(meta.name)}</span>
+                <span class="station-card__subtitle">${escapeHtml(
+                  result ? result.summary : meta.didactic.whatItChecks
+                )}</span>
+              </div>
             </div>
             <div class="station-card__right">
               ${
@@ -92,6 +117,7 @@ export function renderStationCards(container, catalogStations, resultsMap, state
               <span class="status-chip status-chip--${escapeHtml(state)}">${escapeHtml(
                 statusLabel(state)
               )}</span>
+              <span class="station-chevron" aria-hidden="true">▾</span>
             </div>
           </summary>
 
@@ -107,9 +133,14 @@ export function renderStationCards(container, catalogStations, resultsMap, state
               </div>
             </div>
 
-            <div>
-              <div class="didactic-box__label">Comando ejecutado</div>
-              <div class="cmd-box">${escapeHtml(result ? result.command : meta.didactic.toolsByStack)}</div>
+            <div class="terminal-box">
+              <div class="terminal-box__bar">
+                <span class="terminal-dot terminal-dot--red" aria-hidden="true"></span>
+                <span class="terminal-dot terminal-dot--yellow" aria-hidden="true"></span>
+                <span class="terminal-dot terminal-dot--green" aria-hidden="true"></span>
+                <span class="terminal-box__title">comando ejecutado</span>
+              </div>
+              <div class="cmd-box">$ ${escapeHtml(result ? result.command : meta.didactic.toolsByStack)}</div>
             </div>
 
             ${
@@ -119,8 +150,13 @@ export function renderStationCards(container, catalogStations, resultsMap, state
                     <div class="didactic-box__label">Hallazgos y cómo arreglarlo</div>
                     ${renderFindings(result.findings)}
                   </div>
-                  <div>
-                    <div class="didactic-box__label">Salida real</div>
+                  <div class="terminal-box">
+                    <div class="terminal-box__bar">
+                      <span class="terminal-dot terminal-dot--red" aria-hidden="true"></span>
+                      <span class="terminal-dot terminal-dot--yellow" aria-hidden="true"></span>
+                      <span class="terminal-dot terminal-dot--green" aria-hidden="true"></span>
+                      <span class="terminal-box__title">salida real</span>
+                    </div>
                     <pre class="raw-output">${escapeHtml(result.rawOutput || 'Sin salida')}</pre>
                   </div>
                 `
@@ -142,12 +178,16 @@ export function renderSecurityChecklist(sectionEl, checklist) {
   sectionEl.hidden = false;
   const disclaimerEl = document.getElementById('checklist-disclaimer');
   const scoreEl = document.getElementById('checklist-score');
+  const progressEl = document.getElementById('checklist-progress');
   const autoListEl = document.getElementById('checklist-automated');
   const opListEl = document.getElementById('checklist-operational');
 
   if (disclaimerEl) disclaimerEl.textContent = checklist.disclaimer;
   if (scoreEl) {
     scoreEl.textContent = `${checklist.scorePercent}% (${checklist.automatedPassed}/${checklist.automatedTotal} automáticos)`;
+  }
+  if (progressEl) {
+    progressEl.value = checklist.scorePercent;
   }
 
   const renderItem = (item) => {
