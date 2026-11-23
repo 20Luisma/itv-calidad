@@ -1,4 +1,5 @@
 import type {
+  ExternalIntegrationLink,
   Finding,
   InspectionReport,
   InspectionSummary,
@@ -96,6 +97,7 @@ export function createStationResult(params: {
   findings?: readonly Finding[];
   metrics?: Readonly<Record<string, number | string>>;
   securityChecklist?: SecurityChecklistReport;
+  externalLinks?: readonly ExternalIntegrationLink[];
 }): StationResult {
   const base: StationResult = {
     id: params.metadata.id,
@@ -112,13 +114,12 @@ export function createStationResult(params: {
     findings: params.findings ?? []
   };
 
-  const withMetrics =
-    params.metrics && Object.keys(params.metrics).length > 0
-      ? { ...base, metrics: params.metrics }
-      : base;
-
-  if (params.securityChecklist) {
-    return { ...withMetrics, securityChecklist: params.securityChecklist };
-  }
-  return withMetrics;
+  return {
+    ...base,
+    ...(params.metrics && Object.keys(params.metrics).length > 0 ? { metrics: params.metrics } : {}),
+    ...(params.securityChecklist ? { securityChecklist: params.securityChecklist } : {}),
+    ...(params.externalLinks && params.externalLinks.length > 0
+      ? { externalLinks: params.externalLinks }
+      : {})
+  };
 }

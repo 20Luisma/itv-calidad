@@ -3,6 +3,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { CommandExecutor, CommandResult, RepoStack } from '../src/domain/types.js';
+import { loadLocalEnv } from '../src/infrastructure/config/loadDotEnv.js';
+import { querySentryIssues } from '../src/infrastructure/integrations/SentryApiClient.js';
+import { querySonarCloud } from '../src/infrastructure/integrations/SonarCloudClient.js';
 import {
   estimateCyclomaticComplexity,
   scanCodeHealthSonar
@@ -131,5 +134,84 @@ describe('ObservabilitySentryScanner & Station 7', () => {
     });
     expect(stationRes.status).toBe('pass');
     expect(stationRes.metrics?.observability).toBe('Sentry');
+  });
+});
+
+describe('Live API clients (SonarCloud, Sentry) & loadLocalEnv', () => {
+  it('SonarCloudClient devuelve enlace directo sin token y Quality Gate real con token', async () => {
+    const dir = await createTempDir();
+    await writeFile(
+      path.join(dir, 'sonar-project.properties'),
+      'sonar.projectKey=20Luisma_marvel\nsonar.host.url=https://sonarcloud.io\n'
+    );
+
+    const withoutToken = await querySonarCloud(dir, { env: {} });
+    expect(withoutToken.link?.status).toBe('not-configured');
+    expect(withoutToken.link?.url).toBe('https://sonarcloud.io/dashboard?id=20Luisma_marvel');
+
+    const fakeFetch = (async (url: string | URL) => {
+      const target = String(url);
+      if (target.includes('qualitygates')) {
+        return new Response(JSON.stringify({ projectStatus: { status: 'ERROR' } }), { status: 200 });
+      }
+      return new Response(
+        JSON.stringify({
+          component: {
+            measures: [
+              { metric: 'bugs', value: '2' },
+              { metric: 'code_smells', value: '5' }
+            ]
+          }
+        }),
+        { status: 200 }
+      );
+    }) as typeof fetch;
+
+    const withToken = await querySonarCloud(dir, {
+      env: { SONAR_TOKEN: 'fake-token-test' },
+      fetchImpl: fakeFetch
+    });
+    expect(withToken.link?.status).toBe('connected');
+    expect(withToken.link?.summary).toContain('Quality Gate: ERROR');
+    expect(withToken.findings.some((f) => f.severity === 'error')).toBe(true);
+  });
+
+  it('SentryApiClient devuelve enlace sin token, issues reales con token y maneja HTTP 401', async () => {
+    const noToken = await querySentryIssues({
+      env: { SENTRY_ORG: 'mi-org', SENTRY_PROJECT: 'mi-app' }
+    });
+    expect(noToken.link?.status).toBe('not-configured');
+    expect(noToken.link?.url).toContain('/organizations/mi-org/issues/');
+
+    const okFetch = (async () =>
+      new Response(
+        JSON.stringify([
+          { shortId: 'APP-1', title: 'TypeError: Cannot read id', count: '12' }
+        ]),
+        { status: 200 }
+      )) as typeof fetch;
+
+    const connected = await querySentryIssues({
+      env: { SENTRY_ORG: 'mi-org', SENTRY_PROJECT: 'mi-app', SENTRY_AUTH_TOKEN: 'tok' },
+      fetchImpl: okFetch
+    });
+    expect(connected.link?.status).toBe('connected');
+    expect(connected.findings.some((f) => f.title.includes('1 issue(s)'))).toBe(true);
+
+    const errFetch = (async () => new Response('Unauthorized', { status: 401 })) as typeof fetch;
+    const failed = await querySentryIssues({
+      env: { SENTRY_ORG: 'mi-org', SENTRY_PROJECT: 'mi-app', SENTRY_AUTH_TOKEN: 'bad' },
+      fetchImpl: errFetch
+    });
+    expect(failed.link?.status).toBe('error');
+  });
+
+  it('loadLocalEnv carga variables desde .env sin pisar variables existentes', async () => {
+    const dir = await createTempDir();
+    await writeFile(path.join(dir, '.env'), 'ITV_TEST_VAR="valor123"\n# comentario\n');
+    delete process.env.ITV_TEST_VAR;
+    loadLocalEnv(dir);
+    expect(process.env.ITV_TEST_VAR).toBe('valor123');
+    delete process.env.ITV_TEST_VAR;
   });
 });

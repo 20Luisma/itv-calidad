@@ -82,14 +82,14 @@ export const STATION_CATALOG: Readonly<Record<StationId, StationMetadata>> = {
   'code-health-observability': {
     id: 'code-health-observability',
     order: 7,
-    name: 'Estación 7 — Calidad Sonar y Observabilidad (Sentry)',
-    shortName: 'Sonar & Sentry',
+    name: 'Estación 7 — Deuda Técnica y Observabilidad (Sonar / Sentry)',
+    shortName: 'Deuda & Obs.',
     didactic: {
       whatItChecks:
-        'Analiza deuda técnica local tipo Sonar (archivos monolíticos, complejidad ciclomática, bloques duplicados, debugger/var_dump olvidados) y audita observabilidad fail-safe / Sentry (DSN en .env, RGPD PII, handlers globales).',
+        'Ejecuta análisis local de deuda técnica (tamaño, complejidad, duplicados, restos de debug) y observabilidad pre-push; si configurás SONAR_TOKEN o SENTRY_AUTH_TOKEN en tu .env local, consulta en vivo SonarCloud y Sentry con enlaces directos.',
       whyItMatters:
-        'El código duplicado o demasiado complejo dispara el costo de mantenimiento, y desplegar sin observabilidad o con un DSN/PII mal configurado te deja ciego ante fallos en producción.',
-      toolsByStack: 'Escáner local tipo Sonar + auditoría Sentry/observabilidad (0 cuentas obligatorias)'
+        'Evita acumular código inmantenible y te deja ver el Quality Gate real de SonarCloud y los errores abiertos en Sentry antes de hacer git push.',
+      toolsByStack: 'Análisis local (0 cuentas) + API opcional SonarCloud / Sentry vía .env'
     }
   }
 };

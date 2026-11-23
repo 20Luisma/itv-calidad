@@ -1,29 +1,60 @@
 import { STATION_CATALOG } from '../../domain/catalog.js';
 import { createStationResult } from '../../domain/report.js';
-import type { Finding, StationContext, StationResult, StationRunner } from '../../domain/types.js';
+import type {
+  ExternalIntegrationLink,
+  Finding,
+  StationContext,
+  StationResult,
+  StationRunner
+} from '../../domain/types.js';
+import { querySentryIssues } from '../integrations/SentryApiClient.js';
+import { querySonarCloud } from '../integrations/SonarCloudClient.js';
 import { scanCodeHealthSonar } from '../scanners/CodeHealthSonarScanner.js';
 import { scanObservabilitySentry } from '../scanners/ObservabilitySentryScanner.js';
 
+export interface CodeHealthStationDeps {
+  readonly env?: Readonly<Record<string, string | undefined>>;
+  readonly fetchImpl?: typeof fetch;
+}
+
 export class CodeHealthObservabilityStation implements StationRunner {
   readonly metadata = STATION_CATALOG['code-health-observability'];
+
+  constructor(private readonly deps: CodeHealthStationDeps = {}) {}
 
   async run(context: StationContext): Promise<StationResult> {
     const startedAt = Date.now();
     const { repoPath, stack } = context;
 
-    const [sonar, sentry] = await Promise.all([
+    const clientOpts = {
+      ...(this.deps.env ? { env: this.deps.env } : {}),
+      ...(this.deps.fetchImpl ? { fetchImpl: this.deps.fetchImpl } : {})
+    };
+
+    const [sonar, sentry, sonarCloud, sentryApi] = await Promise.all([
       scanCodeHealthSonar(repoPath),
-      scanObservabilitySentry(repoPath, stack)
+      scanObservabilitySentry(repoPath, stack),
+      querySonarCloud(repoPath, clientOpts),
+      querySentryIssues(clientOpts)
     ]);
 
-    const findings: Finding[] = [...sonar.findings, ...sentry.findings];
+    const externalLinks: ExternalIntegrationLink[] = [];
+    if (sonarCloud.link) externalLinks.push(sonarCloud.link);
+    if (sentryApi.link) externalLinks.push(sentryApi.link);
+
+    const findings: Finding[] = [
+      ...sonar.findings,
+      ...sentry.findings,
+      ...sonarCloud.findings,
+      ...sentryApi.findings
+    ];
     const hasErrors = findings.some((f) => f.severity === 'error');
     const hasWarnings = findings.some((f) => f.severity === 'warning');
 
-    if (sonar.filesAnalyzed === 0) {
+    if (sonar.filesAnalyzed === 0 && externalLinks.length === 0) {
       return createStationResult({
         metadata: this.metadata,
-        command: 'Escáner local Sonar + Observabilidad Sentry (0 archivos fuente)',
+        command: 'Escáner local deuda técnica + observabilidad (0 archivos fuente)',
         status: 'skipped',
         durationMs: Date.now() - startedAt,
         summary: 'No se encontraron archivos fuente PHP, JS/TS ni Python para analizar deuda técnica.',
@@ -36,19 +67,25 @@ export class CodeHealthObservabilityStation implements StationRunner {
     const errorCount = findings.filter((f) => f.severity === 'error').length;
 
     const summary = hasErrors
-      ? `Se detectaron ${errorCount} fallo(s) bloqueante(s) de calidad u observabilidad (debugger o Sentry DSN hardcodeado).`
+      ? `Se detectaron ${errorCount} fallo(s) bloqueante(s) de calidad u observabilidad.`
       : hasWarnings
-        ? `Calidad analizada en ${sonar.filesAnalyzed} archivo(s) con ${warningCount} aviso(s) de deuda técnica u observabilidad.`
-        : `Calidad técnica limpia (${sonar.filesAnalyzed} archivo(s), 0 duplicados) y sin fugas de observabilidad.`;
+        ? `Analizados ${sonar.filesAnalyzed} archivo(s) con ${warningCount} aviso(s) de deuda técnica u observabilidad.`
+        : `Calidad técnica limpia (${sonar.filesAnalyzed} archivo(s), 0 duplicados) y observabilidad sin fugas.`;
 
     const outputLines = [
-      `Mini-Sonar local: ${sonar.filesAnalyzed} archivo(s) analizado(s) · ${sonar.duplicateBlocks} bloque(s) duplicado(s) · sonar-project.properties: ${sonar.hasSonarConfig ? 'sí' : 'no'}.`,
-      `Observabilidad / Sentry: ${sentry.sentryDetected ? 'Sentry detectado' : sentry.hasObservability ? 'Handlers/logs detectados' : 'Sin SDK ni handlers globales detectados'}.`
+      `Análisis local deuda técnica: ${sonar.filesAnalyzed} archivo(s) · ${sonar.duplicateBlocks} bloque(s) duplicado(s) · sonar-project.properties: ${sonar.hasSonarConfig ? 'sí' : 'no'}.`,
+      `Observabilidad estática: ${sentry.sentryDetected ? 'Sentry detectado' : sentry.hasObservability ? 'Handlers/logs detectados' : 'Sin SDK ni handlers globales detectados'}.`,
+      ...(sonarCloud.logLine ? [sonarCloud.logLine] : []),
+      ...(sentryApi.logLine ? [sentryApi.logLine] : [])
     ];
+
+    const cmdParts = [`análisis local (${sonar.filesAnalyzed} archivos)`];
+    if (sonarCloud.link?.status === 'connected') cmdParts.push('SonarCloud API');
+    if (sentryApi.link?.status === 'connected') cmdParts.push('Sentry API');
 
     return createStationResult({
       metadata: this.metadata,
-      command: `mini-sonar local (${sonar.filesAnalyzed} archivos) && auditoría observabilidad/Sentry`,
+      command: cmdParts.join(' && '),
       status,
       durationMs: Date.now() - startedAt,
       summary,
@@ -62,7 +99,8 @@ export class CodeHealthObservabilityStation implements StationRunner {
           : sentry.hasObservability
             ? 'Logs/Handlers'
             : 'Sin configurar'
-      }
+      },
+      ...(externalLinks.length > 0 ? { externalLinks } : {})
     });
   }
 }

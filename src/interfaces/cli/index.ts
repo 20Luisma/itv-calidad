@@ -2,9 +2,12 @@
 import { exportReportAsMarkdown } from '../../application/ExportReportMarkdown.js';
 import { RunItvInspection } from '../../application/RunItvInspection.js';
 import type { InspectionEvent, StationStatus } from '../../domain/types.js';
+import { loadLocalEnv } from '../../infrastructure/config/loadDotEnv.js';
 import { SafeCommandExecutor } from '../../infrastructure/exec/SafeCommandExecutor.js';
 import { createDefaultStations } from '../../infrastructure/stations/index.js';
 import { parseCliArgs } from './parseArgs.js';
+
+loadLocalEnv();
 
 const ANSI = {
   reset: '\x1b[0m',

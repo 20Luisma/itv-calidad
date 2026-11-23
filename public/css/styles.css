@@ -973,6 +973,57 @@ code {
   word-break: break-word;
 }
 
+/* External integration links (SonarCloud / Sentry) */
+.external-links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .external-links-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.external-link-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-strong);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.external-link-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.external-link-card__title {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.external-link-card__summary {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.external-link-card__btn {
+  align-self: flex-start;
+  text-decoration: none;
+  height: 36px;
+  font-size: 0.82rem;
+}
+
 /* Findings */
 .findings-list {
   list-style: none;

@@ -89,7 +89,16 @@ npm run itv -- /ruta/a/tu/proyecto --json > itv-evidencia.json
 | **4** | **Seguridad, CVEs y Diligencia Debida** | CVEs en dependencias + escáner de credenciales, IPs `http://`, `eval()`, `shell: true` + Checklist OWASP/RGPD | `npm audit`, `composer audit`, `pip-audit` + escáneres locales propios |
 | **5** | **Pruebas E2E en navegador** | Flujos reales de usuario y casos negativos si el repo tiene suite E2E | `npm run test:e2e`, `npm run e2e` o `playwright test` |
 | **6** | **Accesibilidad y calidad UI** | Cumplimiento WCAG 2.1 AA en vistas y/o URL viva | `npm run test:a11y` / `a11y`, `pa11y --standard WCAG2AA <url>` + escáner estático en `.html`, `.htm`, `.php`, `.jsx`, `.tsx`, `.vue` (`lang`, `alt`, `label`, `button`, `a`, saltos de headings) |
-| **7** | **Calidad Sonar y Observabilidad (Sentry)** | Deuda técnica local (archivos monolíticos, complejidad ciclomática, bloques duplicados, `debugger`/`var_dump`) + observabilidad fail-safe / Sentry (DSN en `.env`, `sendDefaultPii` RGPD) | Mini-Sonar local + auditoría Sentry/observabilidad (0 cuentas obligatorias) |
+| **7** | **Deuda Técnica y Observabilidad (Sonar / Sentry)** | Análisis local ligero (archivos grandes, complejidad, duplicados DRY, `debugger`/`var_dump`) + auditoría estática Sentry/logs + **integración opcional en vivo con SonarCloud y Sentry** | Análisis local (0 cuentas) + API opcional SonarCloud / Sentry vía `.env` |
+
+### Conectar SonarCloud y Sentry reales (opcional)
+Si querés que la Estación 7 consulte el **Quality Gate real de SonarCloud** y los **issues abiertos en Sentry** (mostrando además los enlaces directos a ambos paneles en el Dashboard), copiá `.env.example` a `.env` y cargá tus tokens:
+```bash
+cp .env.example .env
+# Completá SONAR_TOKEN y/o SENTRY_AUTH_TOKEN + SENTRY_ORG + SENTRY_PROJECT
+```
+- `.env` está protegido en `.gitignore`; los tokens solo se leen en backend y nunca se envían al navegador ni a los reportes exportados.
+- Si no creás `.env`, la herramienta sigue funcionando **100% local sin cuentas**.
 
 ---
 

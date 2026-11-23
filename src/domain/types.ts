@@ -61,6 +61,14 @@ export interface SecurityChecklistReport {
   readonly items: readonly SecurityChecklistItem[];
 }
 
+export interface ExternalIntegrationLink {
+  readonly provider: 'sonarcloud' | 'sentry';
+  readonly label: string;
+  readonly url: string;
+  readonly status: 'connected' | 'not-configured' | 'error';
+  readonly summary: string;
+}
+
 export interface StationResult {
   readonly id: StationId;
   readonly order: number;
@@ -76,6 +84,7 @@ export interface StationResult {
   readonly findings: readonly Finding[];
   readonly metrics?: Readonly<Record<string, number | string>>;
   readonly securityChecklist?: SecurityChecklistReport;
+  readonly externalLinks?: readonly ExternalIntegrationLink[];
 }
 
 export interface RepoStack {

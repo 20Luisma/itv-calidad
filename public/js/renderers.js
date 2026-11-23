@@ -91,6 +91,50 @@ function renderFindings(findings) {
   `;
 }
 
+function renderExternalLinks(links) {
+  if (!links || links.length === 0) return '';
+  return `
+    <div>
+      <div class="didactic-box__label">Paneles externos (SonarCloud / Sentry)</div>
+      <div class="external-links-grid">
+        ${links
+          .map((link) => {
+            const chipClass =
+              link.status === 'connected'
+                ? 'status-chip--pass'
+                : link.status === 'error'
+                  ? 'status-chip--fail'
+                  : 'status-chip--pending';
+            const stateText =
+              link.status === 'connected'
+                ? 'Conectado'
+                : link.status === 'error'
+                  ? 'Error API'
+                  : 'Sin token en .env';
+            return `
+              <div class="external-link-card">
+                <div class="external-link-card__top">
+                  <span class="external-link-card__title">${escapeHtml(link.label)}</span>
+                  <span class="status-chip ${chipClass}">${escapeHtml(stateText)}</span>
+                </div>
+                <p class="external-link-card__summary">${escapeHtml(link.summary)}</p>
+                <a
+                  class="btn btn--secondary btn--compact external-link-card__btn"
+                  href="${escapeHtml(link.url)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Abrir panel externo ↗
+                </a>
+              </div>
+            `;
+          })
+          .join('')}
+      </div>
+    </div>
+  `;
+}
+
 export function renderStationCards(container, catalogStations, resultsMap, stateMap) {
   container.innerHTML = catalogStations
     .map((meta) => {
@@ -148,6 +192,7 @@ export function renderStationCards(container, catalogStations, resultsMap, state
             ${
               result
                 ? `
+                  ${renderExternalLinks(result.externalLinks)}
                   <div>
                     <div class="didactic-box__label">Hallazgos y cómo arreglarlo</div>
                     ${renderFindings(result.findings)}

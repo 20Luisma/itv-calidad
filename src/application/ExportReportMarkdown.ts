@@ -35,6 +35,12 @@ export function exportReportAsMarkdown(report: InspectionReport): string {
     lines.push(`- **Comando:** \`${station.command}\``);
     lines.push(`- **Resumen:** ${station.summary}`);
     lines.push(`- **Tiempo:** ${station.durationMs} ms`);
+    if (station.externalLinks && station.externalLinks.length > 0) {
+      lines.push('- **Paneles externos:**');
+      for (const link of station.externalLinks) {
+        lines.push(`  - [${link.label}](${link.url}) — *${link.status}*: ${link.summary}`);
+      }
+    }
     if (station.findings.length > 0) {
       lines.push('- **Hallazgos:**');
       for (const finding of station.findings) {
