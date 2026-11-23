@@ -1,4 +1,4 @@
-# ITV de Código (`itv-calidad`)
+# ITV de Código — MCP App & Auditor Local (`itv-calidad`)
 
 [![CI — ITV de Código](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml/badge.svg)](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml)
 
