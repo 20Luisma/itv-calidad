@@ -866,7 +866,12 @@ code {
   padding: 0 20px 20px;
   border-top: 1px solid var(--border-subtle);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
+}
+
+.station-card__body > * {
+  min-width: 0;
 }
 
 .didactic-grid {
@@ -887,6 +892,8 @@ code {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   padding: 13px 15px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .didactic-box__label {
@@ -981,6 +988,9 @@ code {
   border-radius: var(--radius-sm);
   background: var(--bg-surface-strong);
   border: 1px solid var(--border-subtle);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .finding-item--error {
