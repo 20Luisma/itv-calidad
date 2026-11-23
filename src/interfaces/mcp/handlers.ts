@@ -6,7 +6,7 @@ import { SafeCommandExecutor } from '../../infrastructure/exec/SafeCommandExecut
 import { createDefaultStations } from '../../infrastructure/stations/index.js';
 
 export interface RunItvInput {
-  repoPath: string;
+  repoPath?: string | undefined;
   minCoverage?: number | undefined;
   targetUrl?: string | undefined;
   format?: 'json' | 'markdown' | undefined;
@@ -15,6 +15,7 @@ export interface RunItvInput {
 export interface McpToolResponse {
   [key: string]: unknown;
   content: Array<{ type: 'text'; text: string }>;
+  structuredContent?: Record<string, unknown>;
   isError?: boolean;
 }
 
@@ -37,12 +38,14 @@ export function handleListStations(): McpToolResponse {
     id: s.metadata.id,
     order: s.metadata.order,
     name: s.metadata.name,
+    shortName: s.metadata.shortName,
     whatItChecks: s.metadata.didactic.whatItChecks,
     whyItMatters: s.metadata.didactic.whyItMatters
   }));
 
   return {
-    content: [{ type: 'text', text: JSON.stringify({ totalStations: stations.length, stations }, null, 2) }]
+    content: [{ type: 'text', text: JSON.stringify({ totalStations: stations.length, stations }, null, 2) }],
+    structuredContent: { totalStations: stations.length, stations }
   };
 }
 
@@ -50,39 +53,64 @@ export async function handleRunItv(
   input: RunItvInput,
   runner: InspectionRunner = createDefaultRunner()
 ): Promise<McpToolResponse> {
+  const trimmedPath = input.repoPath?.trim();
+  if (!trimmedPath) {
+    const defaultRepoPath = process.cwd();
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Cabina ITV de Código abierta. Indicá una ruta local de repositorio (por ejemplo: ${defaultRepoPath}) para iniciar las 7 estaciones.`
+        }
+      ],
+      structuredContent: {
+        mode: 'idle',
+        defaultRepoPath
+      }
+    };
+  }
+
   try {
     const report = await runner.execute({
-      repoPath: input.repoPath,
+      repoPath: trimmedPath,
       slowMotionMs: 0,
       minCoverage: input.minCoverage ?? 75,
       ...(input.targetUrl ? { targetUrl: input.targetUrl } : {})
     });
 
+    const structuredPayload = {
+      mode: 'report',
+      verdict: report.verdict,
+      blocksPush: report.blocksPush,
+      repoName: report.stack.repoName,
+      repoPath: report.stack.repoPath,
+      primaryStack: report.stack.primaryStack,
+      gitBranch: report.stack.gitBranch,
+      totalDurationMs: report.totalDurationMs,
+      summary: report.summary,
+      securityChecklist: report.securityChecklist,
+      stations: report.stations.map((s) => ({
+        id: s.id,
+        order: s.order,
+        name: s.name,
+        shortName: s.shortName,
+        status: s.status,
+        durationMs: s.durationMs,
+        summary: s.summary,
+        findings: s.findings,
+        ...(s.externalLinks ? { externalLinks: s.externalLinks } : {})
+      }))
+    };
+
     const text =
       input.format === 'markdown'
         ? exportReportAsMarkdown(report)
-        : JSON.stringify(
-            {
-              verdict: report.verdict,
-              blocksPush: report.blocksPush,
-              repoName: report.stack.repoName,
-              primaryStack: report.stack.primaryStack,
-              gitBranch: report.stack.gitBranch,
-              summary: report.summary,
-              securityChecklist: report.securityChecklist,
-              stations: report.stations.map((s) => ({
-                order: s.order,
-                name: s.name,
-                status: s.status,
-                summary: s.summary,
-                findings: s.findings
-              }))
-            },
-            null,
-            2
-          );
+        : JSON.stringify(structuredPayload, null, 2);
 
-    return { content: [{ type: 'text', text }] };
+    return {
+      content: [{ type: 'text', text }],
+      structuredContent: structuredPayload
+    };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return {
@@ -104,28 +132,22 @@ export async function handleSecurityChecklist(
     });
 
     const securityStation = report.stations.find((s) => s.order === 4);
+    const payload = {
+      repoName: report.stack.repoName,
+      verdict: report.verdict,
+      securityStation: securityStation
+        ? {
+            status: securityStation.status,
+            summary: securityStation.summary,
+            findings: securityStation.findings
+          }
+        : null,
+      checklist: report.securityChecklist ?? null
+    };
+
     return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(
-            {
-              repoName: report.stack.repoName,
-              verdict: report.verdict,
-              securityStation: securityStation
-                ? {
-                    status: securityStation.status,
-                    summary: securityStation.summary,
-                    findings: securityStation.findings
-                  }
-                : null,
-              checklist: report.securityChecklist ?? null
-            },
-            null,
-            2
-          )
-        }
-      ]
+      content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }],
+      structuredContent: payload
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

@@ -13,7 +13,7 @@
     "start": "tsx src/interfaces/web/server.ts",
     "itv": "tsx src/interfaces/cli/index.ts",
     "mcp": "tsx src/interfaces/mcp/server.ts",
-    "build": "tsc",
+    "build": "tsc && node scripts/build-mcp-app.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -25,9 +25,11 @@
     "node": ">=20.0.0"
   },
   "devDependencies": {
+    "@modelcontextprotocol/ext-apps": "^2.0.4",
     "@playwright/test": "^1.65.1",
     "@types/node": "^22.10.0",
     "@vitest/coverage-v8": "^5.1.1",
+    "esbuild": "^0.28.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "vitest": "^5.1.1"

@@ -10,7 +10,9 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       exclude: [
         'src/interfaces/cli/index.ts',
-        'src/interfaces/web/server.ts'
+        'src/interfaces/web/server.ts',
+        'src/interfaces/mcp/server.ts',
+        'src/interfaces/mcp/ui/**'
       ],
       thresholds: {
         lines: 75,

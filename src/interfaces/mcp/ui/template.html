@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ITV de Código — MCP App</title>
+    <style>/*__INLINE_CSS__*/</style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="header">
+        <div class="brand">
+          <div class="brand__logo" aria-hidden="true">ITV</div>
+          <div>
+            <h1 class="brand__title">ITV de Código</h1>
+            <p class="brand__sub">Cabina interactiva embebida · 7 estaciones · Solo lectura</p>
+          </div>
+        </div>
+        <div class="header__meta">
+          <span class="pill" id="pill-repo">Repositorio: pendiente</span>
+          <span class="pill" id="pill-stack">Stack: —</span>
+          <div id="traffic" class="traffic" role="status" aria-label="Semáforo ITV">
+            <span class="lamp lamp--red" aria-hidden="true"></span>
+            <span class="lamp lamp--amber" aria-hidden="true"></span>
+            <span class="lamp lamp--green" aria-hidden="true"></span>
+          </div>
+        </div>
+      </header>
+
+      <form id="launcher-form" class="bar">
+        <label for="repo-input" class="brand__sub">Ruta repo:</label>
+        <input
+          id="repo-input"
+          type="text"
+          class="bar__input"
+          placeholder="/Users/admin/Desktop/Proyectos/mi-repo"
+          autocomplete="off"
+        />
+        <button type="submit" id="btn-run" class="btn btn--primary">Pasar ITV</button>
+      </form>
+
+      <div id="error-box" class="error-box" role="alert" hidden></div>
+
+      <section class="panel" aria-labelledby="track-heading">
+        <div class="panel__head">
+          <h2 id="track-heading" class="panel__title">Línea de 7 estaciones</h2>
+          <span id="status-line" class="status-line">Lista para inspeccionar</span>
+        </div>
+        <div id="track" class="track"></div>
+      </section>
+
+      <section id="verdict-panel" class="panel verdict" hidden>
+        <div>
+          <span id="verdict-badge" class="badge">VEREDICTO</span>
+          <h2 id="verdict-title" class="verdict__title">Resultado</h2>
+          <p id="verdict-sub" class="brand__sub"></p>
+        </div>
+        <div id="kpis" class="kpis"></div>
+      </section>
+
+      <section id="details-panel" class="panel" hidden>
+        <div class="panel__head">
+          <h2 class="panel__title">Detalle de estaciones y hallazgos</h2>
+          <button type="button" id="btn-fix-all" class="btn btn--secondary btn--tiny" hidden>
+            Pedir al agente que corrija todo
+          </button>
+        </div>
+        <div id="details-list" class="details-list"></div>
+      </section>
+
+      <section id="checklist-panel" class="panel" hidden>
+        <div class="panel__head">
+          <h2 class="panel__title">Checklist de Seguridad (OWASP ASVS / RGPD Art. 32)</h2>
+          <span id="checklist-score" class="status-line">0%</span>
+        </div>
+        <progress id="checklist-bar" class="checklist-bar" value="0" max="100"></progress>
+        <div id="checklist-grid" class="checklist-grid"></div>
+      </section>
+    </main>
+
+    <script>/*__INLINE_JS__*/</script>
+  </body>
+</html>
