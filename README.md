@@ -27,7 +27,7 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 ### Lo que SÍ hace (100% real, cero simulaciones)
 - **Ejecuta herramientas reales** sobre tu repositorio local (PHP, Node.js/TypeScript o Python, incluidos repos mixtos o proyectos sin manifiesto) respetando sus códigos de salida reales (**cero falsos verdes**).
 - **Bloquea el push (`exit code != 0`)** si falla cualquier estación obligatoria (sintaxis, tipos, tests/cobertura, CVEs/secretos, E2E o accesibilidad crítica).
-- **Omite con honestidad (`OMITIDA`)** las estaciones que no aplican al stack del proyecto (por ejemplo, si no tiene Playwright), explicándote cómo agregarlas si querés.
+- **Omite con honestidad (`OMITIDA`)** las estaciones que no aplican al stack del proyecto (por ejemplo, si no tiene Playwright), explicándote cómo agregarlas si quieres.
 - **Genera un Checklist de Tranquilidad / Diligencia Debida en Seguridad** (basado en OWASP ASVS Nivel 1 y medidas técnicas del Art. 32 RGPD) y te permite **exportar la evidencia fechada en Markdown (`.md`) o JSON (`.json`)**.
 - **Cabina visual embebida en tu IDE (MCP App):** al ejecutar `run_itv` en Antigravity, se renderiza directo en el chat (y en el panel lateral **`+`**) una cabina dark interactiva con semáforo LED, escaneo animado, detalle por estación, re-escaneo en 1 clic y botón **"Arreglar con agente"**.
 
@@ -36,7 +36,7 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 - **No reemplaza** un pentest profesional, un SAST enterprise (SonarQube / CodeQL / Semgrep) ni una auditoría de seguridad formal para sistemas críticos o banca.
 - **No constituye asesoramiento legal:** el bloque operativo/contractual del checklist (DPA, backups, plan 72h) es una guía técnica de buenas prácticas basada en OWASP/RGPD.
 - **No instala ni modifica dependencias en el repo inspeccionado:** utiliza los binarios disponibles en tu máquina o en `node_modules`/`vendor` del propio proyecto.
-- **Compatible con macOS, Windows y Linux:** el botón **Examinar…** abre el selector nativo de carpetas en los 3 sistemas (Finder en macOS, Explorador vía PowerShell en Windows y `zenity`/`kdialog` en Linux), y también podés pegar cualquier ruta a mano o usar el CLI.
+- **Compatible con macOS, Windows y Linux:** el botón **Examinar…** abre el selector nativo de carpetas en los 3 sistemas (Finder en macOS, Explorador vía PowerShell en Windows y `zenity`/`kdialog` en Linux), y también puedes pegar cualquier ruta a mano o usar el CLI.
 
 ---
 
@@ -47,7 +47,7 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
   - **Node / TypeScript:** `npm`, `tsc` (del proyecto), `vitest`/`jest` (del proyecto).
   - **PHP:** `php`, `composer`, `vendor/bin/phpstan`, `vendor/bin/phpunit`.
   - **Python:** `python3`, `pytest`, `mypy` o `ruff`, `pip-audit`.
-  - **Opcional (WCAG 2.1 AA en vivo sobre URL local):** `npm install -g pa11y` (en macOS/Windows/Linux autodetecta Chrome/Chromium/Brave si ya lo tenés instalado).
+  - **Opcional (WCAG 2.1 AA en vivo sobre URL local):** `npm install -g pa11y` (en macOS/Windows/Linux autodetecta Chrome/Chromium/Brave si ya lo tienes instalado).
 
 ---
 
@@ -69,7 +69,7 @@ npm run build
 ![Demo en vivo de ITV de Código MCP App embebida en Antigravity](docs/assets/itv-mcp-demo.gif)
 
 ### 1. Registrar el servidor MCP en tu IDE / Agente
-- **Antigravity:** `~/.gemini/antigravity/mcp_config.json` *(tras editarlo, reiniciá Antigravity completamente para cargar la MCP App)*
+- **Antigravity:** `~/.gemini/antigravity/mcp_config.json` *(tras editarlo, reinicia Antigravity completamente para cargar la MCP App)*
 - **Cursor:** `.cursor/mcp.json` o `~/.cursor/mcp.json`
 - **Claude Desktop / Claude Code:** `claude_desktop_config.json` o:
   ```bash
@@ -97,7 +97,7 @@ npm run build
 
 ### 2. Orden de lanzamiento automático para `GEMINI.md` (o `AGENTS.md` / `CLAUDE.md`)
 
-Pegá esta regla en tu `~/.gemini/GEMINI.md` (global) o en el `AGENTS.md` / `CLAUDE.md` de tus proyectos para que tu agente dispare la ITV **automáticamente antes de cada `git push`, tag o deploy**:
+Pega esta regla en tu `~/.gemini/GEMINI.md` (global) o en el `AGENTS.md` / `CLAUDE.md` de tus proyectos para que tu agente dispare la ITV **automáticamente antes de cada `git push`, tag o deploy**:
 
 ```markdown
 ## Gate ITV Automático (Pre-Push / Pre-Deploy)
@@ -124,7 +124,7 @@ npm run start
 # Abrir en el navegador: http://127.0.0.1:4173
 ```
 
-Desde el Dashboard podés:
+Desde el Dashboard puedes:
 1. Elegir cualquier proyecto local con el botón **Examinar…** (macOS, Windows y Linux) o pegando su ruta absoluta.
 2. *(Opcional)* Pegar una **URL local viva** (ej. `http://127.0.0.1:3000`) para correr auditoría WCAG 2.1 AA en vivo con `pa11y`.
 3. Elegir velocidad (**Cámara lenta 1.2s**, **Normal 0.6s** o **Rápida 0s**) y umbral mínimo de cobertura (default `75%`).
@@ -169,9 +169,9 @@ Además del MCP App, puedes instalar la **extensión nativa de barra lateral** (
 - **Compilar e instalar el `.vsix` local (Antigravity, Cursor, Windsurf, VS Code):**
   ```bash
   npm run build:vscode
-  # Genera: dist/itv-calidad-vscode-1.2.1.vsix
+  # Genera: dist/itv-calidad-vscode-1.2.2.vsix
   ```
-  Luego en tu IDE: `Cmd/Ctrl + Shift + P` → **Install from VSIX…** → selecciona `dist/itv-calidad-vscode-1.2.1.vsix`.
+  Luego en tu IDE: `Cmd/Ctrl + Shift + P` → **Install from VSIX…** → selecciona `dist/itv-calidad-vscode-1.2.2.vsix`.
 
 ---
 
@@ -188,13 +188,13 @@ Además del MCP App, puedes instalar la **extensión nativa de barra lateral** (
 | **7** | **Deuda Técnica y Observabilidad (Sonar / Sentry / GitHub)** | Análisis local ligero (archivos grandes, complejidad, duplicados DRY, `debugger`/`var_dump`) + auditoría estática Sentry/logs + **integración opcional en vivo con SonarCloud, Sentry y GitHub Security** | Análisis local (0 cuentas) + API opcional SonarCloud / Sentry / GitHub vía `.env` |
 
 ### Conectar SonarCloud, Sentry y GitHub Security reales (opcional)
-Podés conectar cualquiera de estas 3 plataformas gratuitas desde el botón **⚙ Integraciones** del Dashboard (se guardan en tu `.env` local con `chmod 600` y se aplican al instante sin reiniciar, actualizando automáticamente el nombre de la Estación 7 a los servicios conectados), o editando `.env` a mano:
+Puedes conectar cualquiera de estas 3 plataformas gratuitas desde el botón **⚙ Integraciones** del Dashboard (se guardan en tu `.env` local con `chmod 600` y se aplican al instante sin reiniciar, actualizando automáticamente el nombre de la Estación 7 a los servicios conectados), o editando `.env` a mano:
 ```bash
 cp .env.example .env
 # SONAR_TOKEN · SENTRY_AUTH_TOKEN + SENTRY_ORG + SENTRY_PROJECT · GITHUB_TOKEN
 ```
 - `.env` está protegido en `.gitignore`; los tokens solo se leen en backend y nunca se envían al navegador ni a los reportes exportados.
-- Si no conectás ninguno, la herramienta sigue funcionando **100% local sin cuentas**.
+- Si no conectas ninguno, la herramienta sigue funcionando **100% local sin cuentas**.
 
 ---
 
@@ -219,11 +219,11 @@ Además de auditar CVEs y secretos, la Estación 4 genera un reporte de diligenc
 
 ## Flujo recomendado trabajando con Agentes IA
 
-1. Terminás una feature con tu agente de código.
-2. El agente ejecuta `run_itv` vía MCP (o corrés la cabina local `npm run start` → **Examinar…** → **Iniciar ITV**).
-3. Si sale **DESFAVORABLE** u **OBSERVACIONES**, tocás **"Arreglar con agente"** en la cabina MCP (o **Exportar Evidencia (.md)** en el Dashboard).
+1. Terminas una feature con tu agente de código.
+2. El agente ejecuta `run_itv` vía MCP (o ejecutas la cabina local `npm run start` → **Examinar…** → **Iniciar ITV**, o la extensión de barra lateral en VS Code).
+3. Si sale **DESFAVORABLE** u **OBSERVACIONES**, pulsas **"Arreglar con agente"** en la cabina MCP (o **Exportar Evidencia (.md)** en el Dashboard / extensión).
 4. El agente corrige cada hallazgo con archivo y línea exacta.
-5. Volvés a pasar la ITV para verificar de forma independiente que quedó **7/7 APTO**.
+5. Vuelves a pasar la ITV para verificar de forma independiente que quedó **7/7 APTO**.
 
 ---
 
