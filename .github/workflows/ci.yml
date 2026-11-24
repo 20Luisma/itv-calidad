@@ -1,10 +1,21 @@
 name: CI — ITV de Código
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'memory_backups/**'
+      - 'docs/**'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'memory_backups/**'
+      - 'docs/**'
 
 permissions:
   contents: read
