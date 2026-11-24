@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+echo "🛡️ [pre-push] Ejecutando ITV de Código (7 estaciones) antes de git push..."
+cd "$REPO_ROOT"
+npm run itv -- "$REPO_ROOT" --fast
