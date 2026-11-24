@@ -37,6 +37,7 @@ Built for developers and teams coding with AI agents: instead of an opaque cloud
 - **Complements GitHub Actions / CI — does not replace it:** acts as a **fast local pre-push barrier** (preventing leaked secrets, type errors, or CVEs from reaching Git), while cloud CI + Branch Protection remain recommended for teams and production deployments.
 - **Does not replace** a professional penetration test, enterprise SAST (SonarQube / CodeQL / Semgrep), or formal security audit for critical/regulated systems.
 - **Not legal advice:** the operational/contractual checklist block (DPA, encrypted backups, 72h breach response) is a technical best-practice guide based on OWASP/GDPR.
+- **Run only on trusted repositories:** although the tool is read-only and executes commands via `spawn` with `shell: false`, Stations 3 and 5 execute the target repository's own test suites (`npm test`, `phpunit`, `pytest`, Playwright). Do not run it on untrusted third-party repositories outside an isolated container or VM.
 - **Never installs or mutates dependencies in the target repo:** uses binaries already available on your machine or inside the target project's `node_modules`/`vendor`.
 - **Cross-platform (macOS, Windows, Linux):** native folder picker in all 3 OSes (Finder on macOS, PowerShell dialog on Windows, `zenity`/`kdialog` on Linux), plus manual path input and CLI.
 

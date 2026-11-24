@@ -37,6 +37,7 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 - **Es un complemento a GitHub Actions / CI, no un reemplazo:** actúa como **primera barrera local rápida** antes del `git push` (evita subir secretos, errores de tipos o CVEs al repo), pero en equipos o despliegues a producción sigue siendo recomendable mantener CI en la nube (entorno limpio reproducible + *Branch Protection*).
 - **No reemplaza** un pentest profesional, un SAST enterprise (SonarQube / CodeQL / Semgrep) ni una auditoría de seguridad formal para sistemas críticos o banca.
 - **No constituye asesoramiento legal:** el bloque operativo/contractual del checklist (DPA, backups, plan 72h) es una guía técnica de buenas prácticas basada en OWASP/RGPD.
+- **Ejecutar únicamente sobre repositorios propios o de confianza:** aunque la ITV es de solo lectura y usa `spawn` con `shell: false`, las Estaciones 3 y 5 ejecutan la suite de pruebas del proyecto inspeccionado (`npm test`, `phpunit`, `pytest`, Playwright). No la ejecutes sobre repositorios desconocidos sin aislamiento previo (contenedor/VM).
 - **No instala ni modifica dependencias en el repo inspeccionado:** utiliza los binarios disponibles en tu máquina o en `node_modules`/`vendor` del propio proyecto.
 - **Compatible con macOS, Windows y Linux:** el botón **Examinar…** abre el selector nativo de carpetas en los 3 sistemas (Finder en macOS, Explorador vía PowerShell en Windows y `zenity`/`kdialog` en Linux), y también puedes pegar cualquier ruta a mano o usar el CLI.
 
@@ -237,6 +238,7 @@ El propio proyecto sigue Clean Architecture ligera, separación estricta HTML/CS
 - `src/application/` — `DetectRepoStack`, `RunItvInspection` (orquestador + cámara lenta + eventos) y `ExportReportMarkdown`.
 - `src/infrastructure/` — `SafeCommandExecutor` (`spawn` con `shell: false` y timeouts), `RepoFileWalker` (solo lectura), escáneres locales, clientes opcionales (SonarCloud, Sentry, GitHub) y las 7 estaciones.
 - `src/interfaces/` — CLI (`cli/`), servidor HTTP/SSE nativo (`web/`) + Dashboard modular (`public/`), y **Servidor MCP Stdio + MCP App embebida (`mcp/`)** para agentes IA.
+- `extensions/vscode-itv/` — **Extensión nativa de barra lateral** (VS Code Marketplace / Open VSX) con cabina Webview, árbol de 7 estaciones y `SecretStorage` cifrado.
 
 ```bash
 npm run typecheck       # TypeScript strict (0 errores)
