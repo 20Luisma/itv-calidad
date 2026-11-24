@@ -2,7 +2,7 @@
   "name": "itv-calidad-vscode",
   "displayName": "ITV de Código",
   "description": "Gate DevSecOps local de 7 estaciones en tu barra lateral: sintaxis, tipos, cobertura, CVEs/OWASP, E2E, WCAG 2.1 AA y observabilidad (PHP, Node/TS, Python).",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "publisher": "20luisma",
   "icon": "media/icon.png",
   "license": "MIT",

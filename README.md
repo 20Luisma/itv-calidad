@@ -171,9 +171,9 @@ Además del MCP App, puedes instalar la **extensión nativa de barra lateral** (
 - **Compilar e instalar el `.vsix` local (Antigravity, Cursor, Windsurf, VS Code):**
   ```bash
   npm run build:vscode
-  # Genera: dist/itv-calidad-vscode-1.2.2.vsix
+  # Genera: dist/itv-calidad-vscode-1.2.3.vsix
   ```
-  Luego en tu IDE: `Cmd/Ctrl + Shift + P` → **Install from VSIX…** → selecciona `dist/itv-calidad-vscode-1.2.2.vsix`.
+  Luego en tu IDE: `Cmd/Ctrl + Shift + P` → **Install from VSIX…** → selecciona `dist/itv-calidad-vscode-1.2.3.vsix`.
 
 ---
 
