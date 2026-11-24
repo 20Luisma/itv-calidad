@@ -4,6 +4,7 @@
 
 [![CI — ITV de Código](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml/badge.svg)](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml)
 [![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-ITV%20de%20C%C3%B3digo-007ACC?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode)
+[![Open VSX Registry](https://img.shields.io/badge/Open%20VSX-Antigravity%20%C2%B7%20Cursor%20%C2%B7%20Windsurf-A60EE5)](https://open-vsx.org/extension/20luisma/itv-calidad-vscode)
 
 **100% local, open-source, zero-mandatory-accounts** code quality and security gate (**VS Code / Open VSX Sidebar Extension + Interactive MCP App + Stdio MCP Server + Live SSE Web Dashboard + CLI**) that audits any local repository (**PHP, Node.js/TypeScript, or Python**) **before `git push`** across **7 real quality, security, and observability stations**.
 
@@ -151,8 +152,10 @@ npm run itv -- /path/to/your/project --json > itv-evidence.json
 
 Install the native sidebar extension with a dedicated shield icon in the Activity Bar, live traffic light cockpit, clickable 7-station tree with jump-to-file/line, encrypted `SecretStorage` integrations panel, and status bar badge:
 
-- **1-click install from Visual Studio Code Marketplace:**
+- **1-click install from Visual Studio Code Marketplace (VS Code):**
   👉 **[Install ITV de Código on VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode)**
+- **1-click install from Open VSX Registry (Antigravity, Cursor, Windsurf, VSCodium):**
+  👉 **[Install ITV de Código on Open VSX Registry](https://open-vsx.org/extension/20luisma/itv-calidad-vscode)**
 - **Via VS Code CLI:**
   ```bash
   code --install-extension 20luisma.itv-calidad-vscode

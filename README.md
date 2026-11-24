@@ -4,6 +4,7 @@
 
 [![CI — ITV de Código](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml/badge.svg)](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml)
 [![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-ITV%20de%20C%C3%B3digo-007ACC?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode)
+[![Open VSX Registry](https://img.shields.io/badge/Open%20VSX-Antigravity%20%C2%B7%20Cursor%20%C2%B7%20Windsurf-A60EE5)](https://open-vsx.org/extension/20luisma/itv-calidad-vscode)
 
 Herramienta **100% local, open-source y sin cuentas externas** (**Extensión de barra lateral VS Code/Open VSX + MCP App interactiva + Servidor MCP Stdio + Dashboard Web SSE + CLI**) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**.
 
@@ -164,8 +165,10 @@ npm run itv -- /ruta/a/tu/proyecto --json > itv-evidencia.json
 
 Además del MCP App, puedes instalar la **extensión nativa de barra lateral** (con icono de escudo en la barra izquierda, vista en árbol de las 7 estaciones con salto directo a archivo/línea, cabina visual con semáforo, panel **⚙ Integraciones** con `SecretStorage` cifrado y botón en la barra de estado):
 
-- **Instalación en 1 clic desde Visual Studio Code Marketplace:**
+- **Instalación en 1 clic desde Visual Studio Code Marketplace (VS Code):**
   👉 **[Instalar ITV de Código en VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode)**
+- **Instalación en 1 clic desde Open VSX Registry (Antigravity, Cursor, Windsurf, VSCodium):**
+  👉 **[Instalar ITV de Código en Open VSX Registry](https://open-vsx.org/extension/20luisma/itv-calidad-vscode)**
 - **Por CLI de VS Code:**
   ```bash
   code --install-extension 20luisma.itv-calidad-vscode
