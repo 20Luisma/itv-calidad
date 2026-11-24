@@ -9,7 +9,7 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 
 > **Solo lectura y 100% local:** corre íntegramente en tu máquina sin API keys obligatorias, sin tokens pagos, sin telemetría y **sin modificar ni borrar nunca ningún archivo** del repositorio inspeccionado.
 
-![Demo en vivo de ITV de Código (MCP App embebida pasando las 7 estaciones en Antigravity)](docs/assets/itv-mcp-demo.gif)
+![Demo en vivo de la extensión de barra lateral ITV de Código (7 estaciones + semáforo + árbol de hallazgos)](docs/assets/itv-vscode-demo.gif)
 
 ---
 
@@ -56,6 +56,8 @@ npm run build
 ## Opción 1 — MCP App Interactiva y Servidor MCP (Antigravity, Cursor, Claude Code)
 
 `itv-calidad` incluye un **MCP Server oficial por Stdio** con **MCP App visual embebida** (`ui://itv-calidad/app.html`). En **Antigravity**, cada vez que el agente ejecuta `run_itv`, ves la cabina animada directo en el chat o desde el botón **`+`** del panel lateral sin abrir el navegador.
+
+![Demo en vivo de ITV de Código MCP App embebida en Antigravity](docs/assets/itv-mcp-demo.gif)
 
 ### 1. Registrar el servidor MCP en tu IDE / Agente
 - **Antigravity:** `~/.gemini/antigravity/mcp_config.json` *(tras editarlo, reiniciá Antigravity completamente para cargar la MCP App)*
