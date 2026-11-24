@@ -84,6 +84,10 @@ async function main() {
   cpSync(path.join(extDir, 'media'), path.join(extStage, 'media'), { recursive: true });
   const readmeRaw = readFileSync(path.join(rootDir, 'README.md'), 'utf8')
     .replaceAll(
+      '(README.en.md)',
+      '(https://github.com/20Luisma/itv-calidad/blob/main/README.en.md)'
+    )
+    .replaceAll(
       '(docs/assets/itv-vscode-demo.gif)',
       '(https://raw.githubusercontent.com/20Luisma/itv-calidad/main/docs/assets/itv-vscode-demo.gif)'
     )
