@@ -105,7 +105,7 @@ async function main() {
   const vsixPath = path.join(outDir, `${pkg.name}-${pkg.version}.vsix`);
   rmSync(vsixPath, { force: true });
 
-  execFileSync('zip', ['-qr', vsixPath, '[Content_Types].xml', 'extension.vsixmanifest', 'extension'], {
+  execFileSync('zip', ['-qrX', vsixPath, '[Content_Types].xml', 'extension.vsixmanifest', 'extension'], {
     cwd: stageDir,
     stdio: 'inherit'
   });
