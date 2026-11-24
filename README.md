@@ -11,6 +11,15 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 
 ![Demo en vivo de la extensión de barra lateral ITV de Código (7 estaciones + semáforo + árbol de hallazgos)](docs/assets/itv-vscode-demo.gif)
 
+### ¿Cómo prefieres usarla? (Elige 1 sola opción — mismo motor de 7 estaciones)
+
+| Si quieres… | Usa esto | Empezar en 10 segundos |
+|---|---|---|
+| **Instalarla en 1 clic en tu IDE** *(recomendado)* | **Extensión VS Code / Open VSX** | [Instalar desde VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode) |
+| **Que tu agente IA la ejecute antes de pushear** | **MCP App + Servidor MCP** | Ir a [Opción 1 — MCP](#opción-1--mcp-app-interactiva-y-servidor-mcp-antigravity-cursor-claude-code) |
+| **Ver la cabina en cámara lenta en el navegador** | **Dashboard Web SSE** | `npm run start` → `http://127.0.0.1:4173` |
+| **Usarla en terminal o hook `pre-push`** | **CLI** | `npm run itv -- /ruta/a/tu/repo` |
+
 ---
 
 ## ¿Qué hace realmente (y qué NO hace)?
@@ -72,11 +81,19 @@ npm run build
   "mcpServers": {
     "itv-calidad": {
       "command": "node",
-      "args": ["/ruta/absoluta/a/itv-calidad/dist/interfaces/mcp/server.js"]
+      "args": ["/ruta/absoluta/a/itv-calidad/dist/interfaces/mcp/server.js"],
+      "env": {
+        "SONAR_TOKEN": "(opcional)",
+        "SENTRY_AUTH_TOKEN": "(opcional)",
+        "SENTRY_ORG": "(opcional)",
+        "SENTRY_PROJECT": "(opcional)",
+        "GITHUB_TOKEN": "(opcional)"
+      }
     }
   }
 }
 ```
+*(El bloque `"env"` es 100% opcional: si lo quitas, funciona igual en local sin cuentas. También lee tu `.env` local si lo prefieres.)*
 
 ### 2. Orden de lanzamiento automático para `GEMINI.md` (o `AGENTS.md` / `CLAUDE.md`)
 
