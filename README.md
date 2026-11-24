@@ -1,5 +1,7 @@
 # ITV de Código — MCP App & Auditor Local (`itv-calidad`)
 
+🌐 **Idioma / Language:** **🇪🇸 Español (actual)** | [🇬🇧 English](README.en.md)
+
 [![CI — ITV de Código](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml/badge.svg)](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml)
 [![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-ITV%20de%20C%C3%B3digo-007ACC?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode)
 
