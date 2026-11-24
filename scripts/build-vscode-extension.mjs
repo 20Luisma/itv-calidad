@@ -35,6 +35,7 @@ function buildVsixManifest(pkg) {
     <Description xml:space="preserve">${pkg.description}</Description>
     <Tags>${tags}</Tags>
     <Categories>${categories}</Categories>
+    <GalleryFlags>Public</GalleryFlags>
     <Icon>extension/media/icon.png</Icon>
     <Properties>
       <Property Id="Microsoft.VisualStudio.Code.Engine" Value="${pkg.engines.vscode}" />
@@ -81,7 +82,11 @@ async function main() {
   copyFileSync(path.join(extDir, 'package.json'), path.join(extStage, 'package.json'));
   copyFileSync(bundlePath, path.join(extStage, 'dist', 'extension.js'));
   cpSync(path.join(extDir, 'media'), path.join(extStage, 'media'), { recursive: true });
-  copyFileSync(path.join(rootDir, 'README.md'), path.join(extStage, 'README.md'));
+  const readmeRaw = readFileSync(path.join(rootDir, 'README.md'), 'utf8').replace(
+    '(docs/assets/itv-mcp-demo.gif)',
+    '(https://raw.githubusercontent.com/20Luisma/itv-calidad/main/docs/assets/itv-mcp-demo.gif)'
+  );
+  writeFileSync(path.join(extStage, 'README.md'), readmeRaw, 'utf8');
 
   writeFileSync(path.join(stageDir, '[Content_Types].xml'), buildContentTypesXml(), 'utf8');
   writeFileSync(path.join(stageDir, 'extension.vsixmanifest'), buildVsixManifest(pkg), 'utf8');

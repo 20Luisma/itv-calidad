@@ -1,8 +1,9 @@
 # ITV de Código — MCP App & Auditor Local (`itv-calidad`)
 
 [![CI — ITV de Código](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml/badge.svg)](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml)
+[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-ITV%20de%20C%C3%B3digo-007ACC?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode)
 
-Herramienta **100% local, open-source y sin cuentas externas** (**MCP App interactiva embebida en Antigravity + Servidor MCP Stdio + Dashboard Web SSE + CLI**) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**.
+Herramienta **100% local, open-source y sin cuentas externas** (**Extensión de barra lateral VS Code/Open VSX + MCP App interactiva + Servidor MCP Stdio + Dashboard Web SSE + CLI**) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**.
 
 Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar de una "caja negra" que falla en la nube, te muestra paso a paso **qué revisa cada estación, qué comando exacto ejecuta, por qué importa y cómo corregir cada fallo**.
 
