@@ -30,6 +30,7 @@ Built for developers and teams coding with AI agents: instead of an opaque cloud
 - **Runs real tools** against your local repository (PHP, Node.js/TypeScript, or Python, including mixed or manifest-free repos) preserving real exit codes (**zero false greens**).
 - **Blocks `git push` (`exit code != 0`)** whenever any mandatory station fails (syntax, static types, tests/coverage, CVEs/secrets, E2E, or critical accessibility).
 - **Honestly marks inapplicable stations as `OMITIDA` (Skipped)** (e.g., if Playwright is not installed), explaining how to add them if you want.
+- **Reports diagnostic scope & confidence (`Full inspection`, `Partial inspection`, or `Static diagnostic only`):** never confuses *"0 failures in partial checks"* with *"production-ready"*, explicitly listing missing critical layers (types, tests, or E2E).
 - **Generates a Security Due-Diligence Checklist** (based on OWASP ASVS Level 1 and GDPR Art. 32 technical controls) with timestamped **Markdown (`.md`) and JSON (`.json`) evidence export**.
 - **Embedded interactive cockpit inside your IDE (MCP App & VS Code Extension):** dark-mode traffic light, animated station scan, jump-to-file/line findings tree, encrypted `SecretStorage` integrations panel, and one-click *"Fix with agent"* prompt.
 
@@ -195,3 +196,7 @@ npm run test:coverage   # Isolated Vitest suite + coverage gate (>75%)
 npm run audit:deps      # npm audit (0 CVEs)
 npm run itv -- . --fast # 7/7 self-inspection
 ```
+
+## Technical Documentation
+- [AGENTS.md](AGENTS.md) — Engineering protocol and project contracts.
+- [SECURITY.md](SECURITY.md) — Safe execution policy and threat model for trusted repositories.

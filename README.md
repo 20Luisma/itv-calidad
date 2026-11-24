@@ -30,6 +30,7 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 - **Ejecuta herramientas reales** sobre tu repositorio local (PHP, Node.js/TypeScript o Python, incluidos repos mixtos o proyectos sin manifiesto) respetando sus códigos de salida reales (**cero falsos verdes**).
 - **Bloquea el push (`exit code != 0`)** si falla cualquier estación obligatoria (sintaxis, tipos, tests/cobertura, CVEs/secretos, E2E o accesibilidad crítica).
 - **Omite con honestidad (`OMITIDA`)** las estaciones que no aplican al stack del proyecto (por ejemplo, si no tiene Playwright), explicándote cómo agregarlas si quieres.
+- **Mide el alcance y confianza del diagnóstico (`Inspección completa`, `Inspección parcial` o `Solo diagnóstico estático`):** nunca confunde *"0 fallos en lo poco que se pudo medir"* con *"listo para producción"*, avisando explícitamente qué capas críticas faltan (tipos, tests o E2E).
 - **Genera un Checklist de Tranquilidad / Diligencia Debida en Seguridad** (basado en OWASP ASVS Nivel 1 y medidas técnicas del Art. 32 RGPD) y te permite **exportar la evidencia fechada en Markdown (`.md`) o JSON (`.json`)**.
 - **Cabina visual embebida en tu IDE (MCP App):** al ejecutar `run_itv` en Antigravity, se renderiza directo en el chat (y en el panel lateral **`+`**) una cabina dark interactiva con semáforo LED, escaneo animado, detalle por estación, re-escaneo en 1 clic y botón **"Arreglar con agente"**.
 
