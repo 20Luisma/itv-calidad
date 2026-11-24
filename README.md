@@ -172,9 +172,9 @@ Además del MCP App, puedes instalar la **extensión nativa de barra lateral** (
 - **Compilar e instalar el `.vsix` local (Antigravity, Cursor, Windsurf, VS Code):**
   ```bash
   npm run build:vscode
-  # Genera: dist/itv-calidad-vscode-1.2.3.vsix
+  # Genera: dist/itv-calidad-vscode-1.3.0.vsix
   ```
-  Luego en tu IDE: `Cmd/Ctrl + Shift + P` → **Install from VSIX…** → selecciona `dist/itv-calidad-vscode-1.2.3.vsix`.
+  Luego en tu IDE: `Cmd/Ctrl + Shift + P` → **Install from VSIX…** → selecciona `dist/itv-calidad-vscode-1.3.0.vsix`.
 
 ---
 
@@ -248,7 +248,8 @@ npm run itv -- . --fast # Auto-inspección 7/7 de la propia ITV
 ```
 
 ## Documentación Técnica
-- [AGENTS.md](AGENTS.md) — Protocolo de ingeniería y contratos del proyecto.
+- [AGENTS.md](AGENTS.md) — Protocolo técnico y contratos del proyecto.
+- [SECURITY.md](SECURITY.md) — Política de seguridad y modelo de ejecución en repositorios de confianza.
 - [docs/adr/ADR-001-arquitectura-itv-didactica.md](docs/adr/ADR-001-arquitectura-itv-didactica.md) — Decisión arquitectónica inicial.
 - [docs/adr/ADR-002-checklist-diligencia-debida-seguridad.md](docs/adr/ADR-002-checklist-diligencia-debida-seguridad.md) — Checklist de Tranquilidad / Diligencia Debida.
 - [docs/adr/ADR-003-estacion-7-sonar-observabilidad.md](docs/adr/ADR-003-estacion-7-sonar-observabilidad.md) — Estación 7: Calidad Sonar y Observabilidad (Sentry).

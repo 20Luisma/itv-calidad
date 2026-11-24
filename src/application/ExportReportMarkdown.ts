@@ -24,6 +24,11 @@ export function exportReportAsMarkdown(report: InspectionReport): string {
     `- **Stack detectado:** ${report.stack.detectedStacks.join(', ')} (principal: ${report.stack.primaryStack})`,
     `- **Duración total:** ${(report.totalDurationMs / 1000).toFixed(2)}s`,
     `- **Resumen:** ${report.summary.passed} aptas · ${report.summary.warned} observaciones · ${report.summary.failed} desfavorables · ${report.summary.skipped} omitidas`,
+    ...(report.scope
+      ? [
+          `- **Alcance del diagnóstico:** ${report.scope.label} (${report.scope.evaluatedStations}/${report.scope.totalStations} verificadas · ${report.scope.confidencePercent}%) — ${report.scope.note}`
+        ]
+      : []),
     '',
     '## Resultado por Estación',
     ''

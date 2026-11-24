@@ -78,6 +78,7 @@ export class ItvWebviewProvider implements vscode.WebviewViewProvider {
       blocksPush: report.blocksPush,
       durationSec: (report.totalDurationMs / 1000).toFixed(1),
       summary: report.summary,
+      scope: report.scope ?? null,
       checklistScore: report.securityChecklist?.scorePercent ?? null
     });
   }
@@ -286,11 +287,14 @@ export class ItvWebviewProvider implements vscode.WebviewViewProvider {
         $('verdict-card').hidden = false;
         $('verdict-text').className = 'verdict ' + cls;
         $('verdict-text').textContent = msg.verdict.replace(/_/g, ' ');
-        $('verdict-sub').textContent = msg.blocksPush ? 'Hay fallos bloqueantes antes de hacer git push.' : 'Sin fallos bloqueantes. Revisa los detalles abajo.';
+        $('verdict-sub').textContent = msg.blocksPush
+          ? 'Hay fallos bloqueantes antes de hacer git push.'
+          : (msg.scope ? msg.scope.label + ' (' + msg.scope.confidencePercent + '%) · ' + msg.scope.note : 'Sin fallos bloqueantes. Revisa los detalles abajo.');
         const s = msg.summary;
+        const scopeVal = msg.scope ? msg.scope.evaluatedStations + '/' + msg.scope.totalStations + ' (' + msg.scope.confidencePercent + '%)' : s.passed + '/' + s.total;
         $('kpis').innerHTML =
           '<div class="kpi"><span>Aptas</span><strong>' + s.passed + '/' + s.total + '</strong></div>' +
-          '<div class="kpi"><span>Avisos / Fallos</span><strong>' + s.warned + ' / ' + s.failed + '</strong></div>' +
+          '<div class="kpi"><span>Alcance verificado</span><strong>' + scopeVal + '</strong></div>' +
           '<div class="kpi"><span>Checklist OWASP</span><strong>' + (msg.checklistScore !== null ? msg.checklistScore + '%' : 'N/A') + '</strong></div>' +
           '<div class="kpi"><span>Tiempo</span><strong>' + msg.durationSec + 's</strong></div>';
       } else if (msg.type === 'error') {

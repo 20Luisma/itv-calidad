@@ -2,6 +2,7 @@ import type {
   ExternalIntegrationLink,
   Finding,
   InspectionReport,
+  InspectionScope,
   InspectionSummary,
   InspectionVerdict,
   RepoStack,
@@ -56,6 +57,63 @@ export function resolveVerdict(summary: InspectionSummary): {
   return { verdict: 'APTO', blocksPush: false };
 }
 
+export function resolveInspectionScope(stations: readonly StationResult[]): InspectionScope {
+  const totalStations = stations.length;
+  const evaluatedStations = stations.filter((s) => s.status !== 'skipped').length;
+  const confidencePercent =
+    totalStations > 0 ? Math.round((evaluatedStations / totalStations) * 100) : 0;
+
+  const missingCriticalLayers: string[] = [];
+  const typesStation = stations.find((s) => s.id === 'static-types');
+  const testsStation = stations.find((s) => s.id === 'tests-coverage');
+  const e2eStation = stations.find((s) => s.id === 'e2e-browser');
+
+  const missingTypes = !typesStation || typesStation.status === 'skipped';
+  const missingTests = !testsStation || testsStation.status === 'skipped';
+  const missingE2e = !e2eStation || e2eStation.status === 'skipped';
+
+  if (missingTypes) missingCriticalLayers.push('Tipos estáticos');
+  if (missingTests) missingCriticalLayers.push('Tests automáticos');
+  if (missingE2e) missingCriticalLayers.push('Pruebas E2E');
+
+  if (evaluatedStations < 3 || (missingTests && missingTypes)) {
+    return {
+      level: 'diagnostic-only',
+      label: 'Solo diagnóstico estático',
+      evaluatedStations,
+      totalStations,
+      confidencePercent,
+      missingCriticalLayers,
+      note: 'Se auditó sintaxis y seguridad estática, pero faltan tests y tipado para certificar preparación para producción.'
+    };
+  }
+
+  if (evaluatedStations >= 6 && !missingTests) {
+    return {
+      level: 'full',
+      label: 'Inspección completa',
+      evaluatedStations,
+      totalStations,
+      confidencePercent,
+      missingCriticalLayers,
+      note: 'Cobertura completa de estaciones verificadas antes del push.'
+    };
+  }
+
+  return {
+    level: 'partial',
+    label: 'Inspección parcial',
+    evaluatedStations,
+    totalStations,
+    confidencePercent,
+    missingCriticalLayers,
+    note:
+      missingCriticalLayers.length > 0
+        ? `Alcance parcial (${evaluatedStations}/${totalStations} verificadas). Capas no verificadas: ${missingCriticalLayers.join(', ')}.`
+        : `Alcance parcial (${evaluatedStations}/${totalStations} estaciones verificadas).`
+  };
+}
+
 export function buildInspectionReport(params: {
   inspectionId: string;
   startedAt: Date;
@@ -65,6 +123,7 @@ export function buildInspectionReport(params: {
 }): InspectionReport {
   const summary = buildInspectionSummary(params.stations);
   const { verdict, blocksPush } = resolveVerdict(summary);
+  const scope = resolveInspectionScope(params.stations);
   const totalDurationMs = Math.max(0, params.finishedAt.getTime() - params.startedAt.getTime());
 
   const securityChecklist = params.stations.find((s) => s.securityChecklist)?.securityChecklist;
@@ -78,6 +137,7 @@ export function buildInspectionReport(params: {
     blocksPush,
     stack: params.stack,
     summary,
+    scope,
     stations: params.stations
   };
 

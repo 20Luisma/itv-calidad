@@ -60,7 +60,7 @@ export async function handleRunItv(
       content: [
         {
           type: 'text',
-          text: `Cabina ITV de Código abierta. Indicá una ruta local de repositorio (por ejemplo: ${defaultRepoPath}) para iniciar las 7 estaciones.`
+          text: `Cabina ITV de Código abierta. Indica una ruta local de repositorio (por ejemplo: ${defaultRepoPath}) para iniciar las 7 estaciones.`
         }
       ],
       structuredContent: {
@@ -88,6 +88,7 @@ export async function handleRunItv(
       gitBranch: report.stack.gitBranch,
       totalDurationMs: report.totalDurationMs,
       summary: report.summary,
+      ...(report.scope ? { scope: report.scope } : {}),
       securityChecklist: report.securityChecklist,
       stations: report.stations.map((s) => ({
         id: s.id,

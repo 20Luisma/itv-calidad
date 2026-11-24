@@ -120,6 +120,18 @@ export interface InspectionSummary {
   readonly skipped: number;
 }
 
+export type InspectionScopeLevel = 'full' | 'partial' | 'diagnostic-only';
+
+export interface InspectionScope {
+  readonly level: InspectionScopeLevel;
+  readonly label: string;
+  readonly evaluatedStations: number;
+  readonly totalStations: number;
+  readonly confidencePercent: number;
+  readonly missingCriticalLayers: readonly string[];
+  readonly note: string;
+}
+
 export interface InspectionReport {
   readonly inspectionId: string;
   readonly startedAt: string;
@@ -129,6 +141,7 @@ export interface InspectionReport {
   readonly blocksPush: boolean;
   readonly stack: RepoStack;
   readonly summary: InspectionSummary;
+  readonly scope?: InspectionScope;
   readonly stations: readonly StationResult[];
   readonly securityChecklist?: SecurityChecklistReport;
 }

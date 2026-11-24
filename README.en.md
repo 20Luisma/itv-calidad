@@ -159,9 +159,9 @@ Install the native sidebar extension with a dedicated shield icon in the Activit
 - **Build & install local `.vsix` (Antigravity, Cursor, Windsurf, VS Code):**
   ```bash
   npm run build:vscode
-  # Outputs: dist/itv-calidad-vscode-1.2.3.vsix
+  # Outputs: dist/itv-calidad-vscode-1.3.0.vsix
   ```
-  Then in your IDE: `Cmd/Ctrl + Shift + P` → **Install from VSIX…** → select `dist/itv-calidad-vscode-1.2.3.vsix`.
+  Then in your IDE: `Cmd/Ctrl + Shift + P` → **Install from VSIX…** → select `dist/itv-calidad-vscode-1.3.0.vsix`.
 
 ---
 
