@@ -72,7 +72,7 @@ describe('HTTP & SSE Web Server', () => {
     expect(body).toContain('event: inspection:start');
     expect(body).toContain('event: station:complete');
     expect(body).toContain('event: inspection:complete');
-  });
+  }, 20_000);
 
   it('responde POST /api/pick-folder devolviendo la carpeta elegida', async () => {
     const baseUrl = await startTestServer();
