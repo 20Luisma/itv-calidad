@@ -25,16 +25,17 @@
   - `docs/adr/ADR-003-estacion-7-sonar-observabilidad.md`
 
 ## Estado Actual y Próximos Pasos
-- **Estado actual (v1.3.0 — Publicada en 2 tiendas + M8ven verificado + Discord oficial MCP, `main` en `9f653ea`):**
-  - Auto-ITV propia (CLI, hook `pre-push` y MCP `run_itv`) en **7/7 APTO** (`0 observaciones · 0 desfavorables · 0 omitidas`): `tsc --noEmit` 0 errores, **39/39 tests (7 archivos) · 84.54% stmts / 86.03% lines** Vitest (>75% gate), **0 CVEs**, **Checklist 6/6 (100%)**, **Playwright E2E 3/3**, **Pa11y WCAG 2.1 AA 0 errores** y **0 duplicados DRY**.
-  - **Extensión VS Code / Open VSX (`20luisma.itv-calidad-vscode` v1.3.0):** publicada y pública en **Visual Studio Code Marketplace** (`https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode`) y en **Open VSX Registry** (`https://open-vsx.org/extension/20luisma/itv-calidad-vscode`, namespace verificado `20luisma`, 75+ descargas).
+- **Estado actual (v1.4.0 — Publicada en VS Code Marketplace + Open VSX + npm + M8ven verificado + Discord oficial MCP):**
+  - Auto-ITV propia (CLI, hook `pre-push` y MCP `run_itv`) en **7/7 APTO** (`0 observaciones · 0 desfavorables · 0 omitidas`): `tsc --noEmit` 0 errores, **39/39 tests (7 archivos) · 84.87% cobertura** Vitest (>75% gate), **0 CVEs**, **Checklist 6/6 (100%)**, **Playwright E2E 3/3**, **Pa11y WCAG 2.1 AA 0 errores** y **0 duplicados DRY**.
+  - **Paquete `npm` (`https://www.npmjs.com/package/itv-calidad`, v1.4.0):** publicado en `npmjs.com` (`247.8 kB`, 78 archivos), habilita `npx -y itv-calidad --mcp` (Stdio MCP Server + MCP App) y `npx -y itv-calidad . --fast` sin `git clone`.
+  - **Extensión VS Code / Open VSX (`20luisma.itv-calidad-vscode` v1.4.0):** i18n automático `EN / ES` (`package.nls.json`, `package.nls.es.json`, `extensions/vscode-itv/src/i18n.ts`), SEO global en inglés (`ITV Code Gate — 7-Station Local DevSecOps & MCP Auditor`) y README en inglés en el Marketplace. Subida a Open VSX (`v1.4.0`) y VS Code Marketplace (`v1.4.0`).
   - **M8ven MCP Trust Index (`https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn`):** servidor reclamado y verificado por editor, GitHub App read-only vinculada solo a `20Luisma/itv-calidad`, `annotations` oficiales MCP añadidas en `server.ts` y testeadas en `tests/mcp-handlers.test.ts`, badge oficial añadido en `README.md` y `README.en.md`.
-  - **Difusión comunidad:** publicado en vivo en el **Discord oficial de Model Context Protocol** (`#showcase`, hilo con GIF + links a GitHub, VS Code Marketplace y Open VSX). Posts en Reddit (`r/mcp`, `r/vscode`) frenados por filtro automático de karma bajo (cuenta nueva con karma 1).
-  - **Documentación y perfil:** `README.md` (español neutro estricto) + `README.en.md` (inglés) con ambos GIFs y 4 badges (CI, VS Code Marketplace, Open VSX, M8ven); `SECURITY.md` y `CONTRIBUTING.md` bilingües; perfil `20Luisma/20Luisma` actualizado; tag estable anterior `v-estable-2026-11-24`.
+  - **Difusión comunidad:** publicado en vivo en el **Discord oficial de Model Context Protocol** (`#showcase`, hilo con GIF + links).
+  - **Documentación y perfil:** `README.md` (español neutro estricto) + `README.en.md` (inglés) con ambos GIFs y 5 badges (CI, VS Code Marketplace, Open VSX, npm, M8ven); `SECURITY.md` y `CONTRIBUTING.md` bilingües; perfil `20Luisma/20Luisma` actualizado; tag estable anterior `v-estable-2026-11-24`.
 - **Próximos pasos opcionales:**
-  - Publicar paquete en **npm** (`npx -y itv-calidad-mcp`) para instalación en 1 línea sin `git clone`.
-  - Comprobar re-escaneo de nota en **M8ven** tras añadir `annotations` MCP y tests de las 3 herramientas.
-  - Evaluar publicación en **Show HN** o **Reddit** (cuando la cuenta supere ~15–20 de karma).
+  - Registrar en directorios MCP grandes: PR a `punkpeye/awesome-mcp-servers`, `smithery.ai`, `glama.ai` y `mcp.so` usando `npx -y itv-calidad --mcp`.
+  - Comprobar re-escaneo de nota en **M8ven** y propagación final de `1.4.0` en `npmjs.com`.
+  - Lanzamiento en **Show HN** (y Reddit `r/cursor` / `r/ClaudeAI` cuando la cuenta supere ~15–20 de karma).
   - Crear nuevo tag estable `v-estable-2026-11-27` (solo con aprobación explícita de Martín).
 
 ## Historial de Sesiones
