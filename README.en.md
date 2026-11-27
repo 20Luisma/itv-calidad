@@ -54,6 +54,7 @@ Built for developers and teams coding with AI agents: instead of an opaque cloud
   - **Node / TypeScript:** `npm`, project `tsc`, `vitest`/`jest`.
   - **PHP:** `php`, `composer`, `vendor/bin/phpstan`, `vendor/bin/phpunit`.
   - **Python:** `python3`, `pytest`, `mypy` or `ruff`, `pip-audit`.
+  - **.NET / C#:** `dotnet` (`dotnet build`, `dotnet test`, `dotnet list package --vulnerable`).
   - **Optional (live WCAG 2.1 AA on a local URL):** `npm install -g pa11y` (auto-detects local Chrome/Chromium/Brave on macOS/Windows/Linux).
 
 ---

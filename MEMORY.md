@@ -25,18 +25,17 @@
   - `docs/adr/ADR-003-estacion-7-sonar-observabilidad.md`
 
 ## Estado Actual y Próximos Pasos
-- **Estado actual (v1.4.0 — Publicada en VS Code Marketplace + Open VSX + npm + M8ven verificado + Discord oficial MCP):**
-  - Auto-ITV propia (CLI, hook `pre-push` y MCP `run_itv`) en **7/7 APTO** (`0 observaciones · 0 desfavorables · 0 omitidas`): `tsc --noEmit` 0 errores, **39/39 tests (7 archivos) · 84.87% cobertura** Vitest (>75% gate), **0 CVEs**, **Checklist 6/6 (100%)**, **Playwright E2E 3/3**, **Pa11y WCAG 2.1 AA 0 errores** y **0 duplicados DRY**.
-  - **Paquete `npm` (`https://www.npmjs.com/package/itv-calidad`, v1.4.0):** publicado en `npmjs.com` (`247.8 kB`, 78 archivos), habilita `npx -y itv-calidad --mcp` (Stdio MCP Server + MCP App) y `npx -y itv-calidad . --fast` sin `git clone`.
-  - **Extensión VS Code / Open VSX (`20luisma.itv-calidad-vscode` v1.4.0):** i18n automático `EN / ES` (`package.nls.json`, `package.nls.es.json`, `extensions/vscode-itv/src/i18n.ts`), SEO global en inglés (`ITV Code Gate — 7-Station Local DevSecOps & MCP Auditor`) y README en inglés en el Marketplace. Subida a Open VSX (`v1.4.0`) y VS Code Marketplace (`v1.4.0`).
-  - **M8ven MCP Trust Index (`https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn`):** servidor reclamado y verificado por editor, GitHub App read-only vinculada solo a `20Luisma/itv-calidad`, `annotations` oficiales MCP añadidas en `server.ts` y testeadas en `tests/mcp-handlers.test.ts`, badge oficial añadido en `README.md` y `README.en.md`.
-  - **Difusión comunidad:** publicado en vivo en el **Discord oficial de Model Context Protocol** (`#showcase`, hilo con GIF + links).
-  - **Documentación y perfil:** `README.md` (español neutro estricto) + `README.en.md` (inglés) con ambos GIFs y 5 badges (CI, VS Code Marketplace, Open VSX, npm, M8ven); `SECURITY.md` y `CONTRIBUTING.md` bilingües; perfil `20Luisma/20Luisma` actualizado; tag estable anterior `v-estable-2026-11-24`.
+- **Estado actual (v1.5.0 — Publicada en npm + VS Code Marketplace + Open VSX + M8ven B + Discord oficial MCP):**
+  - Auto-ITV propia (CLI, hook `pre-push` y MCP `run_itv`) en **7/7 APTO** (`0 observaciones · 0 desfavorables · 0 omitidas`): `tsc --noEmit` 0 errores, **42/42 tests (8 archivos) · 85.48% cobertura** Vitest (>75% gate), **0 CVEs**, **Checklist 6/6 (100%)**, **Playwright E2E 3/3**, **Pa11y WCAG 2.1 AA 0 errores** y **0 duplicados DRY**.
+  - **Novedades `v1.5.0`:** soporte nativo **`.NET / C#`** (`*.sln`/`*.csproj`, `dotnet build`, `dotnet test` + Coverlet, `dotnet list package --vulnerable` sin falsos verdes) e instalador en 1 comando **`npx -y itv-calidad --init-hook`** (`src/application/InitPrePushHook.ts`).
+  - **Paquete `npm` (`https://www.npmjs.com/package/itv-calidad`, v1.5.0 live):** `250.7 kB`, 80 archivos, solo 2 dependencias de runtime (`@modelcontextprotocol/sdk`, `zod`).
+  - **Extensión VS Code / Open VSX (`20luisma.itv-calidad-vscode`):** i18n automático `EN / ES` (`package.nls.json`, `package.nls.es.json`, `extensions/vscode-itv/src/i18n.ts`), SEO global en inglés (`ITV Code Gate — 7-Station Local DevSecOps & MCP Auditor`). Artefacto compilado `dist/itv-calidad-vscode-1.5.0.vsix` (`84.6 KB`).
+  - **M8ven MCP Trust Index (`https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn`):** subió de **C** a **B · Emerging** en verde; editor verificado y badge activo.
+  - **Perfil GitHub `20Luisma/20Luisma`:** actualizado con **6 tiendas y registros oficiales** (VS Code Marketplace, Open VSX, npm, Google Play, App Store, Amazon Alexa Skills).
 - **Próximos pasos opcionales:**
-  - Registrar en directorios MCP grandes: PR a `punkpeye/awesome-mcp-servers`, `smithery.ai`, `glama.ai` y `mcp.so` usando `npx -y itv-calidad --mcp`.
-  - Comprobar re-escaneo de nota en **M8ven** y propagación final de `1.4.0` en `npmjs.com`.
-  - Lanzamiento en **Show HN** (y Reddit `r/cursor` / `r/ClaudeAI` cuando la cuenta supere ~15–20 de karma).
-  - Crear nuevo tag estable `v-estable-2026-11-27` (solo con aprobación explícita de Martín).
+  - Subir `dist/itv-calidad-vscode-1.5.0.vsix` a VS Code Marketplace y Open VSX (actualmente en `1.4.0`).
+  - Crear GitHub Release oficial `v1.5.0` (con aprobación explícita de Martín) y workflow de auto-publish por tag.
+  - Difusión: PR a `punkpeye/awesome-mcp-servers`, alta en `smithery.ai` / `glama.ai` / `mcp.so`, envío a `console.dev` y lanzamiento en **Show HN**.
 
 ## Historial de Sesiones
 - **2026-11-23 (Sesión 1):** Bootstrap inicial del proyecto (`AGENTS.md`, `MEMORY.md`, `ADR-001`, `.agents/`).

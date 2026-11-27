@@ -54,6 +54,7 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
   - **Node / TypeScript:** `npm`, `tsc` (del proyecto), `vitest`/`jest` (del proyecto).
   - **PHP:** `php`, `composer`, `vendor/bin/phpstan`, `vendor/bin/phpunit`.
   - **Python:** `python3`, `pytest`, `mypy` o `ruff`, `pip-audit`.
+  - **.NET / C#:** `dotnet` (`dotnet build`, `dotnet test`, `dotnet list package --vulnerable`).
   - **Opcional (WCAG 2.1 AA en vivo sobre URL local):** `npm install -g pa11y` (en macOS/Windows/Linux autodetecta Chrome/Chromium/Brave si ya lo tienes instalado).
 
 ---
