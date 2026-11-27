@@ -59,6 +59,16 @@ Built for developers and teams coding with AI agents: instead of an opaque cloud
 
 ## Quick Install
 
+**Zero-clone (`npx`, recommended for CLI & MCP):**
+```bash
+# Inspect the current repository in fast mode
+npx -y itv-calidad . --fast
+
+# Start the Stdio MCP Server (+ embedded MCP App)
+npx -y itv-calidad --mcp
+```
+
+**From source (local clone):**
 ```bash
 git clone https://github.com/20Luisma/itv-calidad.git
 cd itv-calidad
@@ -79,15 +89,15 @@ npm run build
 - **Cursor:** `.cursor/mcp.json` or `~/.cursor/mcp.json`
 - **Claude Desktop / Claude Code:** `claude_desktop_config.json` or:
   ```bash
-  claude mcp add itv-calidad -- node /absolute/path/to/itv-calidad/dist/interfaces/mcp/server.js
+  claude mcp add itv-calidad -- npx -y itv-calidad --mcp
   ```
 
 ```json
 {
   "mcpServers": {
     "itv-calidad": {
-      "command": "node",
-      "args": ["/absolute/path/to/itv-calidad/dist/interfaces/mcp/server.js"],
+      "command": "npx",
+      "args": ["-y", "itv-calidad", "--mcp"],
       "env": {
         "SONAR_TOKEN": "(optional)",
         "SENTRY_AUTH_TOKEN": "(optional)",
@@ -99,7 +109,7 @@ npm run build
   }
 }
 ```
-*(The `"env"` block is 100% optional: omit it to run completely offline with zero accounts. A local `.env` file is also supported.)*
+*(If you prefer running from a local clone without `npx`, use `"command": "node"` and `"args": ["/absolute/path/to/itv-calidad/dist/interfaces/mcp/server.js"]`. The `"env"` block is 100% optional: omit it to run completely offline with zero accounts.)*
 
 ### 2. Automatic pre-push rule for `GEMINI.md` / `AGENTS.md` / `CLAUDE.md`
 

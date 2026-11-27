@@ -24,15 +24,25 @@ function buildContentTypesXml() {
 `;
 }
 
-function buildVsixManifest(pkg) {
+function escapeXml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+function buildVsixManifest(pkg, nls) {
   const tags = (pkg.keywords || []).join(',');
   const categories = (pkg.categories || []).join(',');
+  const displayName = escapeXml(nls.displayName || pkg.displayName);
+  const description = escapeXml(nls.description || pkg.description);
   return `<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
-    <Identity Language="es-ES" Id="${pkg.name}" Version="${pkg.version}" Publisher="${pkg.publisher}" />
-    <DisplayName>${pkg.displayName}</DisplayName>
-    <Description xml:space="preserve">${pkg.description}</Description>
+    <Identity Language="en-US" Id="${pkg.name}" Version="${pkg.version}" Publisher="${pkg.publisher}" />
+    <DisplayName>${displayName}</DisplayName>
+    <Description xml:space="preserve">${description}</Description>
     <Tags>${tags}</Tags>
     <Categories>${categories}</Categories>
     <GalleryFlags>Public</GalleryFlags>
@@ -72,6 +82,7 @@ async function main() {
   });
 
   const pkg = JSON.parse(readFileSync(path.join(extDir, 'package.json'), 'utf8'));
+  const nls = JSON.parse(readFileSync(path.join(extDir, 'package.nls.json'), 'utf8'));
   const stageDir = path.join(extDir, '.vsix-stage');
   rmSync(stageDir, { recursive: true, force: true });
 
@@ -80,12 +91,14 @@ async function main() {
   mkdirSync(path.join(extStage, 'media'), { recursive: true });
 
   copyFileSync(path.join(extDir, 'package.json'), path.join(extStage, 'package.json'));
+  copyFileSync(path.join(extDir, 'package.nls.json'), path.join(extStage, 'package.nls.json'));
+  copyFileSync(path.join(extDir, 'package.nls.es.json'), path.join(extStage, 'package.nls.es.json'));
   copyFileSync(bundlePath, path.join(extStage, 'dist', 'extension.js'));
   cpSync(path.join(extDir, 'media'), path.join(extStage, 'media'), { recursive: true });
-  const readmeRaw = readFileSync(path.join(rootDir, 'README.md'), 'utf8')
+  const readmeRaw = readFileSync(path.join(rootDir, 'README.en.md'), 'utf8')
     .replaceAll(
-      '(README.en.md)',
-      '(https://github.com/20Luisma/itv-calidad/blob/main/README.en.md)'
+      '(README.md)',
+      '(https://github.com/20Luisma/itv-calidad/blob/main/README.md)'
     )
     .replaceAll(
       '(docs/assets/itv-vscode-demo.gif)',
@@ -98,7 +111,7 @@ async function main() {
   writeFileSync(path.join(extStage, 'README.md'), readmeRaw, 'utf8');
 
   writeFileSync(path.join(stageDir, '[Content_Types].xml'), buildContentTypesXml(), 'utf8');
-  writeFileSync(path.join(stageDir, 'extension.vsixmanifest'), buildVsixManifest(pkg), 'utf8');
+  writeFileSync(path.join(stageDir, 'extension.vsixmanifest'), buildVsixManifest(pkg, nls), 'utf8');
 
   const outDir = path.join(rootDir, 'dist');
   mkdirSync(outDir, { recursive: true });

@@ -117,6 +117,10 @@ declare module 'vscode' {
     readonly globalState: Memento;
   }
 
+  export namespace env {
+    export const language: string;
+  }
+
   export namespace workspace {
     export const workspaceFolders: readonly WorkspaceFolder[] | undefined;
     export function openTextDocument(options: { content?: string; language?: string } | Uri): Thenable<unknown>;

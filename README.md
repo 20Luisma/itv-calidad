@@ -59,6 +59,16 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 
 ## Instalación Rápida
 
+**Sin clonar el repositorio (`npx`, recomendado para CLI y MCP):**
+```bash
+# Inspeccionar el repositorio actual en modo rápido
+npx -y itv-calidad . --fast
+
+# Iniciar el servidor MCP Stdio (+ MCP App embebida)
+npx -y itv-calidad --mcp
+```
+
+**Desde código fuente (local):**
 ```bash
 git clone https://github.com/20Luisma/itv-calidad.git
 cd itv-calidad
@@ -79,15 +89,15 @@ npm run build
 - **Cursor:** `.cursor/mcp.json` o `~/.cursor/mcp.json`
 - **Claude Desktop / Claude Code:** `claude_desktop_config.json` o:
   ```bash
-  claude mcp add itv-calidad -- node /ruta/absoluta/a/itv-calidad/dist/interfaces/mcp/server.js
+  claude mcp add itv-calidad -- npx -y itv-calidad --mcp
   ```
 
 ```json
 {
   "mcpServers": {
     "itv-calidad": {
-      "command": "node",
-      "args": ["/ruta/absoluta/a/itv-calidad/dist/interfaces/mcp/server.js"],
+      "command": "npx",
+      "args": ["-y", "itv-calidad", "--mcp"],
       "env": {
         "SONAR_TOKEN": "(opcional)",
         "SENTRY_AUTH_TOKEN": "(opcional)",
@@ -99,7 +109,7 @@ npm run build
   }
 }
 ```
-*(El bloque `"env"` es 100% opcional: si lo quitas, funciona igual en local sin cuentas. También lee tu `.env` local si lo prefieres.)*
+*(Si prefieres ejecutarlo desde un clon local sin `npx`, usa `"command": "node"` y `"args": ["/ruta/absoluta/a/itv-calidad/dist/interfaces/mcp/server.js"]`. El bloque `"env"` es 100% opcional: si lo quitas, funciona igual en local sin cuentas.)*
 
 ### 2. Orden de lanzamiento automático para `GEMINI.md` (o `AGENTS.md` / `CLAUDE.md`)
 

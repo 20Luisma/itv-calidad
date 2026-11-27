@@ -46,12 +46,17 @@ Opciones:
   --url <http://...>   URL local opcional para auditoría WCAG 2.1 AA en vivo (pa11y)
   --json               Imprime el reporte completo en JSON (útil para evidencias/CI)
   --markdown, --md     Imprime el informe de evidencia en Markdown
+  --mcp                Inicia el servidor MCP Stdio (+ MCP App embebida)
   --help, -h           Muestra esta ayuda
 `);
 }
 
 async function main(): Promise<void> {
   const options = parseCliArgs(process.argv.slice(2), process.cwd());
+  if (options.startMcp) {
+    await import('../mcp/server.js');
+    return;
+  }
   if (options.showHelp) {
     printHelp();
     return;

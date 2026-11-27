@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import type { Finding, StationMetadata, StationResult, StationStatus } from '../../../src/domain/types.js';
 import { STATION_CATALOG } from '../../../src/domain/catalog.js';
+import { getUiStrings, localizedStationName, type UiStrings } from './i18n.js';
 
 const ORDERED_STATIONS: readonly StationMetadata[] = Object.values(STATION_CATALOG).sort(
   (a, b) => a.order - b.order
@@ -46,23 +47,6 @@ function iconForState(state: StationRuntimeState): vscode.ThemeIcon {
   }
 }
 
-function labelForState(state: StationRuntimeState): string {
-  switch (state) {
-    case 'pass':
-      return 'APTO';
-    case 'warn':
-      return 'OBSERVACIÓN';
-    case 'fail':
-      return 'DESFAVORABLE';
-    case 'skipped':
-      return 'OMITIDA';
-    case 'running':
-      return 'Escaneando…';
-    default:
-      return 'Pendiente';
-  }
-}
-
 export class ItvTreeProvider implements vscode.TreeDataProvider<ItvTreeNode> {
   private readonly emitter = new vscode.EventEmitter<ItvTreeNode | undefined | void>();
   readonly onDidChangeTreeData = this.emitter.event;
@@ -71,7 +55,7 @@ export class ItvTreeProvider implements vscode.TreeDataProvider<ItvTreeNode> {
   private readonly states = new Map<string, StationRuntimeState>();
   private readonly results = new Map<string, StationResult>();
 
-  constructor() {
+  constructor(private readonly strings: UiStrings = getUiStrings()) {
     this.reset('');
   }
 
@@ -105,10 +89,15 @@ export class ItvTreeProvider implements vscode.TreeDataProvider<ItvTreeNode> {
           : vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None;
 
-      const title = `${String(element.meta.order).padStart(2, '0')} · ${element.result?.shortName ?? element.meta.shortName}`;
+      const stationLabel = localizedStationName(
+        element.meta.id,
+        element.result?.shortName ?? element.meta.shortName,
+        this.strings
+      );
+      const title = `${String(element.meta.order).padStart(2, '0')} · ${stationLabel}`;
       const item = new vscode.TreeItem(title, collapsible);
       const timeTxt = element.result ? ` · ${(element.result.durationMs / 1000).toFixed(1)}s` : '';
-      item.description = `${labelForState(element.state)}${timeTxt}`;
+      item.description = `${this.strings.stateLabels[element.state]}${timeTxt}`;
       item.tooltip = element.result?.summary ?? element.meta.didactic.whatItChecks;
       item.iconPath = iconForState(element.state);
       return item;
@@ -120,14 +109,14 @@ export class ItvTreeProvider implements vscode.TreeDataProvider<ItvTreeNode> {
         : '';
       const item = new vscode.TreeItem(element.finding.title, vscode.TreeItemCollapsibleState.None);
       item.description = loc;
-      item.tooltip = `${element.finding.reason}\n\nCómo arreglarlo: ${element.finding.howToFix}`;
+      item.tooltip = `${element.finding.reason}\n\n${this.strings.howToFixLabel}: ${element.finding.howToFix}`;
       item.iconPath =
         element.finding.severity === 'error'
           ? new vscode.ThemeIcon('error', new vscode.ThemeColor('testing.iconFailed'))
           : new vscode.ThemeIcon('warning', new vscode.ThemeColor('editorWarning.foreground'));
       if (element.finding.file) {
         item.command = {
-          title: 'Abrir hallazgo',
+          title: this.strings.openFindingTitle,
           command: 'itvCalidad.openFinding',
           arguments: [element.repoPath, element.finding.file, element.finding.line ?? 1]
         };

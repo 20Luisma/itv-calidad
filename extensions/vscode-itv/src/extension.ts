@@ -7,13 +7,14 @@ import { loadLocalEnv } from '../../../src/infrastructure/config/loadDotEnv.js';
 import { SafeCommandExecutor } from '../../../src/infrastructure/exec/SafeCommandExecutor.js';
 import { createDefaultStations } from '../../../src/infrastructure/stations/index.js';
 import { IntegrationsStore } from './IntegrationsStore.js';
+import { getUiStrings, localizedStationName } from './i18n.js';
 import { ItvTreeProvider } from './ItvTreeProvider.js';
 import { ItvWebviewProvider } from './ItvWebviewProvider.js';
 
 let activeController: AbortController | null = null;
 let lastReport: InspectionReport | null = null;
 
-async function resolveTargetFolder(): Promise<string | null> {
+async function resolveTargetFolder(openLabel: string): Promise<string | null> {
   const firstWorkspace = vscode.workspace.workspaceFolders?.[0];
   if (firstWorkspace) {
     return firstWorkspace.uri.fsPath;
@@ -23,28 +24,29 @@ async function resolveTargetFolder(): Promise<string | null> {
     canSelectFolders: true,
     canSelectFiles: false,
     canSelectMany: false,
-    openLabel: 'Inspeccionar repositorio con ITV'
+    openLabel
   });
 
   return picked?.[0]?.fsPath ?? null;
 }
 
 export function activate(context: vscode.ExtensionContext): void {
+  const strings = getUiStrings();
   const integrationsStore = new IntegrationsStore(context);
-  const treeProvider = new ItvTreeProvider();
+  const treeProvider = new ItvTreeProvider(strings);
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
   statusBar.text = '$(shield) ITV';
-  statusBar.tooltip = 'Pasar ITV de Código (7 estaciones)';
+  statusBar.tooltip = strings.statusBarTooltip;
   statusBar.command = 'itvCalidad.runInspection';
   statusBar.show();
 
   const runInspection = async (): Promise<void> => {
     if (activeController) {
-      void vscode.window.showWarningMessage('Ya hay una inspección ITV en curso.');
+      void vscode.window.showWarningMessage(strings.alreadyRunningWarn);
       return;
     }
 
-    const repoPath = await resolveTargetFolder();
+    const repoPath = await resolveTargetFolder(strings.openFolderLabel);
     if (!repoPath) return;
 
     loadLocalEnv(repoPath);
@@ -53,7 +55,7 @@ export function activate(context: vscode.ExtensionContext): void {
     activeController = controller;
     treeProvider.reset(repoPath);
 
-    statusBar.text = '$(sync~spin) ITV: Escaneando…';
+    statusBar.text = strings.statusBarScanning;
     statusBar.backgroundColor = undefined;
 
     const runner = new RunItvInspection(createDefaultStations(), new SafeCommandExecutor());
@@ -71,7 +73,10 @@ export function activate(context: vscode.ExtensionContext): void {
             webviewProvider.postStart(event.stack.repoName, event.stack.primaryStack);
           } else if (event.type === 'station:start') {
             treeProvider.markStationRunning(event.station.id);
-            webviewProvider.postStationRunning(event.station.id, event.station.shortName);
+            webviewProvider.postStationRunning(
+              event.station.id,
+              localizedStationName(event.station.id, event.station.shortName, strings)
+            );
           } else if (event.type === 'station:complete') {
             treeProvider.markStationComplete(event.result);
             webviewProvider.postStationComplete(event.result);
@@ -83,21 +88,21 @@ export function activate(context: vscode.ExtensionContext): void {
       webviewProvider.postComplete(report);
 
       if (report.blocksPush) {
-        statusBar.text = `$(error) ITV: DESFAVORABLE (${report.summary.failed} fallos)`;
+        statusBar.text = `$(error) ITV: ${strings.statusBarFail} (${report.summary.failed})`;
         statusBar.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
       } else if (report.verdict === 'APTO') {
-        statusBar.text = `$(pass-filled) ITV: ${report.summary.passed}/${report.summary.total} APTO`;
+        statusBar.text = `$(pass-filled) ITV: ${report.summary.passed}/${report.summary.total} ${strings.statusBarPass}`;
         statusBar.backgroundColor = undefined;
       } else {
-        statusBar.text = `$(warning) ITV: ${report.summary.warned} avisos`;
+        statusBar.text = `$(warning) ITV: ${report.summary.warned} ${strings.statusBarWarn}`;
         statusBar.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Error al ejecutar ITV.';
+      const message = error instanceof Error ? error.message : strings.defaultError;
       webviewProvider.postError(message);
       statusBar.text = '$(shield) ITV';
       if (!controller.signal.aborted) {
-        void vscode.window.showErrorMessage(`ITV de Código: ${message}`);
+        void vscode.window.showErrorMessage(`${strings.appTitle}: ${message}`);
       }
     } finally {
       activeController = null;
@@ -108,13 +113,13 @@ export function activate(context: vscode.ExtensionContext): void {
     if (activeController) {
       activeController.abort();
       activeController = null;
-      statusBar.text = '$(shield) ITV: Detenida';
+      statusBar.text = strings.statusBarStopped;
     }
   };
 
   const exportMarkdown = async (): Promise<void> => {
     if (!lastReport) {
-      void vscode.window.showInformationMessage('Primero ejecuta una inspección ITV para exportar evidencia.');
+      void vscode.window.showInformationMessage(strings.runFirstToExportInfo);
       return;
     }
     const md = exportReportAsMarkdown(lastReport);
@@ -131,26 +136,29 @@ export function activate(context: vscode.ExtensionContext): void {
     await vscode.window.showTextDocument(doc, { selection: new vscode.Range(pos, pos) });
   };
 
-  const webviewProvider = new ItvWebviewProvider({
-    onRun: () => {
-      void runInspection();
+  const webviewProvider = new ItvWebviewProvider(
+    {
+      onRun: () => {
+        void runInspection();
+      },
+      onStop: stopInspection,
+      onExport: () => {
+        void exportMarkdown();
+      },
+      onRequestIntegrations: () => {
+        void integrationsStore.getPublicStatus().then((st) => webviewProvider.postIntegrationsStatus(st));
+      },
+      onSaveIntegrations: (update) => {
+        void integrationsStore.save(update).then((st) => {
+          webviewProvider.postIntegrationsStatus(st, true);
+          void vscode.window.showInformationMessage(
+            `${strings.integrationsSavedPrefix}${st.activeCount}${strings.integrationsActiveSuffix}`
+          );
+        });
+      }
     },
-    onStop: stopInspection,
-    onExport: () => {
-      void exportMarkdown();
-    },
-    onRequestIntegrations: () => {
-      void integrationsStore.getPublicStatus().then((st) => webviewProvider.postIntegrationsStatus(st));
-    },
-    onSaveIntegrations: (update) => {
-      void integrationsStore.save(update).then((st) => {
-        webviewProvider.postIntegrationsStatus(st, true);
-        void vscode.window.showInformationMessage(
-          `ITV de Código: integraciones guardadas (${st.activeCount} activas).`
-        );
-      });
-    }
-  });
+    strings
+  );
 
   context.subscriptions.push(
     statusBar,

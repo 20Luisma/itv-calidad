@@ -1,12 +1,49 @@
 {
   "name": "itv-calidad",
-  "version": "1.0.0",
-  "description": "Herramienta 100% local (CLI + Dashboard Web en cámara lenta) que inspecciona repositorios antes de git push pasando por 7 estaciones de calidad y seguridad.",
+  "version": "1.4.0",
+  "description": "100% local, zero-account 7-station pre-push quality & security gate (MCP Server + MCP App + CLI + Web Dashboard) for PHP, Node.js/TypeScript, and Python.",
   "type": "module",
-  "private": true,
+  "license": "MIT",
+  "author": "20Luisma",
+  "homepage": "https://github.com/20Luisma/itv-calidad#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/20Luisma/itv-calidad.git"
+  },
+  "bugs": {
+    "url": "https://github.com/20Luisma/itv-calidad/issues"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "mcp-app",
+    "model-context-protocol",
+    "pre-push",
+    "code-quality",
+    "devsecops",
+    "security",
+    "owasp",
+    "wcag",
+    "cursor",
+    "claude-code",
+    "local-sonar"
+  ],
+  "files": [
+    "dist/application",
+    "dist/domain",
+    "dist/infrastructure",
+    "dist/interfaces",
+    "public",
+    "README.md",
+    "README.en.md",
+    "LICENSE",
+    "SECURITY.md"
+  ],
   "bin": {
-    "itv-codigo": "./dist/interfaces/cli/index.js",
-    "itv-mcp": "./dist/interfaces/mcp/server.js"
+    "itv-calidad": "./dist/interfaces/cli/index.js",
+    "itv-calidad-mcp": "./dist/interfaces/mcp/server.js",
+    "itv-mcp": "./dist/interfaces/mcp/server.js",
+    "itv-codigo": "./dist/interfaces/cli/index.js"
   },
   "scripts": {
     "dev": "tsx watch src/interfaces/web/server.ts",
@@ -15,6 +52,7 @@
     "mcp": "tsx src/interfaces/mcp/server.ts",
     "build": "tsc && node scripts/build-mcp-app.mjs",
     "build:vscode": "node scripts/build-vscode-extension.mjs",
+    "prepublishOnly": "npm run typecheck && npm run build && npm test",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

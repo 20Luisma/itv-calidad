@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import * as vscode from 'vscode';
 import type { InspectionReport, StationResult } from '../../../src/domain/types.js';
 import { STATION_CATALOG } from '../../../src/domain/catalog.js';
+import { getUiStrings, localizedStationName, type UiStrings } from './i18n.js';
 import type { ExtensionIntegrationsStatus, ExtensionIntegrationsUpdate } from './IntegrationsStore.js';
 
 export interface CockpitCallbacks {
@@ -16,7 +17,10 @@ export class ItvWebviewProvider implements vscode.WebviewViewProvider {
   private view: vscode.WebviewView | undefined;
   private lastPayload: unknown = null;
 
-  constructor(private readonly callbacks: CockpitCallbacks) {}
+  constructor(
+    private readonly callbacks: CockpitCallbacks,
+    private readonly strings: UiStrings = getUiStrings()
+  ) {}
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {
     this.view = webviewView;
@@ -96,19 +100,34 @@ export class ItvWebviewProvider implements vscode.WebviewViewProvider {
 
   private buildHtml(): string {
     const nonce = randomBytes(16).toString('hex');
+    const t = this.strings;
     const stationsJson = JSON.stringify(
       Object.values(STATION_CATALOG)
         .sort((a, b) => a.order - b.order)
-        .map((s) => ({ id: s.id, order: s.order, shortName: s.shortName }))
+        .map((s) => ({ id: s.id, order: s.order, shortName: localizedStationName(s.id, s.shortName, t) }))
     );
+    const i18nJson = JSON.stringify({
+      integrationsBtn: t.integrationsBtn,
+      connectedPill: t.connectedPill,
+      startingStatus: t.startingStatus,
+      runningStationPrefix: t.runningStationPrefix,
+      completedInPrefix: t.completedInPrefix,
+      blockingFailSub: t.blockingFailSub,
+      noBlockingSub: t.noBlockingSub,
+      kpiPassed: t.kpiPassed,
+      kpiScope: t.kpiScope,
+      kpiChecklist: t.kpiChecklist,
+      kpiTime: t.kpiTime,
+      verdicts: t.verdicts
+    });
 
     return `<!doctype html>
-<html lang="es">
+<html lang="${t.htmlLang}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';" />
-  <title>ITV de Código</title>
+  <title>${t.appTitle}</title>
   <style nonce="${nonce}">
     :root { --bg:#0b0f17; --card:#121826; --border:#1e293b; --text:#f1f5f9; --muted:#94a3b8; --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --blue:#38bdf8; }
     * { box-sizing: border-box; }
@@ -158,11 +177,11 @@ export class ItvWebviewProvider implements vscode.WebviewViewProvider {
     <div class="brand">
       <div class="logo" aria-hidden="true">ITV</div>
       <div>
-        <p class="title">ITV de Código</p>
-        <p class="sub" id="repo-label">7 estaciones · 100% local</p>
+        <p class="title">${t.appTitle}</p>
+        <p class="sub" id="repo-label">${t.subtitle}</p>
       </div>
     </div>
-    <div class="traffic" role="status" aria-label="Semáforo ITV">
+    <div class="traffic" role="status" aria-label="${t.trafficAria}">
       <span id="l-red" class="lamp lamp--red"></span>
       <span id="l-amber" class="lamp lamp--amber"></span>
       <span id="l-green" class="lamp lamp--green"></span>
@@ -170,36 +189,36 @@ export class ItvWebviewProvider implements vscode.WebviewViewProvider {
   </div>
 
   <div class="actions">
-    <button id="btn-run" class="primary" type="button">Pasar ITV</button>
-    <button id="btn-stop" class="danger" type="button" hidden>Detener</button>
-    <button id="btn-export" type="button" disabled>Exportar .md</button>
+    <button id="btn-run" class="primary" type="button">${t.runBtn}</button>
+    <button id="btn-stop" class="danger" type="button" hidden>${t.stopBtn}</button>
+    <button id="btn-export" type="button" disabled>${t.exportBtn}</button>
   </div>
-  <button id="btn-integrations" class="full" type="button">⚙ Integraciones (0)</button>
+  <button id="btn-integrations" class="full" type="button">${t.integrationsBtn} (0)</button>
 
   <form id="int-panel" class="card" hidden>
-    <p class="sub">Tokens guardados en el almacén cifrado de tu sistema operativo (SecretStorage). Opcional.</p>
+    <p class="sub">${t.integrationsHint}</p>
     <div class="sec-title"><span>Sentry</span><span id="st-sentry" class="pill-ok"></span></div>
     <div class="field"><label for="i-sentry-token">SENTRY_AUTH_TOKEN</label><input id="i-sentry-token" type="password" placeholder="sntryu_..." autocomplete="off" /></div>
-    <div class="field"><label for="i-sentry-org">SENTRY_ORG</label><input id="i-sentry-org" type="text" placeholder="mi-organizacion" /></div>
-    <div class="field"><label for="i-sentry-proj">SENTRY_PROJECT</label><input id="i-sentry-proj" type="text" placeholder="mi-proyecto" /></div>
+    <div class="field"><label for="i-sentry-org">SENTRY_ORG</label><input id="i-sentry-org" type="text" placeholder="my-org" /></div>
+    <div class="field"><label for="i-sentry-proj">SENTRY_PROJECT</label><input id="i-sentry-proj" type="text" placeholder="my-project" /></div>
 
     <div class="sec-title"><span>GitHub Security</span><span id="st-github" class="pill-ok"></span></div>
-    <div class="field"><label for="i-gh-token">GITHUB_TOKEN (opcional)</label><input id="i-gh-token" type="password" placeholder="ghp_... o github_pat_..." autocomplete="off" /></div>
+    <div class="field"><label for="i-gh-token">${t.githubTokenLabel}</label><input id="i-gh-token" type="password" placeholder="ghp_... / github_pat_..." autocomplete="off" /></div>
 
     <div class="sec-title"><span>SonarCloud / SonarQube</span><span id="st-sonar" class="pill-ok"></span></div>
     <div class="field"><label for="i-sonar-token">SONAR_TOKEN</label><input id="i-sonar-token" type="password" placeholder="squ_..." autocomplete="off" /></div>
     <div class="field"><label for="i-sonar-host">SONAR_HOST_URL</label><input id="i-sonar-host" type="text" placeholder="https://sonarcloud.io" /></div>
-    <div class="field"><label for="i-sonar-key">SONAR_PROJECT_KEY</label><input id="i-sonar-key" type="text" placeholder="org_proyecto" /></div>
+    <div class="field"><label for="i-sonar-key">SONAR_PROJECT_KEY</label><input id="i-sonar-key" type="text" placeholder="org_project" /></div>
 
     <div class="actions">
-      <button type="submit" class="primary">Guardar cifrado</button>
-      <button type="button" id="btn-int-close">Cerrar</button>
+      <button type="submit" class="primary">${t.saveEncryptedBtn}</button>
+      <button type="button" id="btn-int-close">${t.closeBtn}</button>
     </div>
-    <div id="int-msg" class="save-msg" hidden>Guardado en el llavero cifrado del IDE.</div>
+    <div id="int-msg" class="save-msg" hidden>${t.savedMsg}</div>
   </form>
 
   <div class="card">
-    <div id="status" class="status">Lista para inspeccionar el workspace abierto.</div>
+    <div id="status" class="status">${t.readyStatus}</div>
     <div id="track" class="track"></div>
   </div>
 
@@ -212,6 +231,7 @@ export class ItvWebviewProvider implements vscode.WebviewViewProvider {
   <script nonce="${nonce}">
     const vscode = acquireVsCodeApi();
     const stations = ${stationsJson};
+    const T = ${i18nJson};
     const $ = (id) => document.getElementById(id);
     let stateMap = {};
 
@@ -258,10 +278,10 @@ export class ItvWebviewProvider implements vscode.WebviewViewProvider {
         vscode.postMessage({ type: 'getIntegrations' });
       } else if (msg.type === 'integrations' && msg.status) {
         const st = msg.status;
-        $('btn-integrations').textContent = '⚙ Integraciones (' + st.activeCount + ')';
-        $('st-sentry').textContent = st.sentryConfigured ? 'Conectado' : '';
-        $('st-github').textContent = st.githubConfigured ? 'Conectado' : '';
-        $('st-sonar').textContent = st.sonarConfigured ? 'Conectado' : '';
+        $('btn-integrations').textContent = T.integrationsBtn + ' (' + st.activeCount + ')';
+        $('st-sentry').textContent = st.sentryConfigured ? T.connectedPill : '';
+        $('st-github').textContent = st.githubConfigured ? T.connectedPill : '';
+        $('st-sonar').textContent = st.sonarConfigured ? T.connectedPill : '';
         $('i-sentry-org').value = st.sentryOrg || '';
         $('i-sentry-proj').value = st.sentryProject || '';
         $('i-sonar-host').value = st.sonarHostUrl || 'https://sonarcloud.io';
@@ -272,31 +292,31 @@ export class ItvWebviewProvider implements vscode.WebviewViewProvider {
         $('verdict-card').hidden = true;
         $('btn-run').hidden = true; $('btn-stop').hidden = false; $('btn-export').disabled = true;
         $('repo-label').textContent = msg.repoName + ' · ' + msg.stack;
-        $('status').textContent = 'Iniciando inspección de 7 estaciones…';
+        $('status').textContent = T.startingStatus;
         setLamp('amber');
       } else if (msg.type === 'station:running') {
         stateMap[msg.stationId] = 'running'; renderTrack();
-        $('status').textContent = 'Ejecutando ' + msg.name + '…';
+        $('status').textContent = T.runningStationPrefix + msg.name + '…';
       } else if (msg.type === 'station:complete') {
         stateMap[msg.stationId] = msg.status; renderTrack();
       } else if (msg.type === 'complete') {
         $('btn-run').hidden = false; $('btn-stop').hidden = true; $('btn-export').disabled = false;
         const cls = msg.blocksPush ? 'fail' : (msg.verdict === 'APTO' ? 'pass' : 'warn');
         setLamp(cls === 'pass' ? 'green' : cls === 'warn' ? 'amber' : 'red');
-        $('status').textContent = 'Completada en ' + msg.durationSec + 's.';
+        $('status').textContent = T.completedInPrefix + msg.durationSec + 's.';
         $('verdict-card').hidden = false;
         $('verdict-text').className = 'verdict ' + cls;
-        $('verdict-text').textContent = msg.verdict.replace(/_/g, ' ');
+        $('verdict-text').textContent = T.verdicts[msg.verdict] || msg.verdict.replace(/_/g, ' ');
         $('verdict-sub').textContent = msg.blocksPush
-          ? 'Hay fallos bloqueantes antes de hacer git push.'
-          : (msg.scope ? msg.scope.label + ' (' + msg.scope.confidencePercent + '%) · ' + msg.scope.note : 'Sin fallos bloqueantes. Revisa los detalles abajo.');
+          ? T.blockingFailSub
+          : (msg.scope ? msg.scope.label + ' (' + msg.scope.confidencePercent + '%) · ' + msg.scope.note : T.noBlockingSub);
         const s = msg.summary;
         const scopeVal = msg.scope ? msg.scope.evaluatedStations + '/' + msg.scope.totalStations + ' (' + msg.scope.confidencePercent + '%)' : s.passed + '/' + s.total;
         $('kpis').innerHTML =
-          '<div class="kpi"><span>Aptas</span><strong>' + s.passed + '/' + s.total + '</strong></div>' +
-          '<div class="kpi"><span>Alcance verificado</span><strong>' + scopeVal + '</strong></div>' +
-          '<div class="kpi"><span>Checklist OWASP</span><strong>' + (msg.checklistScore !== null ? msg.checklistScore + '%' : 'N/A') + '</strong></div>' +
-          '<div class="kpi"><span>Tiempo</span><strong>' + msg.durationSec + 's</strong></div>';
+          '<div class="kpi"><span>' + T.kpiPassed + '</span><strong>' + s.passed + '/' + s.total + '</strong></div>' +
+          '<div class="kpi"><span>' + T.kpiScope + '</span><strong>' + scopeVal + '</strong></div>' +
+          '<div class="kpi"><span>' + T.kpiChecklist + '</span><strong>' + (msg.checklistScore !== null ? msg.checklistScore + '%' : 'N/A') + '</strong></div>' +
+          '<div class="kpi"><span>' + T.kpiTime + '</span><strong>' + msg.durationSec + 's</strong></div>';
       } else if (msg.type === 'error') {
         $('btn-run').hidden = false; $('btn-stop').hidden = true; setLamp('red');
         $('status').textContent = 'Error: ' + msg.message;

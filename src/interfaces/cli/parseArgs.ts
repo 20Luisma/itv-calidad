@@ -4,6 +4,7 @@ export interface CliOptions {
   readonly minCoverage: number;
   readonly format: 'pretty' | 'json' | 'markdown';
   readonly showHelp: boolean;
+  readonly startMcp: boolean;
   readonly targetUrl?: string;
 }
 
@@ -13,12 +14,15 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
   let minCoverage = 75;
   let format: 'pretty' | 'json' | 'markdown' = 'pretty';
   let showHelp = false;
+  let startMcp = false;
   let targetUrl: string | undefined;
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i] ?? '';
     if (arg === '--help' || arg === '-h') {
       showHelp = true;
+    } else if (arg === '--mcp') {
+      startMcp = true;
     } else if (arg === '--fast') {
       slowMotionMs = 0;
     } else if (arg === '--json') {
@@ -53,6 +57,7 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
     minCoverage,
     format,
     showHelp,
+    startMcp,
     ...(targetUrl ? { targetUrl } : {})
   };
 }

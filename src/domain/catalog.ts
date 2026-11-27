@@ -86,7 +86,7 @@ export const STATION_CATALOG: Readonly<Record<StationId, StationMetadata>> = {
     shortName: 'Deuda & Obs.',
     didactic: {
       whatItChecks:
-        'Ejecuta análisis local de deuda técnica (tamaño, complejidad, duplicados, restos de debug) y observabilidad pre-push; si configurás SONAR_TOKEN o SENTRY_AUTH_TOKEN en tu .env local, consulta en vivo SonarCloud y Sentry con enlaces directos.',
+        'Ejecuta análisis local de deuda técnica (tamaño, complejidad, duplicados, restos de debug) y observabilidad pre-push; si configuras SONAR_TOKEN o SENTRY_AUTH_TOKEN en tu .env local, consulta en vivo SonarCloud y Sentry con enlaces directos.',
       whyItMatters:
         'Evita acumular código inmantenible y te deja ver el Quality Gate real de SonarCloud y los errores abiertos en Sentry antes de hacer git push.',
       toolsByStack: 'Análisis local (0 cuentas) + API opcional SonarCloud / Sentry vía .env'
