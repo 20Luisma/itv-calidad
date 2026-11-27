@@ -2,7 +2,7 @@
 
 ## Contexto General
 - **Proyecto:** ITV de Código — MCP App & Auditor Local (`itv-calidad`, repo GitHub: `https://github.com/20Luisma/itv-calidad`).
-- **Objetivo:** Herramienta **100% local y de solo lectura** (**MCP App interactiva embebida + Servidor MCP Stdio + Dashboard Web SSE + CLI**) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**, explicando qué audita cada estación, por qué importa y cómo corregir los fallos.
+- **Objetivo:** Herramienta **100% local y de solo lectura** (**Extensión de Barra Lateral VS Code / Open VSX + MCP App interactiva embebida + Servidor MCP Stdio + Dashboard Web SSE + CLI / Hook `pre-push`**) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**, explicando qué audita cada estación, por qué importa y cómo corregir los fallos.
 - **Origen:** Surge tras auditar y pulir el proyecto `20Luisma/marvel` y detectar el valor de tener un auditor determinista y visual en local para flujos con agentes de IA, sin cajas negras ni cuentas obligatorias.
 - **Restricciones clave:** 0 cuentas obligatorias (integraciones SonarCloud/Sentry/GitHub opcionales vía `.env` local `chmod 600`), 0 tokens pagos, solo lectura sobre el repo inspeccionado, cero falsos verdes, 0 CVEs propios, sin la palabra "Didáctica" en UI/CLI/docs.
 
@@ -15,24 +15,30 @@
   - `src/interfaces/`:
     - CLI (`cli/parseArgs.ts`, `cli/index.ts`)
     - Web/SSE (`web/httpApp.ts`, `web/server.ts`) + Dashboard `public/`
-    - **MCP Server + MCP App (`mcp/server.ts`, `mcp/handlers.ts`, `mcp/ui/{template.html,styles.css,render.ts,app-client.ts}`):** recurso `ui://itv-calidad/app.html` compilado por `scripts/build-mcp-app.mjs` a `dist/interfaces/mcp/app.html` (`npm run build`), 3 herramientas (`run_itv`, `get_security_checklist`, `list_itv_stations`), entrypoints `aux_pane` y `global` en Antigravity, registrado en `/Users/admin/.gemini/antigravity/mcp_config.json`.
-- **CI / GitHub Actions:** `.github/workflows/ci.yml` en `ubuntu-24.04` (instala `@rolldown/binding-linux-x64-gnu` con `--no-save` para evitar npm bug #4828 sin contaminar `package.json`), pasando `typecheck`, `test:coverage`, `e2e`, `audit:deps` y auto-ITV en verde.
+    - **MCP Server + MCP App (`mcp/server.ts`, `mcp/handlers.ts`, `mcp/ui/{template.html,styles.css,render.ts,app-client.ts}`):** versión `1.3.0`, recurso `ui://itv-calidad/app.html` compilado por `scripts/build-mcp-app.mjs` a `dist/interfaces/mcp/app.html` (`npm run build`), 3 herramientas (`run_itv`, `get_security_checklist`, `list_itv_stations`) con `annotations` oficiales MCP (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`), entrypoints `aux_pane` y `global` en Antigravity, registrado en `/Users/admin/.gemini/antigravity/mcp_config.json`.
+    - **Extensión de Barra Lateral VS Code / Open VSX (`extensions/vscode-itv/`):** paquete `20luisma.itv-calidad-vscode` v1.3.0 empaquetado con `esbuild` + `zip -qrX` (`scripts/build-vscode-extension.mjs`, `<GalleryFlags>Public</GalleryFlags>`), árbol interactivo de 7 estaciones, cabina Webview con CSP `nonce`, KPI `InspectionScope` y panel **⚙ Integraciones** cifrado con `SecretStorage`.
+  - **Hook portable `pre-push` (`.githooks/pre-push`):** ejecuta auto-ITV local (`--fast`) antes de cada push sin consumir tokens de IA (`git config core.hooksPath .githooks`).
+- **CI / GitHub Actions:** `.github/workflows/ci.yml` en `ubuntu-24.04` (con `workflow_dispatch` y `paths-ignore` para docs, instala `@rolldown/binding-linux-x64-gnu` con `--no-save` para evitar npm bug #4828 sin contaminar `package.json`), pasando `typecheck`, `test:coverage`, `e2e`, `audit:deps` y auto-ITV en verde.
 - **ADRs:**
   - `docs/adr/ADR-001-arquitectura-itv-didactica.md`
   - `docs/adr/ADR-002-checklist-diligencia-debida-seguridad.md`
   - `docs/adr/ADR-003-estacion-7-sonar-observabilidad.md`
 
 ## Estado Actual y Próximos Pasos
-- **Estado actual (v1.2 — MCP App + CI en verde en `main`):**
-  - Auto-ITV propia (CLI y MCP `run_itv`) en **7/7 APTO** (`0 observaciones · 0 desfavorables · 0 omitidas`): `tsc --noEmit` 0 errores, **35/35 tests · 84.54% cobertura** Vitest (>75% gate), **0 CVEs**, **Checklist 6/6 (100%)**, **Playwright E2E 3/3**, **Pa11y WCAG 2.1 AA 0 errores** y **0 duplicados DRY**.
-  - **MCP App** operativa en vivo dentro de Antigravity (chat + pestaña `ITV de Código` en panel lateral) con animación de escaneo, semáforo LED, re-escaneo en 1 clic (`Pasar ITV`) y botón para pedir al agente corregir hallazgos.
-  - **README.md y GitHub** actualizados con título MCP App, GIF demo en `docs/assets/itv-mcp-demo.gif`, regla lista para `GEMINI.md`/`AGENTS.md`, descripción About profesional y 16 topics de descubrimiento.
+- **Estado actual (v1.3.0 — Publicada en 2 tiendas + M8ven verificado + Discord oficial MCP, `main` en `9f653ea`):**
+  - Auto-ITV propia (CLI, hook `pre-push` y MCP `run_itv`) en **7/7 APTO** (`0 observaciones · 0 desfavorables · 0 omitidas`): `tsc --noEmit` 0 errores, **39/39 tests (7 archivos) · 84.54% stmts / 86.03% lines** Vitest (>75% gate), **0 CVEs**, **Checklist 6/6 (100%)**, **Playwright E2E 3/3**, **Pa11y WCAG 2.1 AA 0 errores** y **0 duplicados DRY**.
+  - **Extensión VS Code / Open VSX (`20luisma.itv-calidad-vscode` v1.3.0):** publicada y pública en **Visual Studio Code Marketplace** (`https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode`) y en **Open VSX Registry** (`https://open-vsx.org/extension/20luisma/itv-calidad-vscode`, namespace verificado `20luisma`, 75+ descargas).
+  - **M8ven MCP Trust Index (`https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn`):** servidor reclamado y verificado por editor, GitHub App read-only vinculada solo a `20Luisma/itv-calidad`, `annotations` oficiales MCP añadidas en `server.ts` y testeadas en `tests/mcp-handlers.test.ts`, badge oficial añadido en `README.md` y `README.en.md`.
+  - **Difusión comunidad:** publicado en vivo en el **Discord oficial de Model Context Protocol** (`#showcase`, hilo con GIF + links a GitHub, VS Code Marketplace y Open VSX). Posts en Reddit (`r/mcp`, `r/vscode`) frenados por filtro automático de karma bajo (cuenta nueva con karma 1).
+  - **Documentación y perfil:** `README.md` (español neutro estricto) + `README.en.md` (inglés) con ambos GIFs y 4 badges (CI, VS Code Marketplace, Open VSX, M8ven); `SECURITY.md` y `CONTRIBUTING.md` bilingües; perfil `20Luisma/20Luisma` actualizado; tag estable anterior `v-estable-2026-11-24`.
 - **Próximos pasos opcionales:**
   - Publicar paquete en **npm** (`npx -y itv-calidad-mcp`) para instalación en 1 línea sin `git clone`.
-  - Versión bilingüe del README (`README.md` EN + `README.es.md`) y registro en directorios MCP (`awesome-mcp-servers`, `smithery.ai`, `mcp.so`, `glama.ai`).
-  - Crear nuevo tag estable (con aprobación explícita de Martín) para sellar v1.2 MCP App.
+  - Comprobar re-escaneo de nota en **M8ven** tras añadir `annotations` MCP y tests de las 3 herramientas.
+  - Evaluar publicación en **Show HN** o **Reddit** (cuando la cuenta supere ~15–20 de karma).
+  - Crear nuevo tag estable `v-estable-2026-11-27` (solo con aprobación explícita de Martín).
 
 ## Historial de Sesiones
 - **2026-11-23 (Sesión 1):** Bootstrap inicial del proyecto (`AGENTS.md`, `MEMORY.md`, `ADR-001`, `.agents/`).
 - **2026-11-23 (Sesión 2):** Implementación de 7 estaciones, Checklist OWASP/RGPD (`ADR-002`), Estación 7 Sonar/Sentry/GitHub (`ADR-003`), Dashboard dark mode WCAG 2.1 AA, Playwright E2E, selector de carpetas multiplataforma y publicación en GitHub.
 - **2026-11-23 / 2026-11-24 (Sesión 3):** Servidor MCP Stdio + **MCP App interactiva embebida** (`ui://itv-calidad/app.html`), CI GitHub Actions en verde, README bilingüe (`README.md` español neutro + `README.en.md` inglés) con GIFs de Extensión y MCP App, About + 17 topics en GitHub, **Extensión VS Code Marketplace publicada (`20luisma.itv-calidad-vscode` v1.3.0)** con panel **⚙ Integraciones** (`SecretStorage`), **`InspectionScope`** (`full` / `partial` / `diagnostic-only`) + 3 tests nuevos (**84.9% cobertura · 7/7 APTO · 0 CVEs**), `AGENTS.md` sincronizado y **`SECURITY.md`** bilingüe.
+- **2026-11-27 (Sesión 4):** Publicación en **Open VSX Registry** (`v1.3.0`, fix `zip -qrX` y verificación namespace `20luisma`), activación de hook portable `.githooks/pre-push` (`605d6a1`), cumplimiento especificación MCP + **M8ven Trust Index** (`annotations` booleanas en las 3 herramientas en `src/interfaces/mcp/server.ts`, tests de contrato en `tests/mcp-handlers.test.ts`, timeout SSE 20s en `tests/http-server.test.ts` → **39/39 tests · 84.54% cobertura**), claim + badge verificado M8ven (`9f653ea`), perfil GitHub `20Luisma` actualizado y publicación en vivo en el **Discord oficial de Model Context Protocol** (`#showcase`).
