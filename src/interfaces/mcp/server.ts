@@ -24,12 +24,12 @@ async function loadMcpAppHtml(): Promise<string> {
       // probar siguiente ruta
     }
   }
-  return '<!doctype html><html lang="es"><body><p>Ejecutá <code>npm run build</code> para compilar la UI de la MCP App.</p></body></html>';
+  return '<!doctype html><html lang="es"><body><p>Ejecuta <code>npm run build</code> para compilar la UI de la MCP App.</p></body></html>';
 }
 
 const server = new McpServer({
   name: 'itv-calidad',
-  version: '1.1.0'
+  version: '1.3.0'
 });
 
 server.registerResource(
@@ -62,7 +62,13 @@ server.registerTool(
     title: 'Listar Estaciones ITV',
     description:
       'Lista las 7 estaciones de inspección de ITV de Código (sintaxis, tipos, tests/cobertura, seguridad/OWASP, E2E, WCAG y deuda técnica).',
-    inputSchema: {}
+    inputSchema: {},
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false
+    }
   },
   async () => handleListStations()
 );
@@ -87,6 +93,12 @@ server.registerTool(
       targetUrl: z.string().url().optional().describe('URL local opcional para auditoría WCAG en vivo'),
       format: z.enum(['json', 'markdown']).optional().describe('Formato de salida: json (default) o markdown')
     },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true
+    },
     _meta: {
       ui: {
         resourceUri: APP_URI
@@ -110,6 +122,12 @@ server.registerTool(
       'Ejecuta la auditoría de seguridad (CVEs, secretos, IPs, cabeceras HTTP) y devuelve el Checklist OWASP ASVS / RGPD Art. 32.',
     inputSchema: {
       repoPath: z.string().min(1).describe('Ruta absoluta al repositorio local a auditar')
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false
     }
   },
   async (args) => handleSecurityChecklist(args)

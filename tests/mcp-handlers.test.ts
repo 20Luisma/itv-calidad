@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, it, expect, vi } from 'vitest';
 import type { InspectionReport } from '../src/domain/types.js';
 import {
@@ -57,14 +59,14 @@ const mockReport: InspectionReport = {
 };
 
 describe('MCP Handlers (itv-calidad)', () => {
-  it('lists all 7 ITV stations with didactic metadata', () => {
+  it('list_itv_stations: lists all 7 ITV stations with didactic metadata', () => {
     const res = handleListStations();
     const parsed = JSON.parse(res.content[0]!.text);
     expect(parsed.totalStations).toBe(7);
     expect(parsed.stations[0].order).toBe(1);
   });
 
-  it('runs ITV inspection and formats both JSON and Markdown responses', async () => {
+  it('run_itv: runs ITV inspection and formats both JSON and Markdown responses', async () => {
     const runner: InspectionRunner = {
       execute: vi.fn().mockResolvedValue(mockReport)
     };
@@ -79,7 +81,7 @@ describe('MCP Handlers (itv-calidad)', () => {
     expect(mdRes.content[0]!.text).toContain('# Informe ITV de Código');
   });
 
-  it('returns OWASP security checklist and handles errors fail-safely', async () => {
+  it('get_security_checklist: returns OWASP security checklist and handles errors fail-safely', async () => {
     const okRunner: InspectionRunner = {
       execute: vi.fn().mockResolvedValue(mockReport)
     };
@@ -97,5 +99,16 @@ describe('MCP Handlers (itv-calidad)', () => {
 
     const secErr = await handleSecurityChecklist({ repoPath: '/no-existe' }, failRunner);
     expect(secErr.isError).toBe(true);
+  });
+
+  it('declares explicit MCP safety annotations for list_itv_stations, run_itv, and get_security_checklist', () => {
+    const serverSrc = readFileSync(path.resolve('src/interfaces/mcp/server.ts'), 'utf8');
+    for (const toolName of ['list_itv_stations', 'run_itv', 'get_security_checklist']) {
+      expect(serverSrc).toContain(`'${toolName}'`);
+    }
+    expect(serverSrc.match(/readOnlyHint:\s*true/g)?.length).toBe(3);
+    expect(serverSrc.match(/destructiveHint:\s*false/g)?.length).toBe(3);
+    expect(serverSrc.match(/idempotentHint:\s*true/g)?.length).toBe(3);
+    expect(serverSrc.match(/openWorldHint:\s*(true|false)/g)?.length).toBe(3);
   });
 });
