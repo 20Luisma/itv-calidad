@@ -5,6 +5,7 @@
 [![CI — ITV de Código](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml/badge.svg)](https://github.com/20Luisma/itv-calidad/actions/workflows/ci.yml)
 [![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-ITV%20de%20C%C3%B3digo-007ACC?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode)
 [![Open VSX Registry](https://img.shields.io/badge/Open%20VSX-Antigravity%20%C2%B7%20Cursor%20%C2%B7%20Windsurf-A60EE5)](https://open-vsx.org/extension/20luisma/itv-calidad-vscode)
+[![M8ven Score](https://m8ven.ai/badge/mcp/20luisma/itv-calidad)](https://m8ven.ai/mcp/20luisma/itv-calidad?s=readme)
 
 **100% local, open-source, zero-mandatory-accounts** code quality and security gate (**VS Code / Open VSX Sidebar Extension + Interactive MCP App + Stdio MCP Server + Live SSE Web Dashboard + CLI**) that audits any local repository (**PHP, Node.js/TypeScript, or Python**) **before `git push`** across **7 real quality, security, and observability stations**.
 
