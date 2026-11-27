@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { exportReportAsMarkdown } from '../../application/ExportReportMarkdown.js';
+import { initPrePushHook } from '../../application/InitPrePushHook.js';
 import { RunItvInspection } from '../../application/RunItvInspection.js';
 import type { InspectionEvent, StationStatus } from '../../domain/types.js';
 import { loadLocalEnv } from '../../infrastructure/config/loadDotEnv.js';
@@ -47,6 +48,8 @@ Opciones:
   --json               Imprime el reporte completo en JSON (útil para evidencias/CI)
   --markdown, --md     Imprime el informe de evidencia en Markdown
   --mcp                Inicia el servidor MCP Stdio (+ MCP App embebida)
+  --init-hook          Instala el hook portable .githooks/pre-push en el repositorio
+  --force              Sobrescribe .githooks/pre-push si ya existe (junto con --init-hook)
   --help, -h           Muestra esta ayuda
 `);
 }
@@ -63,6 +66,14 @@ async function main(): Promise<void> {
   }
 
   const executor = new SafeCommandExecutor();
+  if (options.initHook) {
+    const result = await initPrePushHook(options.repoPath, executor, options.force);
+    console.log(result.created ? `${ANSI.green}✔ ${result.message}${ANSI.reset}` : `${ANSI.yellow}▲ ${result.message}${ANSI.reset}`);
+    if (!result.created) {
+      process.exitCode = 1;
+    }
+    return;
+  }
   const runner = new RunItvInspection(createDefaultStations(), executor);
 
   const onEvent = (event: InspectionEvent) => {

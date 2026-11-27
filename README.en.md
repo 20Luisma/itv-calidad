@@ -65,6 +65,9 @@ Built for developers and teams coding with AI agents: instead of an opaque cloud
 # Inspect the current repository in fast mode
 npx -y itv-calidad . --fast
 
+# Install the portable pre-push hook in 1 command (0 AI tokens)
+npx -y itv-calidad --init-hook
+
 # Start the Stdio MCP Server (+ embedded MCP App)
 npx -y itv-calidad --mcp
 ```

@@ -121,6 +121,43 @@ export class SecurityCvesStation implements StationRunner {
       }
     }
 
+    if (stack.hasDotnetProject) {
+      const res = await executor.run(
+        'dotnet',
+        ['list', 'package', '--vulnerable', '--include-transitive'],
+        { cwd: repoPath, timeoutMs: commandTimeoutMs, ...(signal ? { signal } : {}) }
+      );
+      if (res.notFound) {
+        findings.push({
+          severity: 'warning',
+          title: 'SDK de .NET no encontrado para auditar CVEs NuGet',
+          reason: res.stderr || 'dotnet no está disponible en PATH.',
+          howToFix: 'Instala el SDK de .NET para ejecutar `dotnet list package --vulnerable`.'
+        });
+      } else {
+        commands.push('dotnet list package --vulnerable --include-transitive');
+        const out = [res.stdout, res.stderr].filter(Boolean).join('\n');
+        outputs.push(out || 'dotnet list package --vulnerable OK');
+        const hasVulnerablePkgs = /has the following vulnerable packages/i.test(out);
+        if (res.exitCode === 0 && !hasVulnerablePkgs) {
+          if (dependencyAuditStatus !== 'fail') {
+            dependencyAuditStatus = 'pass';
+            dependencyAuditDetail = 'NuGet audit: 0 vulnerabilidades conocidas.';
+          }
+        } else {
+          hardFailed = true;
+          dependencyAuditStatus = 'fail';
+          dependencyAuditDetail = 'dotnet list package --vulnerable reportó paquetes NuGet vulnerables.';
+          findings.push({
+            severity: 'error',
+            title: 'Vulnerabilidades (CVEs) detectadas en paquetes NuGet (.NET)',
+            reason: out.slice(0, 500),
+            howToFix: 'Actualiza las referencias vulnerables en tu `.csproj` con `dotnet add package <paquete>`.'
+          });
+        }
+      }
+    }
+
     // 2. Escáner local de secretos e IPs http:// hardcodeadas
     const secretScan = await scanSecretsAndIps(repoPath);
     commands.push(`escáner local de secretos e IPs (${secretScan.filesScanned} archivos)`);

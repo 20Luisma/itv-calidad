@@ -154,6 +154,35 @@ export class StaticTypesStation implements StationRunner {
       }
     }
 
+    // 4. .NET / C# (compilador Roslyn: dotnet build --no-restore)
+    if (stack.hasDotnetProject) {
+      const dotnetRes = await executor.run('dotnet', ['build', '--no-restore', '--nologo', '-v', 'minimal'], {
+        cwd: repoPath,
+        timeoutMs: commandTimeoutMs,
+        ...(signal ? { signal } : {})
+      });
+      if (dotnetRes.notFound) {
+        findings.push({
+          severity: 'warning',
+          title: 'SDK de .NET (dotnet) no encontrado en PATH',
+          reason: 'El repositorio es .NET pero el binario `dotnet` no está instalado localmente.',
+          howToFix: 'Instala el SDK de .NET (`brew install --cask dotnet-sdk` o desde dot.net) para verificar tipos y compilación C#.'
+        });
+      } else {
+        commands.push('dotnet build --no-restore --nologo');
+        outputs.push(dotnetRes.stdout || dotnetRes.stderr || 'dotnet build OK');
+        if (dotnetRes.exitCode !== 0) {
+          hardFailed = true;
+          findings.push({
+            severity: 'error',
+            title: 'dotnet build detectó errores de compilación o tipos en C#/.NET',
+            reason: (dotnetRes.stdout || dotnetRes.stderr).slice(0, 500),
+            howToFix: 'Ejecuta `dotnet build` en local y corrige los errores CS/MSB reportados.'
+          });
+        }
+      }
+    }
+
     const durationMs = Date.now() - startedAt;
 
     if (commands.length === 0 && findings.length === 0) {
@@ -162,7 +191,7 @@ export class StaticTypesStation implements StationRunner {
         command: 'No aplica al stack actual',
         status: 'skipped',
         durationMs,
-        summary: 'Proyecto sin TypeScript, PHPStan ni analizador estático de Python configurado.',
+        summary: 'Proyecto sin TypeScript, PHPStan, analizador de Python ni proyecto .NET configurado.',
         rawOutput: 'Estación omitida limpiamente (sin falso verde).'
       });
     }

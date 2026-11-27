@@ -65,6 +65,9 @@ Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar
 # Inspeccionar el repositorio actual en modo rápido
 npx -y itv-calidad . --fast
 
+# Instalar el hook portable pre-push en 1 comando (0 tokens)
+npx -y itv-calidad --init-hook
+
 # Iniciar el servidor MCP Stdio (+ MCP App embebida)
 npx -y itv-calidad --mcp
 ```

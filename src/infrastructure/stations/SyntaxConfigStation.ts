@@ -189,6 +189,28 @@ export class SyntaxConfigStation implements StationRunner {
       }
     }
 
+    // 4. .NET / C#: validación de proyectos .csproj y compilación de sintaxis
+    if (stack.hasDotnetProject || stack.detectedStacks.includes('dotnet')) {
+      const csprojFiles = await walkRepoFiles(repoPath, new Set(['.csproj']), 20);
+      for (const file of csprojFiles) {
+        const xml = await readFile(file.absolutePath, 'utf8').catch(() => '');
+        if (!/<Project\b/i.test(xml) || !/<\/Project>/i.test(xml)) {
+          hardFailed = true;
+          findings.push({
+            severity: 'error',
+            title: 'Archivo .csproj con XML incompleto o inválido',
+            file: file.relativePath,
+            reason: 'No se encontró una etiqueta raíz <Project>...</Project> válida.',
+            howToFix: `Revisa la estructura XML de \`${file.relativePath}\`.`
+          });
+        }
+      }
+      if (csprojFiles.length > 0) {
+        commands.push(`XML check (${csprojFiles.length} .csproj)`);
+        outputs.push(`.csproj revisados: ${csprojFiles.length} archivo(s).`);
+      }
+    }
+
     const durationMs = Date.now() - startedAt;
     if (commands.length === 0) {
       return createStationResult({
@@ -196,7 +218,7 @@ export class SyntaxConfigStation implements StationRunner {
         command: 'Sin manifiestos reconocidos',
         status: 'skipped',
         durationMs,
-        summary: 'No se detectaron archivos PHP, Node/JS ni Python para validar sintaxis.',
+        summary: 'No se detectaron archivos PHP, Node/JS, Python ni .NET para validar sintaxis.',
         rawOutput: 'Stack no reconocido en la raíz del repositorio.',
         findings
       });

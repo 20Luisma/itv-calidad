@@ -11,7 +11,7 @@ export const STATION_CATALOG: Readonly<Record<StationId, StationMetadata>> = {
         'Comprueba que los archivos de código parseen sin errores de sintaxis y que los manifiestos del proyecto (package.json, composer.json, pyproject.toml) estén íntegros y bien formados.',
       whyItMatters:
         'Un error de sintaxis o un manifiesto roto detiene el despliegue o rompe el entorno de cualquier compañero apenas hace git pull.',
-      toolsByStack: 'PHP: php -l + composer validate | Node/TS: node --check + eslint | Python: py_compile'
+      toolsByStack: 'PHP: php -l + composer validate | Node/TS: node --check + eslint | Python: py_compile | .NET: XML .csproj'
     }
   },
   'static-types': {
@@ -24,7 +24,7 @@ export const STATION_CATALOG: Readonly<Record<StationId, StationMetadata>> = {
         'Analiza el flujo de tipos y contratos sin ejecutar la aplicación para detectar nulos no controlados, propiedades inexistentes o firmas incompatibles.',
       whyItMatters:
         'Atrapa en segundos bugs silenciosos que de otro modo explotan en producción recién cuando un usuario cae en un caso borde.',
-      toolsByStack: 'PHP: PHPStan | Node/TS: tsc --noEmit | Python: mypy / ruff'
+      toolsByStack: 'PHP: PHPStan | Node/TS: tsc --noEmit | Python: mypy / ruff | .NET: dotnet build'
     }
   },
   'tests-coverage': {
@@ -37,7 +37,7 @@ export const STATION_CATALOG: Readonly<Record<StationId, StationMetadata>> = {
         'Ejecuta la suite local de pruebas automáticas y verifica si la cobertura de código alcanza el umbral mínimo exigido (coverage gate).',
       whyItMatters:
         'Es la red de seguridad contra regresiones: garantiza que un cambio nuevo no rompió comportamiento crítico que ya funcionaba.',
-      toolsByStack: 'PHP: PHPUnit | Node/TS: Vitest / Jest | Python: Pytest'
+      toolsByStack: 'PHP: PHPUnit | Node/TS: Vitest / Jest | Python: Pytest | .NET: dotnet test'
     }
   },
   'security-cves': {
@@ -50,7 +50,7 @@ export const STATION_CATALOG: Readonly<Record<StationId, StationMetadata>> = {
         'Audita vulnerabilidades conocidas (CVEs) en las dependencias instaladas y escanea el código fuente en busca de secretos, API keys o IPs http:// hardcodeadas.',
       whyItMatters:
         'Subir una credencial a Git o desplegar una librería vulnerable expone infraestructura y datos de usuarios al instante.',
-      toolsByStack: 'composer audit / npm audit / pip-audit + escáner local de secretos e IPs'
+      toolsByStack: 'composer audit / npm audit / pip-audit / dotnet list package --vulnerable + escáner local de secretos e IPs'
     }
   },
   'e2e-browser': {

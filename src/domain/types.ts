@@ -1,4 +1,4 @@
-export type StackKind = 'node' | 'php' | 'python' | 'unknown';
+export type StackKind = 'node' | 'php' | 'python' | 'dotnet' | 'unknown';
 
 export type StationId =
   | 'syntax-config'
@@ -96,6 +96,7 @@ export interface RepoStack {
   readonly hasPackageJson: boolean;
   readonly hasComposerJson: boolean;
   readonly hasPythonProject: boolean;
+  readonly hasDotnetProject?: boolean;
   readonly hasPlaywright: boolean;
   readonly hasAccessibilityTooling: boolean;
   readonly packageScripts: Readonly<Record<string, string>>;

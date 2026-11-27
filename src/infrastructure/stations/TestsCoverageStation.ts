@@ -30,6 +30,11 @@ export function extractCoveragePercent(output: string): number | null {
   if (phpunitMatch?.[1]) {
     return Number(phpunitMatch[1]);
   }
+  // Formato Coverlet (.NET): "| Total | 84.2% |"
+  const coverletMatch = /\|\s*Total\s*\|\s*(\d+(?:\.\d+)?)%/i.exec(output);
+  if (coverletMatch?.[1]) {
+    return Number(coverletMatch[1]);
+  }
   return null;
 }
 
@@ -72,6 +77,11 @@ export class TestsCoverageStation implements StationRunner {
     if (!binary && stack.hasPythonProject) {
       binary = 'pytest';
       args = ['-q'];
+    }
+
+    if (!binary && stack.hasDotnetProject) {
+      binary = 'dotnet';
+      args = ['test', '--nologo'];
     }
 
     if (!binary) {

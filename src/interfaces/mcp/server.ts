@@ -29,7 +29,7 @@ async function loadMcpAppHtml(): Promise<string> {
 
 const server = new McpServer({
   name: 'itv-calidad',
-  version: '1.4.0'
+  version: '1.5.0'
 });
 
 server.registerResource(

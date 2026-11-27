@@ -5,6 +5,8 @@ export interface CliOptions {
   readonly format: 'pretty' | 'json' | 'markdown';
   readonly showHelp: boolean;
   readonly startMcp: boolean;
+  readonly initHook: boolean;
+  readonly force: boolean;
   readonly targetUrl?: string;
 }
 
@@ -15,6 +17,8 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
   let format: 'pretty' | 'json' | 'markdown' = 'pretty';
   let showHelp = false;
   let startMcp = false;
+  let initHook = false;
+  let force = false;
   let targetUrl: string | undefined;
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -23,6 +27,10 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
       showHelp = true;
     } else if (arg === '--mcp') {
       startMcp = true;
+    } else if (arg === '--init-hook') {
+      initHook = true;
+    } else if (arg === '--force') {
+      force = true;
     } else if (arg === '--fast') {
       slowMotionMs = 0;
     } else if (arg === '--json') {
@@ -58,6 +66,8 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
     format,
     showHelp,
     startMcp,
+    initHook,
+    force,
     ...(targetUrl ? { targetUrl } : {})
   };
 }

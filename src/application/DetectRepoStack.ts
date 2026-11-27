@@ -114,25 +114,30 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
     ? await readJsonSafe<ComposerJsonShape>(path.join(resolvedPath, 'composer.json'))
     : null;
 
+  const dotnetFiles = await walkRepoFiles(resolvedPath, new Set(['.sln', '.csproj']), 10);
+  const hasDotnetProject = dotnetFiles.length > 0;
   const hasPythonProject = hasPyproject || hasRequirements || hasSetupPy;
   const detectedStacks: StackKind[] = [];
   if (hasPackageJson) detectedStacks.push('node');
   if (hasComposerJson) detectedStacks.push('php');
   if (hasPythonProject) detectedStacks.push('python');
+  if (hasDotnetProject) detectedStacks.push('dotnet');
 
-  // Fallback para proyectos vanilla sin manifiesto (ej. PHP puro con index.php, JS o Python suelto)
+  // Fallback para proyectos vanilla sin manifiesto (ej. PHP puro con index.php, JS, Python o C# suelto)
   if (detectedStacks.length === 0) {
     const sampleFiles = await walkRepoFiles(
       resolvedPath,
-      new Set(['.php', '.js', '.mjs', '.cjs', '.py']),
+      new Set(['.php', '.js', '.mjs', '.cjs', '.py', '.cs']),
       30
     );
     const hasPhpFiles = sampleFiles.some((f) => f.relativePath.endsWith('.php'));
     const hasPyFiles = sampleFiles.some((f) => f.relativePath.endsWith('.py'));
     const hasJsFiles = sampleFiles.some((f) => /\.(?:js|mjs|cjs)$/i.test(f.relativePath));
+    const hasCsFiles = sampleFiles.some((f) => f.relativePath.endsWith('.cs'));
     if (hasPhpFiles) detectedStacks.push('php');
     if (hasJsFiles) detectedStacks.push('node');
     if (hasPyFiles) detectedStacks.push('python');
+    if (hasCsFiles) detectedStacks.push('dotnet');
   }
 
   const allNodeDeps = {
@@ -173,6 +178,8 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
     primaryStack = 'php';
   } else if (hasPythonProject) {
     primaryStack = 'python';
+  } else if (hasDotnetProject) {
+    primaryStack = 'dotnet';
   } else if (detectedStacks[0]) {
     primaryStack = detectedStacks[0];
   }
@@ -186,6 +193,7 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
     hasPackageJson,
     hasComposerJson,
     hasPythonProject,
+    hasDotnetProject,
     hasPlaywright,
     hasAccessibilityTooling,
     packageScripts,
