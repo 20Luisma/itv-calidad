@@ -10,6 +10,8 @@ const SCANNABLE_EXTENSIONS = new Set([
   '.cjs',
   '.php',
   '.py',
+  '.cs',
+  '.config',
   '.sh',
   '.yml',
   '.yaml',

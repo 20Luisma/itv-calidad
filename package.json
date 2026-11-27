@@ -1,6 +1,6 @@
 {
   "name": "itv-calidad",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "100% local, zero-account 7-station pre-push quality & security gate (MCP Server + MCP App + CLI + Web Dashboard) for PHP, Node.js/TypeScript, Python, and .NET/C#.",
   "type": "module",
   "license": "MIT",
