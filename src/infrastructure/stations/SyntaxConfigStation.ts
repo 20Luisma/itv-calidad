@@ -211,6 +211,42 @@ export class SyntaxConfigStation implements StationRunner {
       }
     }
 
+    // 5. Go: validación de go.mod
+    if (stack.hasGoProject) {
+      commands.push('check(go.mod)');
+      const raw = await readFile(path.join(repoPath, 'go.mod'), 'utf8').catch(() => '');
+      if (!/^module\s+\S+/m.test(raw)) {
+        hardFailed = true;
+        findings.push({
+          severity: 'error',
+          title: 'go.mod sin directiva module válida',
+          file: 'go.mod',
+          reason: 'No se encontró una declaración `module <ruta>` válida en `go.mod`.',
+          howToFix: 'Ejecuta `go mod init <modulo>` o corrige la cabecera de `go.mod`.'
+        });
+      } else {
+        outputs.push('go.mod: directiva module válida.');
+      }
+    }
+
+    // 6. Flutter / Dart: validación de pubspec.yaml
+    if (stack.hasFlutterProject) {
+      commands.push('check(pubspec.yaml)');
+      const raw = await readFile(path.join(repoPath, 'pubspec.yaml'), 'utf8').catch(() => '');
+      if (!/^name\s*:\s*[a-z0-9_]+/m.test(raw)) {
+        hardFailed = true;
+        findings.push({
+          severity: 'error',
+          title: 'pubspec.yaml sin campo name válido',
+          file: 'pubspec.yaml',
+          reason: 'No se encontró un campo `name:` válido en `pubspec.yaml`.',
+          howToFix: 'Define un `name: mi_app` válido en snake_case al inicio de `pubspec.yaml`.'
+        });
+      } else {
+        outputs.push('pubspec.yaml: manifiesto Flutter/Dart válido.');
+      }
+    }
+
     const durationMs = Date.now() - startedAt;
     if (commands.length === 0) {
       return createStationResult({
@@ -218,7 +254,7 @@ export class SyntaxConfigStation implements StationRunner {
         command: 'Sin manifiestos reconocidos',
         status: 'skipped',
         durationMs,
-        summary: 'No se detectaron archivos PHP, Node/JS, Python ni .NET para validar sintaxis.',
+        summary: 'No se detectaron archivos PHP, Node/JS, Python, .NET, Go ni Flutter/Dart para validar sintaxis.',
         rawOutput: 'Stack no reconocido en la raíz del repositorio.',
         findings
       });

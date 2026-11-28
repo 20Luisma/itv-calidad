@@ -12,7 +12,9 @@ const OBSERVABILITY_EXTENSIONS = new Set([
   '.cjs',
   '.php',
   '.py',
-  '.cs'
+  '.cs',
+  '.go',
+  '.dart'
 ]);
 
 const SENTRY_DSN_PATTERN = /https:\/\/[a-f0-9]{16,}@[a-z0-9.-]*sentry\.io\/\d+/i;

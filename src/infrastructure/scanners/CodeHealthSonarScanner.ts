@@ -3,7 +3,7 @@ import path from 'node:path';
 import type { Finding } from '../../domain/types.js';
 import { walkRepoFiles } from '../fs/RepoFileWalker.js';
 
-const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.php', '.py', '.cs']);
+const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.php', '.py', '.cs', '.go', '.dart']);
 
 const MAX_FILE_LINES = 500;
 const MAX_COMPLEXITY_PER_FILE = 85;

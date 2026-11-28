@@ -183,6 +183,64 @@ export class StaticTypesStation implements StationRunner {
       }
     }
 
+    // 5. Go (go vet ./...)
+    if (stack.hasGoProject) {
+      const goRes = await executor.run('go', ['vet', './...'], {
+        cwd: repoPath,
+        timeoutMs: commandTimeoutMs,
+        ...(signal ? { signal } : {})
+      });
+      if (goRes.notFound) {
+        findings.push({
+          severity: 'warning',
+          title: 'Binario go no encontrado en PATH',
+          reason: 'El repositorio es Go pero `go` no está instalado localmente.',
+          howToFix: 'Instala Go (`brew install go`) para ejecutar `go vet ./...`.'
+        });
+      } else {
+        commands.push('go vet ./...');
+        outputs.push(goRes.stdout || goRes.stderr || 'go vet OK');
+        if (goRes.exitCode !== 0) {
+          hardFailed = true;
+          findings.push({
+            severity: 'error',
+            title: 'go vet detectó errores estáticos en Go',
+            reason: (goRes.stderr || goRes.stdout).slice(0, 500),
+            howToFix: 'Ejecuta `go vet ./...` en local y corrige los problemas reportados.'
+          });
+        }
+      }
+    }
+
+    // 6. Flutter / Dart (dart analyze)
+    if (stack.hasFlutterProject) {
+      const dartRes = await executor.run('dart', ['analyze'], {
+        cwd: repoPath,
+        timeoutMs: commandTimeoutMs,
+        ...(signal ? { signal } : {})
+      });
+      if (dartRes.notFound) {
+        findings.push({
+          severity: 'warning',
+          title: 'Binario dart no encontrado en PATH',
+          reason: 'El repositorio es Flutter/Dart pero `dart` no está disponible en PATH.',
+          howToFix: 'Instala el SDK de Flutter/Dart para ejecutar `dart analyze`.'
+        });
+      } else {
+        commands.push('dart analyze');
+        outputs.push(dartRes.stdout || dartRes.stderr || 'dart analyze OK');
+        if (dartRes.exitCode !== 0) {
+          hardFailed = true;
+          findings.push({
+            severity: 'error',
+            title: 'dart analyze detectó errores estáticos en Flutter/Dart',
+            reason: (dartRes.stdout || dartRes.stderr).slice(0, 500),
+            howToFix: 'Ejecuta `dart analyze` en local y resuelve los errores reportados.'
+          });
+        }
+      }
+    }
+
     const durationMs = Date.now() - startedAt;
 
     if (commands.length === 0 && findings.length === 0) {
@@ -191,7 +249,7 @@ export class StaticTypesStation implements StationRunner {
         command: 'No aplica al stack actual',
         status: 'skipped',
         durationMs,
-        summary: 'Proyecto sin TypeScript, PHPStan, analizador de Python ni proyecto .NET configurado.',
+        summary: 'Proyecto sin TypeScript, PHPStan, analizador de Python, .NET, Go ni Flutter/Dart configurado.',
         rawOutput: 'Estación omitida limpiamente (sin falso verde).'
       });
     }

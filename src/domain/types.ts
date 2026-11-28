@@ -1,4 +1,4 @@
-export type StackKind = 'node' | 'php' | 'python' | 'dotnet' | 'unknown';
+export type StackKind = 'node' | 'php' | 'python' | 'dotnet' | 'go' | 'flutter' | 'unknown';
 
 export type StationId =
   | 'syntax-config'
@@ -97,6 +97,8 @@ export interface RepoStack {
   readonly hasComposerJson: boolean;
   readonly hasPythonProject: boolean;
   readonly hasDotnetProject?: boolean;
+  readonly hasGoProject?: boolean;
+  readonly hasFlutterProject?: boolean;
   readonly hasPlaywright: boolean;
   readonly hasAccessibilityTooling: boolean;
   readonly packageScripts: Readonly<Record<string, string>>;
