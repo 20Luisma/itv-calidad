@@ -33,11 +33,15 @@
     - PR `#6` (`Closes #2`): GitHub Action oficial (`action.yml`) con `$GITHUB_STEP_SUMMARY`, comentario sticky sin spam en PRs y gate estricto sin falsos verdes.
     - PR `#7` (`Closes #3`): soporte nativo **Flutter/Dart** (`pubspec.yaml`, `dart analyze`, `flutter test`/`dart test`, `.dart`) y **Go** (`go.mod`, `go vet`, `go test -cover`, `govulncheck`, `.go`).
     - PR `#8` (`Closes #4`): workflow automático `.github/workflows/release.yml` disparado por tags `v*.*.*` (gates + build `.vsix` + GitHub Release automático + hooks opcionales para `npm` y Open VSX).
-  - **Distribución y credibilidad:** `npm` (`itv-calidad`, 1.5.1 live, listo para publicar `1.6.0`), **VS Code Marketplace** + **Open VSX** (`dist/itv-calidad-vscode-1.6.0.vsix` compilado), **M8ven Trust Index B · Emerging**, GitHub Release `v1.5.1` publicado, perfil `20Luisma` con 6 tiendas/registros oficiales y regla de flujo `Issue → rama → PR → CI verde → Merge` añadida en `~/.gemini/GEMINI.md`.
+  - **Distribución y credibilidad (`v1.6.0` / `v1.6.1` LIVE en 4 plataformas):**
+    - **npm (`1.6.0` live):** `npx -y itv-calidad . --fast --lang en` / `--mcp` / `--init-hook`.
+    - **VS Code Marketplace (`1.6.0` live)** + **Open VSX (`1.6.0` live, 259 descargas)**.
+    - **GitHub Marketplace (`v1.6.1` live):** `https://github.com/marketplace/actions/itv-code-gate-7-station-quality-security-audit` (7.ª tienda/registro oficial en el perfil `20Luisma`).
+    - **Directorios & comunidad:** **Glama.ai** verificado (`by 20Luisma ✓`, **TDQS A**, icono oficial), **M8ven Trust Index B · Emerging**, PR oficial **`punkpeye/awesome-mcp-servers#21012`**, Discord oficial MCP (`#showcase`) y envío editorial confirmado en **`console.dev`**.
+    - **Regla global actualizada:** flujo `Issue → rama → PR con CI verde → Merge` añadido a `~/.gemini/GEMINI.md` para repos públicos/open-source.
 - **Próximos pasos:**
-  - Crear tag `v1.6.0` (con aprobación explícita de Martín) para disparar automáticamente el GitHub Release `v1.6.0` con el `.vsix`.
-  - Publicar `v1.6.0` en `npm` (`npm publish --access public`) y subir `dist/itv-calidad-vscode-1.6.0.vsix` a VS Code Marketplace y Open VSX.
-  - Difusión: PR a `punkpeye/awesome-mcp-servers`, alta en `smithery.ai` / `glama.ai` / `mcp.so`, envío a `console.dev` y post en **Show HN** / LinkedIn.
+  - Lanzar **Show HN** (martes–jueves 14:30–16:30 hora España) + post en LinkedIn con el caso real de `.NET 8` / 6 stacks.
+  - Seguimiento del PR `punkpeye/awesome-mcp-servers#21012` y respuesta editorial de `console.dev`.
 
 ## Historial de Sesiones
 - **2026-11-23 (Sesión 1):** Bootstrap inicial del proyecto (`AGENTS.md`, `MEMORY.md`, `ADR-001`, `.agents/`).

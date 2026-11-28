@@ -6,6 +6,8 @@
 [![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-ITV%20de%20C%C3%B3digo-007ACC?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode)
 [![Open VSX Registry](https://img.shields.io/badge/Open%20VSX-Antigravity%20%C2%B7%20Cursor%20%C2%B7%20Windsurf-A60EE5)](https://open-vsx.org/extension/20luisma/itv-calidad-vscode)
 [![npm](https://img.shields.io/npm/v/itv-calidad?logo=npm&color=CB3837&label=npm)](https://www.npmjs.com/package/itv-calidad)
+[![GitHub Marketplace](https://img.shields.io/badge/GitHub%20Marketplace-Action-2088FF?logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/itv-code-gate-7-station-quality-security-audit)
+[![Glama MCP](https://img.shields.io/badge/Glama%20MCP-TDQS%20A-10B981)](https://glama.ai/mcp/servers/20Luisma/itv-calidad)
 [![M8ven Score](https://m8ven.ai/badge/mcp/20luisma-itv-calidad-ksuhsn?v=c7fd12a82c8e9dddf091f2381441116a)](https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn?s=readme)
 
 **100% local, open-source, zero-mandatory-accounts** code quality and security gate (**VS Code / Open VSX Sidebar Extension + Interactive MCP App + Stdio MCP Server + GitHub Action + Live SSE Web Dashboard + CLI**) that audits any local repository (**Node.js/TypeScript, PHP, Python, .NET/C#, Go, or Flutter/Dart**) **before `git push`** across **7 real quality, security, and observability stations**.
@@ -77,7 +79,7 @@ npx -y itv-calidad --mcp
 
 **In GitHub Actions (automated sticky PR summary comment):**
 ```yaml
-- uses: 20Luisma/itv-calidad@v1.6.0
+- uses: 20Luisma/itv-calidad@v1.6.1
   with:
     min-coverage: '75'
     lang: 'en'
