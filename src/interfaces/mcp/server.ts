@@ -91,7 +91,8 @@ server.registerTool(
         .optional()
         .describe('Umbral mínimo de cobertura en % (por defecto 75)'),
       targetUrl: z.string().url().optional().describe('URL local opcional para auditoría WCAG en vivo'),
-      format: z.enum(['json', 'markdown']).optional().describe('Formato de salida: json (default) o markdown')
+      format: z.enum(['json', 'markdown']).optional().describe('Formato de salida: json (default) o markdown'),
+      lang: z.enum(['es', 'en']).optional().describe('Idioma de salida para reportes y mensajes: es (default) o en')
     },
     annotations: {
       readOnlyHint: true,

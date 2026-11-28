@@ -1,59 +1,52 @@
-import type { InspectionReport, StationStatus } from '../domain/types.js';
+import { getCoreLabels, getLocalizedStationName, type SupportedLang } from '../domain/i18n.js';
+import type { InspectionReport } from '../domain/types.js';
 
-function statusBadge(status: StationStatus): string {
-  switch (status) {
-    case 'pass':
-      return 'APTO';
-    case 'warn':
-      return 'OBSERVACION';
-    case 'fail':
-      return 'DESFAVORABLE';
-    case 'skipped':
-      return 'OMITIDA';
-  }
-}
-
-export function exportReportAsMarkdown(report: InspectionReport): string {
+export function exportReportAsMarkdown(
+  report: InspectionReport,
+  lang: SupportedLang = 'es'
+): string {
+  const t = getCoreLabels(lang);
   const lines: string[] = [
-    `# Informe ITV de Código — ${report.stack.repoName}`,
+    `# ${t.reportTitle} — ${report.stack.repoName}`,
     '',
-    `- **Veredicto:** ${report.verdict} (${report.blocksPush ? 'BLOQUEA PUSH' : 'APTO PARA PUSH'})`,
-    `- **Fecha:** ${report.finishedAt}`,
-    `- **Repositorio:** \`${report.stack.repoPath}\``,
-    `- **Rama Git:** \`${report.stack.gitBranch ?? 'N/A'}\``,
-    `- **Stack detectado:** ${report.stack.detectedStacks.join(', ')} (principal: ${report.stack.primaryStack})`,
-    `- **Duración total:** ${(report.totalDurationMs / 1000).toFixed(2)}s`,
-    `- **Resumen:** ${report.summary.passed} aptas · ${report.summary.warned} observaciones · ${report.summary.failed} desfavorables · ${report.summary.skipped} omitidas`,
+    `- **${t.verdict}:** ${t.verdicts[report.verdict]} (${report.blocksPush ? t.blocksPush : t.readyToPush})`,
+    `- **${t.date}:** ${report.finishedAt}`,
+    `- **${t.repository}:** \`${report.stack.repoPath}\``,
+    `- **${t.gitBranch}:** \`${report.stack.gitBranch ?? 'N/A'}\``,
+    `- **${t.detectedStack}:** ${report.stack.detectedStacks.join(', ')} (${t.primary}: ${report.stack.primaryStack})`,
+    `- **${t.totalDuration}:** ${(report.totalDurationMs / 1000).toFixed(2)}s`,
+    `- **${t.summary}:** ${t.summaryCounts(report.summary.passed, report.summary.warned, report.summary.failed, report.summary.skipped)}`,
     ...(report.scope
       ? [
-          `- **Alcance del diagnóstico:** ${report.scope.label} (${report.scope.evaluatedStations}/${report.scope.totalStations} verificadas · ${report.scope.confidencePercent}%) — ${report.scope.note}`
+          `- **${t.diagnosticScope}:** ${report.scope.label} (${report.scope.evaluatedStations}/${report.scope.totalStations} ${t.verified} · ${report.scope.confidencePercent}%) — ${report.scope.note}`
         ]
       : []),
     '',
-    '## Resultado por Estación',
+    `## ${t.resultsByStation}`,
     ''
   ];
 
   for (const station of report.stations) {
-    lines.push(`### ${station.name} — [${statusBadge(station.status)}]`);
-    lines.push(`- **Qué revisa:** ${station.didacticExplanation}`);
-    lines.push(`- **Comando:** \`${station.command}\``);
-    lines.push(`- **Resumen:** ${station.summary}`);
-    lines.push(`- **Tiempo:** ${station.durationMs} ms`);
+    const stationTitle = getLocalizedStationName(station.id, station.name, lang);
+    lines.push(`### ${stationTitle} — [${t.statusBadges[station.status]}]`);
+    lines.push(`- **${t.whatItChecks}:** ${station.didacticExplanation}`);
+    lines.push(`- **${t.command}:** \`${station.command}\``);
+    lines.push(`- **${t.summary}:** ${station.summary}`);
+    lines.push(`- **${t.time}:** ${station.durationMs} ms`);
     if (station.externalLinks && station.externalLinks.length > 0) {
-      lines.push('- **Paneles externos:**');
+      lines.push(`- **${t.externalPanels}:**`);
       for (const link of station.externalLinks) {
         lines.push(`  - [${link.label}](${link.url}) — *${link.status}*: ${link.summary}`);
       }
     }
     if (station.findings.length > 0) {
-      lines.push('- **Hallazgos:**');
+      lines.push(`- **${t.findings}:**`);
       for (const finding of station.findings) {
         const loc = finding.file
           ? ` (\`${finding.file}${finding.line ? `:${finding.line}` : ''}\`)`
           : '';
         lines.push(`  - **[${finding.severity.toUpperCase()}] ${finding.title}**${loc}: ${finding.reason}`);
-        lines.push(`    - *Cómo arreglarlo:* ${finding.howToFix}`);
+        lines.push(`    - *${t.howToFix}:* ${finding.howToFix}`);
       }
     }
     lines.push('');
@@ -61,18 +54,18 @@ export function exportReportAsMarkdown(report: InspectionReport): string {
 
   if (report.securityChecklist) {
     const cl = report.securityChecklist;
-    lines.push('## Checklist de Tranquilidad / Diligencia Debida en Seguridad');
+    lines.push(`## ${t.checklistTitle}`);
     lines.push('');
     lines.push(`> ${cl.disclaimer}`);
     lines.push('');
     lines.push(
-      `**Controles automáticos superados:** ${cl.automatedPassed}/${cl.automatedTotal} (${cl.scorePercent}%)`
+      `**${t.automatedPassed}:** ${cl.automatedPassed}/${cl.automatedTotal} (${cl.scorePercent}%)`
     );
     lines.push('');
-    lines.push('| Estado | Tipo | Control | Referencia | Detalle |');
+    lines.push(t.checklistTableHeader);
     lines.push('|---|---|---|---|---|');
     for (const item of cl.items) {
-      const tipo = item.category === 'automated' ? 'Automático' : 'Operativo/Legal';
+      const tipo = item.category === 'automated' ? t.automated : t.operational;
       lines.push(
         `| ${item.status.toUpperCase()} | ${tipo} | ${item.title} | ${item.standardRef} | ${item.detail.replace(/\|/g, '\\|')} |`
       );
