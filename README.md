@@ -1,4 +1,6 @@
-# ITV de Código — MCP App & Auditor Local (`itv-calidad`)
+# 🛡️ ITV de Código (`itv-calidad`)
+
+> **¿Tu agente de IA dijo «todo funciona» antes de hacer `git push`? Compruébalo en tu propia máquina en 10 segundos.**
 
 🌐 **Idioma / Language:** **🇪🇸 Español (actual)** | [🇬🇧 English](README.en.md)
 
@@ -10,29 +12,35 @@
 [![Glama MCP](https://img.shields.io/badge/Glama%20MCP-TDQS%20A-10B981)](https://glama.ai/mcp/servers/20Luisma/itv-calidad)
 [![M8ven Score](https://m8ven.ai/badge/mcp/20luisma-itv-calidad-ksuhsn?v=c7fd12a82c8e9dddf091f2381441116a)](https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn?s=readme)
 
-Herramienta **100% local, open-source y sin cuentas externas** (**Extensión de barra lateral VS Code/Open VSX + MCP App interactiva + Servidor MCP Stdio + GitHub Action + Dashboard Web SSE + CLI**) que inspecciona cualquier repositorio local (**Node.js/TypeScript, PHP, Python, .NET/C#, Go o Flutter/Dart**) **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**.
+### Pruébalo ahora en 1 línea *(sin instalar nada, sin cuentas, 100% solo lectura)*
 
-Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar de una "caja negra" que falla en la nube, te muestra paso a paso **qué revisa cada estación, qué comando exacto ejecuta, por qué importa y cómo corregir cada fallo**.
+```bash
+npx -y itv-calidad . --fast
+```
 
-> **Solo lectura y 100% local:** corre íntegramente en tu máquina sin API keys obligatorias, sin tokens pagos, sin telemetría y **sin modificar ni borrar nunca ningún archivo** del repositorio inspeccionado.
+Detecta automáticamente tu proyecto (**Node/TS, PHP, Python, .NET/C#, Go o Flutter/Dart**) y revisa **sintaxis, tipos, tests, secretos filtrados, CVEs, accesibilidad y deuda técnica** antes de subir código a Git. **Nunca modifica ni borra tus archivos.**
+
+- 🧩 **¿Prefieres botones en tu editor?** [Instalar en VS Code](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode) · [Instalar en Cursor / Windsurf / Antigravity](https://open-vsx.org/extension/20luisma/itv-calidad-vscode)
+- 🤖 **¿Usas agentes IA (MCP) o GitHub Actions?** Configúralo en 1 línea con `npx -y itv-calidad --mcp` o `uses: 20Luisma/itv-calidad@v1.6.1`.
 
 ![Demo en vivo de la extensión de barra lateral ITV de Código (7 estaciones + semáforo + árbol de hallazgos)](docs/assets/itv-vscode-demo.gif)
 
-### ¿Cómo prefieres usarla? (Elige 1 sola opción — mismo motor de 7 estaciones)
+### Elige cómo usarlo *(mismo motor de 7 estaciones)*
 
 | Si quieres… | Usa esto | Empezar en 10 segundos |
 |---|---|---|
-| **Instalarla en 1 clic en tu IDE** *(recomendado)* | **Extensión VS Code / Open VSX** | [Instalar desde VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode) |
-| **Que tu agente IA la ejecute antes de pushear** | **MCP App + Servidor MCP** | Ir a [Opción 1 — MCP](#opción-1--mcp-app-interactiva-y-servidor-mcp-antigravity-cursor-claude-code) |
-| **Ver la cabina en cámara lenta en el navegador** | **Dashboard Web SSE** | `npm run start` → `http://127.0.0.1:4173` |
-| **Usarla en terminal o hook `pre-push`** | **CLI** | `npm run itv -- /ruta/a/tu/repo` |
+| **Probarlo ya en cualquier carpeta** | **CLI (`npx`)** | `npx -y itv-calidad . --fast` |
+| **Botón visual en la barra lateral de tu IDE** | **Extensión VS Code / Open VSX** | [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode) · [Open VSX](https://open-vsx.org/extension/20luisma/itv-calidad-vscode) |
+| **Que tu agente IA lo ejecute antes de pushear** | **Servidor MCP + MCP App** | `npx -y itv-calidad --mcp` ([ver guía](#opción-1--mcp-app-interactiva-y-servidor-mcp-antigravity-cursor-claude-code)) |
+| **Frenar cada `git push` automáticamente** | **Hook `pre-push` (0 tokens)** | `npx -y itv-calidad --init-hook` |
+| **Comentar el semáforo en cada Pull Request** | **GitHub Action oficial** | `uses: 20Luisma/itv-calidad@v1.6.1` |
 
 ---
 
 ## ¿Qué hace realmente (y qué NO hace)?
 
 ### Lo que SÍ hace (100% real, cero simulaciones)
-- **Ejecuta herramientas reales** sobre tu repositorio local (PHP, Node.js/TypeScript o Python, incluidos repos mixtos o proyectos sin manifiesto) respetando sus códigos de salida reales (**cero falsos verdes**).
+- **Ejecuta herramientas reales** sobre tu repositorio local (**Node.js/TypeScript, PHP, Python, .NET/C#, Go o Flutter/Dart**, incluidos repos mixtos o sin manifiesto) respetando sus códigos de salida reales (**cero falsos verdes**).
 - **Bloquea el push (`exit code != 0`)** si falla cualquier estación obligatoria (sintaxis, tipos, tests/cobertura, CVEs/secretos, E2E o accesibilidad crítica).
 - **Omite con honestidad (`OMITIDA`)** las estaciones que no aplican al stack del proyecto (por ejemplo, si no tiene Playwright), explicándote cómo agregarlas si quieres.
 - **Mide el alcance y confianza del diagnóstico (`Inspección completa`, `Inspección parcial` o `Solo diagnóstico estático`):** nunca confunde *"0 fallos en lo poco que se pudo medir"* con *"listo para producción"*, avisando explícitamente qué capas críticas faltan (tipos, tests o E2E).

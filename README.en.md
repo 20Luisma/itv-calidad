@@ -1,4 +1,6 @@
-# ITV de Código — VS Code Extension, MCP App & Local Code Quality Gate (`itv-calidad`)
+# 🛡️ ITV Code Gate (`itv-calidad`)
+
+> **Did your AI agent say "everything passes" before `git push`? Verify it locally in 10 seconds.**
 
 🌐 **Language / Idioma:** [🇪🇸 Español](README.md) | **🇬🇧 English (current)**
 
@@ -10,29 +12,35 @@
 [![Glama MCP](https://img.shields.io/badge/Glama%20MCP-TDQS%20A-10B981)](https://glama.ai/mcp/servers/20Luisma/itv-calidad)
 [![M8ven Score](https://m8ven.ai/badge/mcp/20luisma-itv-calidad-ksuhsn?v=c7fd12a82c8e9dddf091f2381441116a)](https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn?s=readme)
 
-**100% local, open-source, zero-mandatory-accounts** code quality and security gate (**VS Code / Open VSX Sidebar Extension + Interactive MCP App + Stdio MCP Server + GitHub Action + Live SSE Web Dashboard + CLI**) that audits any local repository (**Node.js/TypeScript, PHP, Python, .NET/C#, Go, or Flutter/Dart**) **before `git push`** across **7 real quality, security, and observability stations**.
+### Try it right now in 1 line *(zero clone, zero accounts, 100% read-only)*
 
-Built for developers and teams coding with AI agents: instead of an opaque cloud pipeline failure, it shows step by step **what each station checks, the exact command executed, why it matters, and how to fix each finding**.
+```bash
+npx -y itv-calidad . --fast --lang en
+```
 
-> **Read-only & 100% local:** runs entirely on your machine with no mandatory API keys, no paid tokens, no telemetry, and **never modifies or deletes any file** in the inspected repository.
+Auto-detects your stack (**Node/TS, PHP, Python, .NET/C#, Go, or Flutter/Dart**) and checks **syntax, static types, tests, leaked secrets, dependency CVEs, WCAG accessibility, and code health** before you push. **Never modifies or deletes any file.**
+
+- 🧩 **Prefer a visual sidebar in your IDE?** [Install on VS Code](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode) · [Install on Cursor / Windsurf / Antigravity](https://open-vsx.org/extension/20luisma/itv-calidad-vscode)
+- 🤖 **Using AI agents (MCP) or GitHub Actions?** Add `npx -y itv-calidad --mcp` or `uses: 20Luisma/itv-calidad@v1.6.1`.
 
 ![Live demo of the ITV de Código VS Code sidebar extension (7 stations + traffic light + findings tree)](docs/assets/itv-vscode-demo.gif)
 
-### How do you want to use it? (Pick 1 option — same 7-station engine)
+### Pick how you want to use it *(same 7-station engine)*
 
 | If you want to… | Use this | Get started in 10 seconds |
 |---|---|---|
-| **Install in 1 click inside your IDE** *(recommended)* | **VS Code / Open VSX Extension** | [Install from VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode) |
-| **Have your AI agent run it before pushing** | **MCP App + MCP Server** | Jump to [Option 1 — MCP](#option-1--interactive-mcp-app--mcp-server-antigravity-cursor-claude-code) |
-| **Watch the cockpit in slow motion in your browser** | **Local SSE Web Dashboard** | `npm run start` → `http://127.0.0.1:4173` |
-| **Run from terminal or a `pre-push` hook** | **CLI** | `npm run itv -- /path/to/your/repo` |
+| **Audit any folder immediately** | **CLI (`npx`)** | `npx -y itv-calidad . --fast --lang en` |
+| **Visual traffic-light sidebar in your IDE** | **VS Code / Open VSX Extension** | [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=20luisma.itv-calidad-vscode) · [Open VSX](https://open-vsx.org/extension/20luisma/itv-calidad-vscode) |
+| **Have your AI agent run it before pushing** | **MCP Server + MCP App** | `npx -y itv-calidad --mcp` ([setup guide](#option-1--interactive-mcp-app--mcp-server-antigravity-cursor-claude-code)) |
+| **Block bad `git push` automatically** | **Portable `pre-push` hook (0 tokens)** | `npx -y itv-calidad --init-hook` |
+| **Post sticky reports on Pull Requests** | **Official GitHub Action** | `uses: 20Luisma/itv-calidad@v1.6.1` |
 
 ---
 
 ## What it actually does (and what it does NOT do)
 
 ### What it DOES (100% real, zero simulations)
-- **Runs real tools** against your local repository (PHP, Node.js/TypeScript, or Python, including mixed or manifest-free repos) preserving real exit codes (**zero false greens**).
+- **Runs real tools** against your local repository (**Node.js/TypeScript, PHP, Python, .NET/C#, Go, or Flutter/Dart**, including mixed or manifest-free repos) preserving real exit codes (**zero false greens**).
 - **Blocks `git push` (`exit code != 0`)** whenever any mandatory station fails (syntax, static types, tests/coverage, CVEs/secrets, E2E, or critical accessibility).
 - **Honestly marks inapplicable stations as `OMITIDA` (Skipped)** (e.g., if Playwright is not installed), explaining how to add them if you want.
 - **Reports diagnostic scope & confidence (`Full inspection`, `Partial inspection`, or `Static diagnostic only`):** never confuses *"0 failures in partial checks"* with *"production-ready"*, explicitly listing missing critical layers (types, tests, or E2E).
