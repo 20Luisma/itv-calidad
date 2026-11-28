@@ -1,6 +1,6 @@
 {
   "displayName": "ITV Code Gate — 7-Station Local DevSecOps & MCP Auditor",
-  "description": "100% local, zero-account 7-station pre-push quality & security gate in your sidebar: syntax, static types, test coverage, CVEs/OWASP/secrets, Playwright E2E, WCAG 2.1 AA, and code health/observability (PHP, Node/TS, Python, .NET/C#).",
+  "description": "100% local, zero-account 7-station pre-push quality & security gate in your sidebar: syntax, static types, test coverage, CVEs/OWASP/secrets, Playwright E2E, WCAG 2.1 AA, and code health (Node/TS, PHP, Python, .NET, Go, Flutter/Dart).",
   "container.title": "ITV Code Gate",
   "view.cockpit": "ITV Cockpit",
   "view.stations": "7 Stations & Findings",

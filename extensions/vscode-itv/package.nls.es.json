@@ -1,6 +1,6 @@
 {
   "displayName": "ITV de Código — Gate DevSecOps Local de 7 Estaciones",
-  "description": "Gate DevSecOps 100% local y sin cuentas obligatorias en tu barra lateral: sintaxis, tipos, cobertura, CVEs/OWASP/secretos, E2E, WCAG 2.1 AA y deuda técnica/observabilidad (PHP, Node/TS, Python, .NET/C#).",
+  "description": "Gate DevSecOps 100% local y sin cuentas obligatorias en tu barra lateral: sintaxis, tipos, cobertura, CVEs/OWASP/secretos, E2E, WCAG 2.1 AA y deuda técnica (Node/TS, PHP, Python, .NET, Go, Flutter/Dart).",
   "container.title": "ITV de Código",
   "view.cockpit": "Cabina ITV",
   "view.stations": "7 Estaciones y Hallazgos",
