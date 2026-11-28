@@ -2,7 +2,7 @@
   "name": "itv-calidad-vscode",
   "displayName": "%displayName%",
   "description": "%description%",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "publisher": "20luisma",
   "icon": "media/icon.png",
   "license": "MIT",

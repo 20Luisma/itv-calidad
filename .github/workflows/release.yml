@@ -1,0 +1,76 @@
+name: Release — ITV Code Gate
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    name: Verify · Build VSIX · Publish Release
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save @rolldown/binding-linux-x64-gnu
+
+      - name: TypeScript strict check (core + VS Code extension)
+        run: |
+          npm run typecheck
+          npx tsc -p extensions/vscode-itv/tsconfig.json --noEmit
+
+      - name: Unit & integration tests + coverage gate
+        run: npm run test:coverage
+
+      - name: Security dependency audit (0 CVEs)
+        run: npm run audit:deps
+
+      - name: Build MCP App & VS Code / Open VSX VSIX
+        run: |
+          npm run build
+          npm run build:vscode
+
+      - name: Publish GitHub Release with VSIX asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          VSIX_FILE="$(ls dist/itv-calidad-vscode-*.vsix | head -n 1)"
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" "$VSIX_FILE" --clobber
+          else
+            gh release create "$TAG_NAME" "$VSIX_FILE" \
+              --title "$TAG_NAME — ITV Code Gate" \
+              --generate-notes
+          fi
+
+      - name: Publish package to npm (when NPM_TOKEN secret is configured)
+        if: startsWith(github.ref, 'refs/tags/v') && secrets.NPM_TOKEN != ''
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance
+
+      - name: Publish extension to Open VSX (when OVSX_PAT secret is configured)
+        if: startsWith(github.ref, 'refs/tags/v') && secrets.OVSX_PAT != ''
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          VSIX_FILE="$(ls dist/itv-calidad-vscode-*.vsix | head -n 1)"
+          npx -y ovsx publish "$VSIX_FILE" -p "$OVSX_PAT"
