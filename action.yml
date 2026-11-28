@@ -1,0 +1,126 @@
+name: 'ITV Code Gate — 7-Station Quality & Security Audit'
+author: '20Luisma'
+description: '100% local, zero-account 7-station quality & security gate (syntax, types, coverage, CVEs/OWASP, E2E, WCAG, code health) with sticky PR comments.'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  repo-path:
+    description: 'Path to the repository to audit'
+    required: false
+    default: '.'
+  min-coverage:
+    description: 'Minimum test coverage gate percentage (0-100)'
+    required: false
+    default: '75'
+  lang:
+    description: 'Report language (en or es)'
+    required: false
+    default: 'en'
+  post-pr-comment:
+    description: 'Post or update a sticky summary comment on Pull Requests (true/false)'
+    required: false
+    default: 'true'
+  fail-on-warn:
+    description: 'Fail the workflow if warnings are found (true/false)'
+    required: false
+    default: 'false'
+  github-token:
+    description: 'GitHub token used to post sticky PR comments'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  exit-code:
+    description: 'Exit code returned by ITV Code Gate (0 = pass, 1 = blocking failures)'
+    value: ${{ steps.run-itv.outputs.exit_code }}
+  report-path:
+    description: 'Path to the generated Markdown evidence report'
+    value: ${{ steps.run-itv.outputs.report_path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run ITV Code Gate (7 Stations)
+      id: run-itv
+      shell: bash
+      env:
+        INPUT_REPO_PATH: ${{ inputs.repo-path }}
+        INPUT_MIN_COVERAGE: ${{ inputs.min-coverage }}
+        INPUT_LANG: ${{ inputs.lang }}
+      run: |
+        REPORT_FILE="${RUNNER_TEMP:-/tmp}/itv-report.md"
+        set +e
+        npx -y itv-calidad "$INPUT_REPO_PATH" --fast --min-coverage "$INPUT_MIN_COVERAGE" --lang "$INPUT_LANG" --markdown > "$REPORT_FILE"
+        EXIT_CODE=$?
+        set -e
+
+        echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+        echo "report_path=$REPORT_FILE" >> "$GITHUB_OUTPUT"
+
+        if [ -f "$REPORT_FILE" ]; then
+          cat "$REPORT_FILE" >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+    - name: Upsert Sticky PR Comment
+      if: ${{ inputs.post-pr-comment == 'true' && github.event_name == 'pull_request' }}
+      uses: actions/github-script@v7
+      env:
+        REPORT_FILE: ${{ steps.run-itv.outputs.report_path }}
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const fs = require('node:fs');
+          const marker = '<!-- itv-calidad-pr-comment -->';
+          const reportPath = process.env.REPORT_FILE;
+          if (!reportPath || !fs.existsSync(reportPath)) return;
+
+          const rawReport = fs.readFileSync(reportPath, 'utf8');
+          const truncated = rawReport.length > 60000
+            ? rawReport.slice(0, 60000) + '\n\n*(Report truncated to fit GitHub comment limits)*'
+            : rawReport;
+          const body = `${marker}\n${truncated}`;
+
+          const { owner, repo } = context.repo;
+          const issue_number = context.issue.number;
+          const { data: comments } = await github.rest.issues.listComments({
+            owner,
+            repo,
+            issue_number,
+            per_page: 100
+          });
+
+          const existing = comments.find((c) => c.body && c.body.includes(marker));
+          if (existing) {
+            await github.rest.issues.updateComment({
+              owner,
+              repo,
+              comment_id: existing.id,
+              body
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body
+            });
+          }
+
+    - name: Enforce ITV Quality Gate
+      shell: bash
+      env:
+        ITV_EXIT_CODE: ${{ steps.run-itv.outputs.exit_code }}
+        REPORT_FILE: ${{ steps.run-itv.outputs.report_path }}
+        FAIL_ON_WARN: ${{ inputs.fail-on-warn }}
+      run: |
+        if [ "$ITV_EXIT_CODE" -ne 0 ]; then
+          echo "::error::ITV Code Gate failed (blocking station findings detected)."
+          exit "$ITV_EXIT_CODE"
+        fi
+        if [ "$FAIL_ON_WARN" = "true" ] && grep -qE "PASS WITH WARNINGS|APTO_CON_OBSERVACIONES" "$REPORT_FILE"; then
+          echo "::error::ITV Code Gate reported warnings and fail-on-warn is enabled."
+          exit 1
+        fi
