@@ -1,3 +1,5 @@
+import { resolveLang, type SupportedLang } from '../../domain/i18n.js';
+
 export interface CliOptions {
   readonly repoPath: string;
   readonly slowMotionMs: number;
@@ -7,6 +9,7 @@ export interface CliOptions {
   readonly startMcp: boolean;
   readonly initHook: boolean;
   readonly force: boolean;
+  readonly lang: SupportedLang;
   readonly targetUrl?: string;
 }
 
@@ -19,6 +22,7 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
   let startMcp = false;
   let initHook = false;
   let force = false;
+  let lang: SupportedLang = 'es';
   let targetUrl: string | undefined;
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -31,6 +35,9 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
       initHook = true;
     } else if (arg === '--force') {
       force = true;
+    } else if (arg === '--lang' && argv[i + 1]) {
+      lang = resolveLang(argv[i + 1]);
+      i += 1;
     } else if (arg === '--fast') {
       slowMotionMs = 0;
     } else if (arg === '--json') {
@@ -68,6 +75,7 @@ export function parseCliArgs(argv: readonly string[], defaultRepoPath: string): 
     startMcp,
     initHook,
     force,
+    lang,
     ...(targetUrl ? { targetUrl } : {})
   };
 }

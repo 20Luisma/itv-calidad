@@ -1,5 +1,6 @@
 import { exportReportAsMarkdown } from '../../application/ExportReportMarkdown.js';
 import { RunItvInspection } from '../../application/RunItvInspection.js';
+import { getCoreLabels, resolveLang, type SupportedLang } from '../../domain/i18n.js';
 import type { InspectionReport } from '../../domain/types.js';
 import { loadLocalEnv } from '../../infrastructure/config/loadDotEnv.js';
 import { SafeCommandExecutor } from '../../infrastructure/exec/SafeCommandExecutor.js';
@@ -10,6 +11,7 @@ export interface RunItvInput {
   minCoverage?: number | undefined;
   targetUrl?: string | undefined;
   format?: 'json' | 'markdown' | undefined;
+  lang?: SupportedLang | undefined;
 }
 
 export interface McpToolResponse {
@@ -53,6 +55,7 @@ export async function handleRunItv(
   input: RunItvInput,
   runner: InspectionRunner = createDefaultRunner()
 ): Promise<McpToolResponse> {
+  const lang = resolveLang(input.lang);
   const trimmedPath = input.repoPath?.trim();
   if (!trimmedPath) {
     const defaultRepoPath = process.cwd();
@@ -60,7 +63,7 @@ export async function handleRunItv(
       content: [
         {
           type: 'text',
-          text: `Cabina ITV de Código abierta. Indica una ruta local de repositorio (por ejemplo: ${defaultRepoPath}) para iniciar las 7 estaciones.`
+          text: getCoreLabels(lang).idleCockpitMsg(defaultRepoPath)
         }
       ],
       structuredContent: {
@@ -105,7 +108,7 @@ export async function handleRunItv(
 
     const text =
       input.format === 'markdown'
-        ? exportReportAsMarkdown(report)
+        ? exportReportAsMarkdown(report, lang)
         : JSON.stringify(structuredPayload, null, 2);
 
     return {

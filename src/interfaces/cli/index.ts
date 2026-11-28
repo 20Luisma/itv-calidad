@@ -2,6 +2,7 @@
 import { exportReportAsMarkdown } from '../../application/ExportReportMarkdown.js';
 import { initPrePushHook } from '../../application/InitPrePushHook.js';
 import { RunItvInspection } from '../../application/RunItvInspection.js';
+import { getCoreLabels, getLocalizedStationName, type SupportedLang } from '../../domain/i18n.js';
 import type { InspectionEvent, StationStatus } from '../../domain/types.js';
 import { loadLocalEnv } from '../../infrastructure/config/loadDotEnv.js';
 import { SafeCommandExecutor } from '../../infrastructure/exec/SafeCommandExecutor.js';
@@ -20,16 +21,17 @@ const ANSI = {
   cyan: '\x1b[36m'
 };
 
-function formatStatus(status: StationStatus): string {
+function formatStatus(status: StationStatus, lang: SupportedLang): string {
+  const badge = getCoreLabels(lang).statusBadges[status];
   switch (status) {
     case 'pass':
-      return `${ANSI.green}● APTO${ANSI.reset}`;
+      return `${ANSI.green}● ${badge}${ANSI.reset}`;
     case 'warn':
-      return `${ANSI.yellow}▲ OBSERVACIÓN${ANSI.reset}`;
+      return `${ANSI.yellow}▲ ${badge}${ANSI.reset}`;
     case 'fail':
-      return `${ANSI.red}✖ DESFAVORABLE${ANSI.reset}`;
+      return `${ANSI.red}✖ ${badge}${ANSI.reset}`;
     case 'skipped':
-      return `${ANSI.dim}○ OMITIDA${ANSI.reset}`;
+      return `${ANSI.dim}○ ${badge}${ANSI.reset}`;
   }
 }
 
@@ -50,6 +52,7 @@ Opciones:
   --mcp                Inicia el servidor MCP Stdio (+ MCP App embebida)
   --init-hook          Instala el hook portable .githooks/pre-push en el repositorio
   --force              Sobrescribe .githooks/pre-push si ya existe (junto con --init-hook)
+  --lang <es|en>       Idioma de salida para CLI y Markdown (default: es)
   --help, -h           Muestra esta ayuda
 `);
 }
@@ -75,27 +78,29 @@ async function main(): Promise<void> {
     return;
   }
   const runner = new RunItvInspection(createDefaultStations(), executor);
+  const t = getCoreLabels(options.lang);
 
   const onEvent = (event: InspectionEvent) => {
     if (options.format !== 'pretty') return;
 
     if (event.type === 'inspection:start') {
       console.log('');
-      console.log(`${ANSI.bold}${ANSI.cyan}═══ ITV DE CÓDIGO ═══${ANSI.reset}`);
-      console.log(`Repositorio : ${event.stack.repoName} (${event.stack.repoPath})`);
+      console.log(`${ANSI.bold}${ANSI.cyan}${t.cliBanner}${ANSI.reset}`);
+      console.log(`${t.repository} : ${event.stack.repoName} (${event.stack.repoPath})`);
       console.log(
-        `Stack       : ${event.stack.detectedStacks.join(', ')} (principal: ${event.stack.primaryStack})${event.stack.gitBranch ? ` · rama ${event.stack.gitBranch}` : ''}`
+        `Stack       : ${event.stack.detectedStacks.join(', ')} (${t.primary}: ${event.stack.primaryStack})${event.stack.gitBranch ? ` · ${t.branchWord} ${event.stack.gitBranch}` : ''}`
       );
-      console.log(`Cámara lenta: ${event.slowMotionMs} ms por estación`);
+      console.log(`${t.slowMotion}: ${event.slowMotionMs} ${t.perStation}`);
       console.log('');
     } else if (event.type === 'station:start') {
-      console.log(`${ANSI.bold}▶ ${event.station.name}${ANSI.reset}`);
+      const stationTitle = getLocalizedStationName(event.station.id, event.station.name, options.lang);
+      console.log(`${ANSI.bold}▶ ${stationTitle}${ANSI.reset}`);
       console.log(`  ${ANSI.dim}${event.station.didactic.whatItChecks}${ANSI.reset}`);
     } else if (event.type === 'station:complete') {
       const r = event.result;
-      console.log(`  Estado  : ${formatStatus(r.status)} ${ANSI.dim}(${r.durationMs} ms)${ANSI.reset}`);
-      console.log(`  Comando : ${ANSI.dim}${r.command}${ANSI.reset}`);
-      console.log(`  Resumen : ${r.summary}`);
+      console.log(`  ${t.statusLabel}  : ${formatStatus(r.status, options.lang)} ${ANSI.dim}(${r.durationMs} ms)${ANSI.reset}`);
+      console.log(`  ${t.command} : ${ANSI.dim}${r.command}${ANSI.reset}`);
+      console.log(`  ${t.summary} : ${r.summary}`);
 
       for (const finding of r.findings.slice(0, 6)) {
         const loc = finding.file
@@ -108,8 +113,8 @@ async function main(): Promise<void> {
               ? ANSI.yellow
               : ANSI.cyan;
         console.log(`    ${color}• ${finding.title}${loc}${ANSI.reset}`);
-        console.log(`      ${ANSI.dim}Motivo: ${finding.reason}${ANSI.reset}`);
-        console.log(`      ${ANSI.dim}Arreglo: ${finding.howToFix}${ANSI.reset}`);
+        console.log(`      ${ANSI.dim}${t.reasonLabel}: ${finding.reason}${ANSI.reset}`);
+        console.log(`      ${ANSI.dim}${t.fixLabel}: ${finding.howToFix}${ANSI.reset}`);
       }
       console.log('');
     }
@@ -129,7 +134,7 @@ async function main(): Promise<void> {
     if (options.format === 'json') {
       console.log(JSON.stringify(report, null, 2));
     } else if (options.format === 'markdown') {
-      console.log(exportReportAsMarkdown(report));
+      console.log(exportReportAsMarkdown(report, options.lang));
     } else {
       const verdictColor =
         report.verdict === 'DESFAVORABLE'
@@ -138,20 +143,20 @@ async function main(): Promise<void> {
             ? ANSI.yellow
             : ANSI.green;
 
-      console.log(`${ANSI.bold}═══ VEREDICTO FINAL ═══${ANSI.reset}`);
-      console.log(`Resultado : ${verdictColor}${ANSI.bold}${report.verdict}${ANSI.reset}`);
+      console.log(`${ANSI.bold}${t.finalVerdict}${ANSI.reset}`);
+      console.log(`${t.resultLabel} : ${verdictColor}${ANSI.bold}${t.verdicts[report.verdict]}${ANSI.reset}`);
       console.log(
-        `Estaciones: ${report.summary.passed} aptas · ${report.summary.warned} observaciones · ${report.summary.failed} desfavorables · ${report.summary.skipped} omitidas`
+        `${t.stationsLabel}: ${t.summaryCounts(report.summary.passed, report.summary.warned, report.summary.failed, report.summary.skipped)}`
       );
       if (report.securityChecklist) {
         console.log(
-          `Checklist : ${report.securityChecklist.automatedPassed}/${report.securityChecklist.automatedTotal} controles técnicos de diligencia debida (${report.securityChecklist.scorePercent}%)`
+          `${t.checklistLabel} : ${report.securityChecklist.automatedPassed}/${report.securityChecklist.automatedTotal} ${t.technicalControls} (${report.securityChecklist.scorePercent}%)`
         );
       }
       console.log(
         report.blocksPush
-          ? `${ANSI.red}✖ PUSH BLOQUEADO: corregí las estaciones desfavorables antes de subir.${ANSI.reset}`
-          : `${ANSI.green}✔ APTO PARA GIT PUSH.${ANSI.reset}`
+          ? `${ANSI.red}${t.pushBlockedMsg}${ANSI.reset}`
+          : `${ANSI.green}${t.pushReadyMsg}${ANSI.reset}`
       );
       console.log('');
     }
