@@ -25,17 +25,19 @@
   - `docs/adr/ADR-003-estacion-7-sonar-observabilidad.md`
 
 ## Estado Actual y Próximos Pasos
-- **Estado actual (v1.5.0 — Publicada en npm + VS Code Marketplace + Open VSX + M8ven B + Discord oficial MCP):**
-  - Auto-ITV propia (CLI, hook `pre-push` y MCP `run_itv`) en **7/7 APTO** (`0 observaciones · 0 desfavorables · 0 omitidas`): `tsc --noEmit` 0 errores, **42/42 tests (8 archivos) · 85.48% cobertura** Vitest (>75% gate), **0 CVEs**, **Checklist 6/6 (100%)**, **Playwright E2E 3/3**, **Pa11y WCAG 2.1 AA 0 errores** y **0 duplicados DRY**.
-  - **Novedades `v1.5.0`:** soporte nativo **`.NET / C#`** (`*.sln`/`*.csproj`, `dotnet build`, `dotnet test` + Coverlet, `dotnet list package --vulnerable` sin falsos verdes) e instalador en 1 comando **`npx -y itv-calidad --init-hook`** (`src/application/InitPrePushHook.ts`).
-  - **Paquete `npm` (`https://www.npmjs.com/package/itv-calidad`, v1.5.0 live):** `250.7 kB`, 80 archivos, solo 2 dependencias de runtime (`@modelcontextprotocol/sdk`, `zod`).
-  - **Extensión VS Code / Open VSX (`20luisma.itv-calidad-vscode`):** i18n automático `EN / ES` (`package.nls.json`, `package.nls.es.json`, `extensions/vscode-itv/src/i18n.ts`), SEO global en inglés (`ITV Code Gate — 7-Station Local DevSecOps & MCP Auditor`). Artefacto compilado `dist/itv-calidad-vscode-1.5.0.vsix` (`84.6 KB`).
-  - **M8ven MCP Trust Index (`https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn`):** subió de **C** a **B · Emerging** en verde; editor verificado y badge activo.
-  - **Perfil GitHub `20Luisma/20Luisma`:** actualizado con **6 tiendas y registros oficiales** (VS Code Marketplace, Open VSX, npm, Google Play, App Store, Amazon Alexa Skills).
-- **Próximos pasos opcionales:**
-  - Subir `dist/itv-calidad-vscode-1.5.0.vsix` a VS Code Marketplace y Open VSX (actualmente en `1.4.0`).
-  - Crear GitHub Release oficial `v1.5.0` (con aprobación explícita de Martín) y workflow de auto-publish por tag.
-  - Difusión: PR a `punkpeye/awesome-mcp-servers`, alta en `smithery.ai` / `glama.ai` / `mcp.so`, envío a `console.dev` y lanzamiento en **Show HN**.
+- **Estado actual (v1.6.0 lista en `main` `dd6da9a` — 4/4 Issues del roadmap cerrados vía PRs `#5`–`#8` con CI en verde):**
+  - Auto-ITV propia en **7/7 APTO** (`0 observaciones · 0 desfavorables · 0 omitidas`): `tsc --noEmit` 0 errores (motor + extensión), **48/48 tests (11 archivos) · 85.43% stmts / 86.74% lines** Vitest (>75% gate), **0 CVEs**, **Checklist 6/6 (100%)**, **Playwright E2E 3/3** y **0 duplicados DRY**.
+  - **6 stacks nativos:** **Node/TS · PHP · Python · .NET/C# · Go · Flutter/Dart** (probado en vivo contra SDK oficial `.NET 8` en Docker y contra `app_flutter` real en Mac).
+  - **Novedades `v1.6.0` (4 PRs mergeados):**
+    - PR `#5` (`Closes #1`): salida nativa `EN / ES` (`src/domain/i18n.ts`, `--lang es|en` en CLI, Markdown y MCP `run_itv`).
+    - PR `#6` (`Closes #2`): GitHub Action oficial (`action.yml`) con `$GITHUB_STEP_SUMMARY`, comentario sticky sin spam en PRs y gate estricto sin falsos verdes.
+    - PR `#7` (`Closes #3`): soporte nativo **Flutter/Dart** (`pubspec.yaml`, `dart analyze`, `flutter test`/`dart test`, `.dart`) y **Go** (`go.mod`, `go vet`, `go test -cover`, `govulncheck`, `.go`).
+    - PR `#8` (`Closes #4`): workflow automático `.github/workflows/release.yml` disparado por tags `v*.*.*` (gates + build `.vsix` + GitHub Release automático + hooks opcionales para `npm` y Open VSX).
+  - **Distribución y credibilidad:** `npm` (`itv-calidad`, 1.5.1 live, listo para publicar `1.6.0`), **VS Code Marketplace** + **Open VSX** (`dist/itv-calidad-vscode-1.6.0.vsix` compilado), **M8ven Trust Index B · Emerging**, GitHub Release `v1.5.1` publicado, perfil `20Luisma` con 6 tiendas/registros oficiales y regla de flujo `Issue → rama → PR → CI verde → Merge` añadida en `~/.gemini/GEMINI.md`.
+- **Próximos pasos:**
+  - Crear tag `v1.6.0` (con aprobación explícita de Martín) para disparar automáticamente el GitHub Release `v1.6.0` con el `.vsix`.
+  - Publicar `v1.6.0` en `npm` (`npm publish --access public`) y subir `dist/itv-calidad-vscode-1.6.0.vsix` a VS Code Marketplace y Open VSX.
+  - Difusión: PR a `punkpeye/awesome-mcp-servers`, alta en `smithery.ai` / `glama.ai` / `mcp.so`, envío a `console.dev` y post en **Show HN** / LinkedIn.
 
 ## Historial de Sesiones
 - **2026-11-23 (Sesión 1):** Bootstrap inicial del proyecto (`AGENTS.md`, `MEMORY.md`, `ADR-001`, `.agents/`).
