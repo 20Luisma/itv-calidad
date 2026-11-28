@@ -27,5 +27,6 @@ describe('GitHub Action oficial (action.yml — #2)', () => {
     expect(raw).toContain('npm run build:vscode');
     expect(raw).toContain('gh release create');
     expect(raw).toContain('npm publish --access public');
+    expect(raw).not.toMatch(/if:.*secrets\./);
   });
 });

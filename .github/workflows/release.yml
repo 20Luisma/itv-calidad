@@ -62,15 +62,24 @@ jobs:
           fi
 
       - name: Publish package to npm (when NPM_TOKEN secret is configured)
-        if: startsWith(github.ref, 'refs/tags/v') && secrets.NPM_TOKEN != ''
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public --provenance
+        run: |
+          if [ -n "$NODE_AUTH_TOKEN" ]; then
+            npm publish --access public --provenance
+          else
+            echo "NPM_TOKEN not configured; skipping automated npm publish."
+          fi
 
       - name: Publish extension to Open VSX (when OVSX_PAT secret is configured)
-        if: startsWith(github.ref, 'refs/tags/v') && secrets.OVSX_PAT != ''
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
-          VSIX_FILE="$(ls dist/itv-calidad-vscode-*.vsix | head -n 1)"
-          npx -y ovsx publish "$VSIX_FILE" -p "$OVSX_PAT"
+          if [ -n "$OVSX_PAT" ]; then
+            VSIX_FILE="$(ls dist/itv-calidad-vscode-*.vsix | head -n 1)"
+            npx -y ovsx publish "$VSIX_FILE" -p "$OVSX_PAT"
+          else
+            echo "OVSX_PAT not configured; skipping automated Open VSX publish."
+          fi
