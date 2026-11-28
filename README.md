@@ -8,7 +8,7 @@
 [![npm](https://img.shields.io/npm/v/itv-calidad?logo=npm&color=CB3837&label=npm)](https://www.npmjs.com/package/itv-calidad)
 [![M8ven Score](https://m8ven.ai/badge/mcp/20luisma-itv-calidad-ksuhsn?v=c7fd12a82c8e9dddf091f2381441116a)](https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn?s=readme)
 
-Herramienta **100% local, open-source y sin cuentas externas** (**Extensión de barra lateral VS Code/Open VSX + MCP App interactiva + Servidor MCP Stdio + Dashboard Web SSE + CLI**) que inspecciona cualquier repositorio local **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**.
+Herramienta **100% local, open-source y sin cuentas externas** (**Extensión de barra lateral VS Code/Open VSX + MCP App interactiva + Servidor MCP Stdio + GitHub Action + Dashboard Web SSE + CLI**) que inspecciona cualquier repositorio local (**Node.js/TypeScript, PHP, Python, .NET/C#, Go o Flutter/Dart**) **antes de hacer `git push`** pasando por **7 estaciones reales de calidad, seguridad y observabilidad**.
 
 Pensada para desarrolladores y equipos que programan con agentes de IA: en lugar de una "caja negra" que falla en la nube, te muestra paso a paso **qué revisa cada estación, qué comando exacto ejecuta, por qué importa y cómo corregir cada fallo**.
 
@@ -77,7 +77,7 @@ npx -y itv-calidad --mcp
 
 **En GitHub Actions (comentario automático en Pull Requests):**
 ```yaml
-- uses: 20Luisma/itv-calidad@v1.5.1
+- uses: 20Luisma/itv-calidad@v1.6.0
   with:
     min-coverage: '75'
     lang: 'es'

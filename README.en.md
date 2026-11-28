@@ -8,7 +8,7 @@
 [![npm](https://img.shields.io/npm/v/itv-calidad?logo=npm&color=CB3837&label=npm)](https://www.npmjs.com/package/itv-calidad)
 [![M8ven Score](https://m8ven.ai/badge/mcp/20luisma-itv-calidad-ksuhsn?v=c7fd12a82c8e9dddf091f2381441116a)](https://m8ven.ai/mcp/20luisma-itv-calidad-ksuhsn?s=readme)
 
-**100% local, open-source, zero-mandatory-accounts** code quality and security gate (**VS Code / Open VSX Sidebar Extension + Interactive MCP App + Stdio MCP Server + Live SSE Web Dashboard + CLI**) that audits any local repository (**PHP, Node.js/TypeScript, or Python**) **before `git push`** across **7 real quality, security, and observability stations**.
+**100% local, open-source, zero-mandatory-accounts** code quality and security gate (**VS Code / Open VSX Sidebar Extension + Interactive MCP App + Stdio MCP Server + GitHub Action + Live SSE Web Dashboard + CLI**) that audits any local repository (**Node.js/TypeScript, PHP, Python, .NET/C#, Go, or Flutter/Dart**) **before `git push`** across **7 real quality, security, and observability stations**.
 
 Built for developers and teams coding with AI agents: instead of an opaque cloud pipeline failure, it shows step by step **what each station checks, the exact command executed, why it matters, and how to fix each finding**.
 
@@ -77,7 +77,7 @@ npx -y itv-calidad --mcp
 
 **In GitHub Actions (automated sticky PR summary comment):**
 ```yaml
-- uses: 20Luisma/itv-calidad@v1.5.1
+- uses: 20Luisma/itv-calidad@v1.6.0
   with:
     min-coverage: '75'
     lang: 'en'
