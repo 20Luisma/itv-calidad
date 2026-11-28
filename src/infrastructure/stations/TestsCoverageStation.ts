@@ -1,4 +1,4 @@
-import { access } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { STATION_CATALOG } from '../../domain/catalog.js';
 import { createStationResult } from '../../domain/report.js';
@@ -34,6 +34,11 @@ export function extractCoveragePercent(output: string): number | null {
   const coverletMatch = /\|\s*Total\s*\|\s*(\d+(?:\.\d+)?)%/i.exec(output);
   if (coverletMatch?.[1]) {
     return Number(coverletMatch[1]);
+  }
+  // Formato Go test: "coverage: 84.5% of statements"
+  const goMatch = /coverage:\s*(\d+(?:\.\d+)?)%\s+of\s+statements/i.exec(output);
+  if (goMatch?.[1]) {
+    return Number(goMatch[1]);
   }
   return null;
 }
@@ -82,6 +87,18 @@ export class TestsCoverageStation implements StationRunner {
     if (!binary && stack.hasDotnetProject) {
       binary = 'dotnet';
       args = ['test', '--nologo'];
+    }
+
+    if (!binary && stack.hasGoProject) {
+      binary = 'go';
+      args = ['test', '-cover', './...'];
+    }
+
+    if (!binary && stack.hasFlutterProject) {
+      const pubspec = await readFile(path.join(repoPath, 'pubspec.yaml'), 'utf8').catch(() => '');
+      const usesFlutterSdk = /\bsdk:\s*flutter\b/i.test(pubspec);
+      binary = usesFlutterSdk ? 'flutter' : 'dart';
+      args = ['test'];
     }
 
     if (!binary) {

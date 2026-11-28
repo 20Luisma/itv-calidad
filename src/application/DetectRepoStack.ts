@@ -91,6 +91,8 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
     hasPlaywrightMjs,
     hasPa11yRc,
     hasLighthouserc,
+    hasGoMod,
+    hasPubspecYaml,
     gitBranch
   ] = await Promise.all([
     pathExists(path.join(resolvedPath, 'package.json')),
@@ -104,6 +106,8 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
     pathExists(path.join(resolvedPath, 'playwright.config.mjs')),
     pathExists(path.join(resolvedPath, '.pa11yci')),
     pathExists(path.join(resolvedPath, 'lighthouserc.json')),
+    pathExists(path.join(resolvedPath, 'go.mod')),
+    pathExists(path.join(resolvedPath, 'pubspec.yaml')),
     readGitBranch(resolvedPath)
   ]);
 
@@ -116,28 +120,36 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
 
   const dotnetFiles = await walkRepoFiles(resolvedPath, new Set(['.sln', '.csproj']), 10);
   const hasDotnetProject = dotnetFiles.length > 0;
+  const hasGoProject = hasGoMod;
+  const hasFlutterProject = hasPubspecYaml;
   const hasPythonProject = hasPyproject || hasRequirements || hasSetupPy;
   const detectedStacks: StackKind[] = [];
   if (hasPackageJson) detectedStacks.push('node');
   if (hasComposerJson) detectedStacks.push('php');
   if (hasPythonProject) detectedStacks.push('python');
   if (hasDotnetProject) detectedStacks.push('dotnet');
+  if (hasGoProject) detectedStacks.push('go');
+  if (hasFlutterProject) detectedStacks.push('flutter');
 
-  // Fallback para proyectos vanilla sin manifiesto (ej. PHP puro con index.php, JS, Python o C# suelto)
+  // Fallback para proyectos vanilla sin manifiesto (ej. PHP puro, JS, Python, C#, Go o Dart suelto)
   if (detectedStacks.length === 0) {
     const sampleFiles = await walkRepoFiles(
       resolvedPath,
-      new Set(['.php', '.js', '.mjs', '.cjs', '.py', '.cs']),
+      new Set(['.php', '.js', '.mjs', '.cjs', '.py', '.cs', '.go', '.dart']),
       30
     );
     const hasPhpFiles = sampleFiles.some((f) => f.relativePath.endsWith('.php'));
     const hasPyFiles = sampleFiles.some((f) => f.relativePath.endsWith('.py'));
     const hasJsFiles = sampleFiles.some((f) => /\.(?:js|mjs|cjs)$/i.test(f.relativePath));
     const hasCsFiles = sampleFiles.some((f) => f.relativePath.endsWith('.cs'));
+    const hasGoFiles = sampleFiles.some((f) => f.relativePath.endsWith('.go'));
+    const hasDartFiles = sampleFiles.some((f) => f.relativePath.endsWith('.dart'));
     if (hasPhpFiles) detectedStacks.push('php');
     if (hasJsFiles) detectedStacks.push('node');
     if (hasPyFiles) detectedStacks.push('python');
     if (hasCsFiles) detectedStacks.push('dotnet');
+    if (hasGoFiles) detectedStacks.push('go');
+    if (hasDartFiles) detectedStacks.push('flutter');
   }
 
   const allNodeDeps = {
@@ -180,6 +192,10 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
     primaryStack = 'python';
   } else if (hasDotnetProject) {
     primaryStack = 'dotnet';
+  } else if (hasFlutterProject) {
+    primaryStack = 'flutter';
+  } else if (hasGoProject) {
+    primaryStack = 'go';
   } else if (detectedStacks[0]) {
     primaryStack = detectedStacks[0];
   }
@@ -194,6 +210,8 @@ export async function detectRepoStack(rawRepoPath: string): Promise<RepoStack> {
     hasComposerJson,
     hasPythonProject,
     hasDotnetProject,
+    hasGoProject,
+    hasFlutterProject,
     hasPlaywright,
     hasAccessibilityTooling,
     packageScripts,

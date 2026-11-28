@@ -158,6 +158,42 @@ export class SecurityCvesStation implements StationRunner {
       }
     }
 
+    if (stack.hasGoProject) {
+      const res = await executor.run('govulncheck', ['./...'], {
+        cwd: repoPath,
+        timeoutMs: commandTimeoutMs,
+        ...(signal ? { signal } : {})
+      });
+      if (res.notFound) {
+        findings.push({
+          severity: 'warning',
+          title: 'govulncheck no encontrado para auditar CVEs en Go',
+          reason: res.stderr || 'govulncheck no está instalado en PATH.',
+          howToFix: 'Instala `govulncheck` con `go install golang.org/x/vuln/cmd/govulncheck@latest`.'
+        });
+      } else {
+        commands.push('govulncheck ./...');
+        const out = [res.stdout, res.stderr].filter(Boolean).join('\n');
+        outputs.push(out || 'govulncheck OK');
+        if (res.exitCode === 0) {
+          if (dependencyAuditStatus !== 'fail') {
+            dependencyAuditStatus = 'pass';
+            dependencyAuditDetail = 'govulncheck: 0 vulnerabilidades conocidas en Go.';
+          }
+        } else {
+          hardFailed = true;
+          dependencyAuditStatus = 'fail';
+          dependencyAuditDetail = 'govulncheck detectó vulnerabilidades en dependencias Go.';
+          findings.push({
+            severity: 'error',
+            title: 'Vulnerabilidades (CVEs) detectadas por govulncheck (Go)',
+            reason: out.slice(0, 500),
+            howToFix: 'Actualiza los módulos vulnerables con `go get -u` y `go mod tidy`.'
+          });
+        }
+      }
+    }
+
     // 2. Escáner local de secretos e IPs http:// hardcodeadas
     const secretScan = await scanSecretsAndIps(repoPath);
     commands.push(`escáner local de secretos e IPs (${secretScan.filesScanned} archivos)`);

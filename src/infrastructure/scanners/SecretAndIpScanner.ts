@@ -12,6 +12,8 @@ const SCANNABLE_EXTENSIONS = new Set([
   '.py',
   '.cs',
   '.config',
+  '.go',
+  '.dart',
   '.sh',
   '.yml',
   '.yaml',
