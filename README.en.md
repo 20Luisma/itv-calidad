@@ -73,6 +73,14 @@ npx -y itv-calidad --init-hook
 npx -y itv-calidad --mcp
 ```
 
+**In GitHub Actions (automated sticky PR summary comment):**
+```yaml
+- uses: 20Luisma/itv-calidad@v1.5.1
+  with:
+    min-coverage: '75'
+    lang: 'en'
+```
+
 **From source (local clone):**
 ```bash
 git clone https://github.com/20Luisma/itv-calidad.git
