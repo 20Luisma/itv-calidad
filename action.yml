@@ -1,6 +1,6 @@
 name: 'ITV Code Gate — 7-Station Quality & Security Audit'
 author: '20Luisma'
-description: '100% local, zero-account 7-station quality & security gate (syntax, types, coverage, CVEs/OWASP, E2E, WCAG, code health) with sticky PR comments.'
+description: '100% local 7-station quality & security gate (types, coverage, CVEs/OWASP, E2E, WCAG) with sticky PR comments.'
 
 branding:
   icon: 'shield'

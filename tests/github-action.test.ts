@@ -15,6 +15,8 @@ describe('GitHub Action oficial (action.yml — #2)', () => {
     expect(raw).toContain('GITHUB_STEP_SUMMARY');
     expect(raw).toContain('Enforce ITV Quality Gate');
     expect(raw).toContain('exit "$ITV_EXIT_CODE"');
+    const descMatch = /^description:\s*'([^']+)'/m.exec(raw);
+    expect(descMatch?.[1]?.length ?? 999).toBeLessThan(125);
   });
 
   it('valida el workflow automático de Release (.github/workflows/release.yml — #4)', async () => {
